@@ -1,0 +1,113 @@
+<div class="screen">
+    <div class="container-register">
+        <div class="image-container">
+            <img src="SIS.png" alt="SIS Logo" class="centered-img">
+        </div>
+        <h2>Register</h2>
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+            <!-- label name customer -->
+            <div class="row">
+                <div class="column">
+                    <label for="fstname">Name<span style="color: red;">*</span></label>
+                </div>
+                <div class="column">
+                    <label for="username">Customer<span style="color: red;">*</span></label>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- name-->
+                <div class="column bordor">
+                    <div class="row">
+                        <div class="column">
+                            <input type="text" formControlName="fstname" id="fstname" required
+                                placeholder="Enter First Name">
+                            <label class="desc">First Name</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column">
+                            <input type="text" formControlName="lstname" id="lstname" required
+                                placeholder="Enter Last Name">
+                            <label class="desc">Last Name</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- customer-->
+                <div class="column bordor">
+                    <div class="row">
+                        <div class="column">
+                            <input type="text" formControlName="customercode" id="customercode" required
+                                placeholder="Enter Customer code">
+                            <label class="desc">Customer code</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column">
+                            <input type="text" formControlName="customername" id="customername" required
+                                placeholder="Enter Customer Name">
+                            <label class="desc">Customer Name</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- label username -->
+            <div class="row">
+                <div class="column">
+                    <label for="username">Username<span style="color: red;">*</span></label>
+                </div>
+            </div>
+
+            <div class="row bordor">
+                <!-- username pass -->
+                <div class="column">
+                    <div class="row">
+                        <div class="column">
+                            <input type="text" formControlName="username" id="username" required
+                                placeholder="Enter Username">
+                            <label class="desc">Username</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column">
+                            <input type="password" formControlName="password" id="password" required
+                                placeholder="Enter password">
+                            <label class="desc">Password</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- email position-->
+                <div class="column">
+                    <div class="row">
+                        <div class="column">
+                            <input type="email" formControlName="email" id="email" required placeholder="Enter Email">
+                            <label class="desc">example&#64;gmail.com</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column">
+                            <input type="text" formControlName="position" id="position" required
+                                placeholder="Enter Position">
+                            <label class="desc">Position</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reg-page">
+                <div class="row">
+                    <div class="column bot">
+                        <a routerLink="/loginpage" class="link for-pass">Back</a>
+                    </div>
+                    <div class="column">
+                        <button class="confirm-button" type="submit" [disabled]="!registerForm.valid">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Your Angular App</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+
+<div style="position: relative;">
+  <img src="SIS.png" style="width: 110px; height: auto;">
+  <label id="customerLabel" class="tag-name">{{ customerLabel }}</label>
+</div>
+<div [formGroup]="headerForm">
+<div class="row">
+  <div class="column">
+    <label for="cuscode">Customer Code.<span style="color: red;">*</span></label>
+    <input autocomplete="off" type="text" id="cuscode" formControlName="cuscode" placeholder="Enter customer code" required>
+  </div>
+
+  <div class="column">
+    <label for="invNo">Invoice No.<span style="color: red;">*</span></label>
+    <input autocomplete="off" type="text" id="invNo" formControlName="invNo" placeholder="Enter invoice number" required>
+  </div>
+
+  <div class="column-btn">
+    <div class="row-btn">
+      <button class="button search-button" type="button" (click)="searchPayment()">
+        <span class="material-icons">search</span>
+        Search
+      </button>
+      <button class="button create-payment-button" type="button" (click)="createPayment()">
+        <span class="material-icons">payment</span>
+        Create Payment
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="divider-line"></div>
+<div class="table-container">
+  <table id="filterDataTable">
+    <thead>
+      <tr>
+        <th class="size-cbx">
+          <input  type="checkbox"
+          [checked]="isAllSelected()"
+          (change)="toggleSelectAll('all')" />
+        </th>
+        <th class="size-doctype">Doc. Type</th>
+        <th class="size-docno">Doc. No.</th>
+        <th class="size-docdate">Doc. Date</th>
+        <th class="size-duedate">Due Date</th>
+        <th class="size-docamount">Amount</th>
+        <th class="size-balamount">Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let record of allData">
+        <td class="text-center size-cbx">
+          <input type="checkbox" class="checkbox-custom" [(ngModel)]="record.selected"/>
+        </td>
+        <td class="text-center size-doctype">{{ record.DOC_TYPE_DISPLAY }}</td>
+        <td class="text-center size-docno">{{ record.BILL_DOC }}</td>
+        <td class="text-center size-docdate">{{ record.DOC_DATE }}</td>
+        <td class="text-center size-duedate">{{ record.DUE_DATE }}</td>
+        <td class="text-right size-docamount">{{ record.DOC_AMOUNT }}</td>
+        <td class="text-right size-balamount">{{ record.BALANCE_AMOUNT }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div>
+  <app-popup *ngIf="warning_pop"
+    [title]="'WARNING MESSAGE'"
+    [message]="'คุณยังไม่ได้เลือกรายการ กรุณาเลือกรายการก่อน ทำการ Payment.'"
+    [headerColor]="'#FCD69D'"
+    [confirmButton]="true"
+    (close)="warning_pop = false"
+    (confirm)="handleConfirm('warning')">
+  </app-popup>
+</div>
+
+<!-- Success Popup -->
+<div>
+  <app-popup *ngIf="success_pop"
+    [title]="'SUCCESS MESSAGE !'"
+    [message]="'ขอบคุณที่ใช้บริการ.'"
+    [headerColor]="'#CCEFE8'"
+    [confirmButton]="true"
+    (close)="success_pop = false"
+    (confirm)="handleConfirm('success')">
+  </app-popup>
+</div>
+
+<!-- Fail Popup -->
+<div>
+  <app-popup *ngIf="fail_pop"
+    [title]="'FAIL MESSAGE !'"
+    [message]="'ทำรายการไม่สำเร็จ.'"
+    [headerColor]="'#FFDBDB'"
+    [confirmButton]="true"
+    (close)="fail_pop = false"
+    (confirm)="handleConfirm('fail')">
+  </app-popup>
+</div>
+
+<!-- Fail Popup -->
+<div>
+  <app-popup *ngIf="warning_search"
+    [title]="'WARNING MESSAGE !'"
+    [message]="'กรุณากรอก Customer Code. และ Invoice No.'"
+    [headerColor]="'#FCD69D'"
+    [confirmButton]="true"
+    (close)="warning_search = false"
+    (confirm)="handleConfirm('search')">
+  </app-popup>
+</div>
+
+</body>
+</html>
+
+<!-- Same for allDataTable -->

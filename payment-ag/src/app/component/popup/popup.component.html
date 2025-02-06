@@ -1,0 +1,21 @@
+<div class="popup-overlay" (click)="closePopup()">
+    <div class="popup-content">
+      <div class="popup-header" [ngStyle]="{ backgroundColor: headerColor }">
+        <div class="text-header">{{ title }}</div>
+      </div>
+      <div class="popup-body">
+        <div class="text-detail">{{ message }}</div>
+      </div>
+      <div class="popup-footer">
+        <button class="button-close" (click)="confirmAction()" *ngIf="closeButton">
+          <span class="icon">✘</span>
+          <span class="text">ปิด</span>
+        </button>
+        <button class="button-ok" (click)="confirmAction()" *ngIf="confirmButton">
+          <span class="icon">✔</span>
+          <span class="text">ตกลง</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  

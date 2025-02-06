@@ -1,0 +1,163 @@
+body {
+    background-color: #f4f4f4;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.screen {
+    background-color: #f4f4f4;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 40%;
+}
+
+.container-register {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 60%;
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.centered-img {
+    max-width: 110px;
+    height: auto;
+}
+
+
+h2 {
+    font-size: 18px;
+    text-align: center;
+    color: #00317A;
+}
+
+.form-group {
+    margin-top: 15px;
+}
+
+.reg-page {
+    margin-top: 15px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.column {
+    flex: 1;
+    margin: 0 px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+label {
+    display: block;
+    color: #00317A;
+    margin-bottom: 5px;
+}
+
+.desc{
+    font-size: 12px;
+    color: #556a8a;
+    margin-top: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.login-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #bbfbcb;
+    border: 1px solid #608a55;
+    color: #113600;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #cef8db;
+}
+
+.regis-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #bbdefb;
+    border: 1px solid #556a8a;
+    color: #00317A;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.confirm-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #bbfbcb;
+    border: 1px solid #608a55;
+    color: #113600;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.regis-button:hover {
+    background-color: #c6e4fc;
+}
+
+
+.for-pass {
+    font-size: 12px;
+    color: #967300;
+}
+
+
+.one-button {
+    width: 25%;
+    padding: 10px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    position: center;
+    margin-left: 37.5%;
+}
+
+.bordor {
+    border: 1px solid #92606f;
+    border-radius: 5px;
+    margin: 0 5px;
+}
+
+.bot {
+    margin-bottom: 5px 0;
+}

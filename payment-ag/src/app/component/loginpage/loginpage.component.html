@@ -1,0 +1,40 @@
+<div class="screen">
+  <div class="container">
+    <div class="image-container">
+      <img src="SIS.png" alt="SIS Image" />
+    </div>
+
+    <h2>Payment Credit Card</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <!-- Username -->
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" placeholder="Enter Customer Code" 
+        formControlName="usr" required />
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" placeholder="Enter Password" 
+        formControlName="pss" autocomplete="off" required />
+      </div>
+
+      <a routerLink="/forgot-password" class="link for-pass">Forgot password?</a>
+    </form>
+
+    <div class="row">
+      <div class="column">
+        <button class="login-button" type="button" (click)="login()">
+          Log In
+        </button>
+      </div>
+      <div class="column">
+        <button class="regis-button" type="button" (click)="register()">
+          <!-- routerLink="/regispage" -->
+          Register
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
