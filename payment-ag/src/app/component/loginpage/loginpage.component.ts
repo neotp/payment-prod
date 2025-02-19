@@ -48,7 +48,7 @@ export class LoginpageComponent implements OnInit {
     if (!this.loginData.username || !this.loginData.password) {
       console.log('alert message');
       
-      this.router.navigate(['/pymntpage'], {queryParams: this.loginData});
+      this.router.navigate(['pymntpage'], {queryParams: this.loginData});
     } else {
       console.log('username :', this.loginData.username);
       console.log('password :', this.loginData.password);
