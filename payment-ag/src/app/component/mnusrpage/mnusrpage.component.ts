@@ -46,7 +46,7 @@ export class MnusrpageComponent {
 
   public ngOnInit(): void {
     this.setLoading(true);
-    this.loadData();
+    this.findData();
     this.setLoading(false);
   }
 
@@ -56,50 +56,16 @@ export class MnusrpageComponent {
   }
 
 
-  public loadData(): void {
-   // 
+  public findData(): void {
+    this.api.findDataPending().subscribe((result: any) => {
+      this.allData = result.data;
+    }, (error: any) => {
+      console.log('Error during login:', error);
+    });
+
   }
 
-  public async searchPayment(): Promise<void> {
-    this.setLoading(true);
-    this.populateForm()
-    
-    if (this.searchData.customer_code && this.searchData.invno){
-      // this.api.testConnect(this.searchData).forEach((result: any) => {
-      //   if(result){
-      //       console.log(result);
-      //   } else {
-      //       console.log('alert message');
-      //   }
-      // });
-      
-      // const result = await firstValueFrom(this.api.getData(this.searchData));
-      // if (result) {
-      //   console.log(result);
-      // } else {
-      //   console.log('alert message');
-      // }
-      console.log('alert message');
-      // this.api.getData(this.searchData).subscribe({
-      //   next: (result: any) => {                     
-      //     if (result) {
-      //       console.log(result);
-      //     } else {
-      //       console.log('alert message');
-      //     }
-      //   },
-      //   error: (err: any) => {
-      //     console.error('API call failed:', err);
-      //     console.log('alert message');
-      //   },
-      //   complete: () => {
-      //     this.setLoading(false);
-      //   }
-      // });
-    } else {
-      this.popup('search');
-    }
-  }
+  
 
   public createPayment(): void {
     // const { cuscode, invNo } = this.paymentForm.value;
@@ -108,17 +74,6 @@ export class MnusrpageComponent {
     // });
   }
 
-  public toggleSelectAll(table: string): void {
-    const data = table === 'filtered' ? this.filterData : this.allData;
-    const allSelected = data.every((item: any) => item.selected);
-    data.forEach((item: any) => (
-      item.selected = !allSelected
-    ));
-  }
-
-  public isAllSelected(): boolean {
-    return this.allData.every(item => item.selected);
-  }
   
   public popup(pop: string) {
     switch (pop) {

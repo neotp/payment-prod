@@ -8,27 +8,32 @@ import { KbankcallbackComponent } from './component/kbankcallback/kbankcallback.
 export const routes: Routes = [
     {
         path:'',
-        redirectTo:'/payment/loginpage',
+        redirectTo:'payment/loginpage',
         pathMatch:'full'
     },
     {
-        path:'/payment/loginpage',
+        path:'*',
+        redirectTo:'payment/loginpage',
+        pathMatch:'full'
+    },
+    {
+        path:'payment/loginpage',
         component:LoginpageComponent
     },
     {
-        path:'/payment/regispage',
+        path:'payment/regispage',
         component:RegispageComponent
     },
     {
-        path:'/payment/pymntpage',
+        path:'payment/pymntpage',
         component:PymntpageComponent
     },
     {
-        path:'/payment/mnusrpage',
+        path:'payment/mnusrpage',
         component:MnusrpageComponent
     },
     {
-        path:'/payment/callback',
+        path:'payment/callback',
         component:KbankcallbackComponent
     }
 ];

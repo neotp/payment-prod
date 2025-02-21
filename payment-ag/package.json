@@ -25,6 +25,7 @@
     "ag-grid-angular": "^32.3.3",
     "ag-grid-community": "^32.3.3",
     "ag-grid-enterprise": "^32.3.3",
+    "cors": "^2.8.5",
     "express": "^4.21.2",
     "force": "^0.0.3",
     "path": "^0.12.7",

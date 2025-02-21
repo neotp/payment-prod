@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 import { Login } from '../interface/loginpage-interface';
 import { SearchInv } from '../interface/payment-interface';
 import { Register } from '../interface/register-interface';
@@ -9,18 +9,14 @@ import { Register } from '../interface/register-interface';
   providedIn: 'root', // No `imports` here
 })
 export class ApiService {
-  private apiUrl = 'http://172.31.50.11:7000/';
+  private apiUrl = 'http://172.31.144.1:7000/';
 
   constructor(private http: HttpClient) {}
 
-  public getRequestHeader(): HttpHeaders {
-    return new HttpHeaders({
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Credentials': 'true',
-      // Uncomment if Content-Type is required
+  public getRequestHeader() {
+    return {
       'Content-Type': 'application/json',
-    });
+    };
   }
 
   // Function to send a POST request with a customer code
@@ -34,17 +30,28 @@ export class ApiService {
   }
 
   public login(data: Login): Observable<any> {
-    return this.http.post(`${this.apiUrl}login`
-      , data
-      , { headers: this.getRequestHeader(), withCredentials: true }
-    ); 
+    return this.http.post(`${this.apiUrl}login/`, data, { 
+      headers: this.getRequestHeader(), 
+      withCredentials: true 
+    }).pipe(
+      catchError(error => {
+        console.error('Login failed:', error);
+        return throwError(error);
+      })
+    );
   }
-
+  
   public register(data: Register): Observable<any> {
-    return this.http.post(`${this.apiUrl}register`
+    return this.http.post(`${this.apiUrl}register/`
       , data
       , { headers: this.getRequestHeader(), withCredentials: true }
     ); // Example for POST login
+  }
+
+  public findDataPending(): Observable<any> {
+    return this.http.post(`${this.apiUrl}findDataPending/`
+      , { headers: this.getRequestHeader(), withCredentials: true }
+    );
   }
 
   public testConnect(data: SearchInv): Observable<any> {

@@ -3,9 +3,17 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule, FormBuilder, F
 import { Router, RouterLink } from '@angular/router';
 import { Register } from '../../interface/register-interface';
 import { ApiService } from '../../service/api.service';
+import { PopupComponent } from '../popup/popup.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  imports: [ FormsModule ,ReactiveFormsModule, RouterLink]
+  imports: [ 
+    FormsModule 
+    ,ReactiveFormsModule
+    , CommonModule
+    , RouterLink
+    , PopupComponent
+  ]
   , selector: 'app-regispage'
   , templateUrl: './regispage.component.html'
   , styleUrls: ['./regispage.component.css'
@@ -14,6 +22,9 @@ import { ApiService } from '../../service/api.service';
 })
 export class RegispageComponent implements OnInit {
   public registerForm: FormGroup;
+  public dup_pop: boolean = false;
+  public success_pop: boolean = false;
+  public fail_pop: boolean = false;
   public loadingApp: EventEmitter<boolean> = new EventEmitter(false);
 
   public registerData = {} as Register;
@@ -49,16 +60,48 @@ export class RegispageComponent implements OnInit {
   }
 
   public onSubmit(): void {
+    this.populateForm();
     if (this.registerForm.valid) {
-        // this.api.register(this.registerData).subscribe((result: any) => {
-        //   if(result.role === 'admin') {
-            this.router.navigate(['/pymntpage'], {queryParams: this.registerData});
-          // } else {
-            // this.router.navigate(['/mnusrpage'], {queryParams: this.registerData});
-          // }
-        // }, (error: any) => {
-        //   console.log('Error during login:', error);
-        // });
+        this.api.register(this.registerData).subscribe((result: any) => {
+          if(result.regis === 'success') {
+            this.router.navigate(['payment/loginpage'], {queryParams: { regis: result.regis } });
+          } else if (result.regis === 'dup') {
+            this.popup('dup')
+          } else {
+            this.popup('fail')
+          }
+        }, (error: any) => {
+          console.log('Error during login:', error);
+        });
+    }
+  }
+
+  
+  public popup(pop: string) {
+    switch (pop) {
+      case 'dup':
+        this.dup_pop = true;
+        break;
+      case 'fail':
+        this.fail_pop = true;
+        break;
+      case 'success':
+        this.success_pop = true;
+        break;
+    }
+  }
+
+  public handleConfirm(pop: string) {
+    switch (pop) {
+      case 'dup':
+        this.dup_pop = false;
+        break;
+      case 'fail':
+        this.fail_pop = false;
+        break;
+      case 'success':
+        this.success_pop = false;
+        break;
     }
   }
 

@@ -26,8 +26,7 @@ BEGIN
           AND usrpass = p_pass
           AND usrstat <> 'pending';
     ELSE
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'User not found or multiple users detected.';
+        SET p_usrrole = 'notfound';
     END IF;
 END $$
 

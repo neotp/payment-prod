@@ -1,38 +1,25 @@
-# Step 1: Use Node.js image to build the Angular app
-FROM node:18 AS build
+# Stage 1: Build Angular App
+FROM node:18-alpine AS build
 
-# Set working directory
 WORKDIR /app
 
 # Copy package.json and install dependencies
-COPY package*.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm install --legacy-peer-deps
 
-# Copy application code
+# Copy the rest of the app and build it
 COPY . .
+RUN npm run build --configuration=production
 
-# Build the Angular app
-RUN npm run build --prod
+# Stage 2: Serve with Nginx
+FROM nginx:alpine
 
-# Step 2: Use Node.js to serve the Angular app
-FROM node:18-alpine
+# Copy Angular build files to Nginx HTML directory
+COPY --from=build /app/dist/payment-ag/browser/. /usr/share/nginx/html/
 
-# Set working directory
-WORKDIR /app
+# Copy a custom Nginx configuration (optional)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy built files
-COPY --from=build /app/dist/payment-ag ./dist
+EXPOSE 80
 
-# Copy server files
-COPY server.js ./
-COPY package*.json ./
-RUN npm install --only=production
-
-# Copy SSL Certificatesอ
-COPY cert.pem key.pem ./
-
-# Expose HTTPS port
-EXPOSE 443
-
-# Start the Node.js HTTPS server
-CMD ["node", "server.js"]
+CMD ["nginx", "-g", "daemon off;"]

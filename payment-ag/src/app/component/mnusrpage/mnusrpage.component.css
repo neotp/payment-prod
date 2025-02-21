@@ -175,34 +175,43 @@
   }
   
   
-  .size-cbx {
-    width: 5%;
+  
+  .size-usrname {
+    width: 10%;
   }
   
-  .size-doctype {
-    width: 5%;
-  }
-  
-  .size-docno {
-    width: 20%;
-  }
-  
-  .size-docdate {
-    width: 20%;
-  }
-  
-  .size-duedate {
-    width: 20%;
-  }
-  
-  .size-docamount {
+  .size-fname {
     width: 15%;
   }
   
-  .size-balamount {
+  .size-lname {
     width: 15%;
   }
   
+  .size-cuscode {
+    width: 15%;
+  }
+  
+  .size-cusname {
+    width: 15%;
+  }
+  
+  .size-email {
+    width: 10%;
+  }
+  
+  .size-pos {
+    width: 10%;
+  }
+
+  .size-role {
+    width: 5%;
+  }
+
+  .size-stat {
+    width: 5%;
+  }
+
   p {
     text-align: center;
   }

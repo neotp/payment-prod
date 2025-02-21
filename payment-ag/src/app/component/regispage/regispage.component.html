@@ -22,14 +22,14 @@
                     <div class="row">
                         <div class="column">
                             <input type="text" formControlName="fstname" id="fstname" required
-                                placeholder="Enter First Name">
+                                placeholder="Enter First Name" autocomplete="off">
                             <label class="desc">First Name</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="column">
                             <input type="text" formControlName="lstname" id="lstname" required
-                                placeholder="Enter Last Name">
+                                placeholder="Enter Last Name" autocomplete="off">
                             <label class="desc">Last Name</label>
                         </div>
                     </div>
@@ -40,14 +40,14 @@
                     <div class="row">
                         <div class="column">
                             <input type="text" formControlName="customercode" id="customercode" required
-                                placeholder="Enter Customer code">
+                                placeholder="Enter Customer code" autocomplete="off">
                             <label class="desc">Customer code</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="column">
                             <input type="text" formControlName="customername" id="customername" required
-                                placeholder="Enter Customer Name">
+                                placeholder="Enter Customer Name" autocomplete="off">
                             <label class="desc">Customer Name</label>
                         </div>
                     </div>
@@ -67,14 +67,14 @@
                     <div class="row">
                         <div class="column">
                             <input type="text" formControlName="username" id="username" required
-                                placeholder="Enter Username">
+                                placeholder="Enter Username" autocomplete="off">
                             <label class="desc">Username</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="column">
                             <input type="password" formControlName="password" id="password" required
-                                placeholder="Enter password">
+                                placeholder="Enter password" autocomplete="off">
                             <label class="desc">Password</label>
                         </div>
                     </div>
@@ -84,14 +84,15 @@
                 <div class="column">
                     <div class="row">
                         <div class="column">
-                            <input type="email" formControlName="email" id="email" required placeholder="Enter Email">
+                            <input type="email" formControlName="email" id="email" 
+                                required placeholder="Enter Email" autocomplete="off">
                             <label class="desc">example&#64;gmail.com</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="column">
                             <input type="text" formControlName="position" id="position" required
-                                placeholder="Enter Position">
+                                placeholder="Enter Position" autocomplete="off">
                             <label class="desc">Position</label>
                         </div>
                     </div>
@@ -101,7 +102,7 @@
             <div class="reg-page">
                 <div class="row">
                     <div class="column bot">
-                        <a routerLink="/loginpage" class="link for-pass">Back</a>
+                        <a routerLink="/payment/loginpage" class="link for-pass">Back</a>
                     </div>
                     <div class="column">
                         <button class="confirm-button" type="submit" [disabled]="!registerForm.valid">Confirm</button>
@@ -111,3 +112,41 @@
         </form>
     </div>
 </div>
+
+
+
+<!-- Fail Popup -->
+<div>
+    <app-popup *ngIf="fail_pop"
+      [title]="'FAIL MESSAGE !'"
+      [message]="'Register Error.Please Contract Admin !'"
+      [headerColor]="'#FFDBDB'"
+      [confirmButton]="true"
+      (close)="fail_pop = false"
+      (confirm)="handleConfirm('fail')">
+    </app-popup>
+  </div>
+  
+  <!-- dup Popup -->
+  <div>
+    <app-popup *ngIf="dup_pop"
+      [title]="'WARNING MESSAGE !'"
+      [message]="'The Username was already entered. Please try again !'"
+      [headerColor]="'#FCD69D'"
+      [confirmButton]="true"
+      (close)="dup_pop = false"
+      (confirm)="handleConfirm('dup')">
+    </app-popup>
+  </div>
+
+  <!-- Success Popup -->
+<div>
+    <app-popup *ngIf="success_pop"
+      [title]="'SUCCESS MESSAGE !'"
+      [message]="'Register Success !'"
+      [headerColor]="'#CCEFE8'"
+      [confirmButton]="true"
+      (close)="success_pop = false"
+      (confirm)="handleConfirm('success')">
+    </app-popup>
+  </div>

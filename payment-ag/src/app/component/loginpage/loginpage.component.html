@@ -5,19 +5,20 @@
     </div>
 
     <h2>Payment Credit Card</h2>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" >
+
       <!-- Username -->
       <div class="form-group">
         <label for="username">Username</label>
         <input type="text" name="username" id="username" placeholder="Enter Customer Code" 
-        formControlName="usr" required />
+          formControlName="usr" autocomplete="off" required />
       </div>
 
       <!-- Password -->
       <div class="form-group">
         <label for="password">Password</label>
         <input type="password" name="password" id="password" placeholder="Enter Password" 
-        formControlName="pss" autocomplete="off" required />
+          formControlName="pss" autocomplete="off" required />
       </div>
 
       <a routerLink="/forgot-password" class="link for-pass">Forgot password?</a>
@@ -38,3 +39,39 @@
     </div>
   </div>
 </div>
+
+<div>
+  <app-popup *ngIf="warning_pop"
+    [title]="'WARNING MESSAGE !'"
+    [message]="'The username or password you entered is incorrect.'"
+    [headerColor]="'#FCD69D'"
+    [confirmButton]="true"
+    (close)="warning_pop = false"
+    (confirm)="handleConfirm('notfound')">
+  </app-popup>
+</div>
+
+
+<div>
+  <app-popup *ngIf="blank_pop"
+    [title]="'WARNING MESSAGE !'"
+    [message]="'Please input Username or Password.'"
+    [headerColor]="'#FCD69D'"
+    [confirmButton]="true"
+    (close)="blank_pop = false"
+    (confirm)="handleConfirm('blank')">
+  </app-popup>
+</div>
+
+
+  <!-- Success Popup -->
+  <div>
+    <app-popup *ngIf="success_pop"
+      [title]="'SUCCESS MESSAGE !'"
+      [message]="'Register Success !'"
+      [headerColor]="'#CCEFE8'"
+      [confirmButton]="true"
+      (close)="success_pop = false"
+      (confirm)="handleConfirm('success')">
+    </app-popup>
+  </div>
