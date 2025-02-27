@@ -27,6 +27,9 @@
               }
             ],
             "styles": [
+              "node_modules/ag-grid-community/styles/ag-grid.css",
+              "node_modules/ag-grid-community/styles/ag-theme-alpine.css",
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.css"
             ],
             "scripts": [],
@@ -41,13 +44,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2mb",
+                  "maximumError": "3mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "10kb",
+                  "maximumError": "15kb"
                 }
               ],
               "outputHashing": "all"
@@ -90,6 +93,9 @@
               }
             ],
             "styles": [
+              "node_modules/ag-grid-community/styles/ag-grid.css",
+              "node_modules/ag-grid-community/styles/ag-theme-alpine.css",
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.css"
             ],
             "scripts": []

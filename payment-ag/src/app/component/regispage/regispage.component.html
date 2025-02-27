@@ -4,7 +4,7 @@
             <img src="SIS.png" alt="SIS Logo" class="centered-img">
         </div>
         <h2>Register</h2>
-        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <form [formGroup]="registerForm" (ngSubmit)="onConfirm()">
 
             <!-- label name customer -->
             <div class="row">
@@ -84,8 +84,8 @@
                 <div class="column">
                     <div class="row">
                         <div class="column">
-                            <input type="email" formControlName="email" id="email" 
-                                required placeholder="Enter Email" autocomplete="off">
+                            <input type="email" formControlName="email" id="email" required placeholder="Enter Email"
+                                autocomplete="off">
                             <label class="desc">example&#64;gmail.com</label>
                         </div>
                     </div>
@@ -99,13 +99,14 @@
                 </div>
             </div>
 
+
             <div class="reg-page">
                 <div class="row">
                     <div class="column bot">
                         <a routerLink="/payment/loginpage" class="link for-pass">Back</a>
                     </div>
                     <div class="column">
-                        <button class="confirm-button" type="submit" [disabled]="!registerForm.valid">Confirm</button>
+                        <button class="confirm-button" type="button" [disabled]="!registerForm.valid" (click)="onConfirm()">Confirm</button>
                     </div>
                 </div>
             </div>
@@ -113,40 +114,35 @@
     </div>
 </div>
 
-
-
 <!-- Fail Popup -->
 <div>
-    <app-popup *ngIf="fail_pop"
-      [title]="'FAIL MESSAGE !'"
-      [message]="'Register Error.Please Contract Admin !'"
-      [headerColor]="'#FFDBDB'"
-      [confirmButton]="true"
-      (close)="fail_pop = false"
-      (confirm)="handleConfirm('fail')">
+    <app-popup *ngIf="fail_pop" [title]="'FAIL MESSAGE !'" [message]="'Register Error.Please Contract Admin !'"
+        [headerColor]="'#FFDBDB'" [confirmButton]="true" (close)="fail_pop = false" (confirm)="handleConfirm('fail')">
     </app-popup>
-  </div>
-  
-  <!-- dup Popup -->
-  <div>
-    <app-popup *ngIf="dup_pop"
-      [title]="'WARNING MESSAGE !'"
-      [message]="'The Username was already entered. Please try again !'"
-      [headerColor]="'#FCD69D'"
-      [confirmButton]="true"
-      (close)="dup_pop = false"
-      (confirm)="handleConfirm('dup')">
-    </app-popup>
-  </div>
+</div>
 
-  <!-- Success Popup -->
+<!-- cancelcaptcha Popup -->
 <div>
-    <app-popup *ngIf="success_pop"
-      [title]="'SUCCESS MESSAGE !'"
-      [message]="'Register Success !'"
-      [headerColor]="'#CCEFE8'"
-      [confirmButton]="true"
-      (close)="success_pop = false"
-      (confirm)="handleConfirm('success')">
+    <app-popup *ngIf="captcha_cancel_pop" [title]="'FAIL MESSAGE !'" [message]="'Registration failed  !'"
+        [headerColor]="'#FFDBDB'" [confirmButton]="true" (close)="captcha_cancel_pop = false" (confirm)="handleConfirm('captcha_cancel')">
     </app-popup>
-  </div>
+</div>
+
+<!-- dup Popup -->
+<div>
+    <app-popup *ngIf="dup_pop" [title]="'WARNING MESSAGE !'"
+        [message]="'The Username was already entered. Please try again !'" [headerColor]="'#FCD69D'"
+        [confirmButton]="true" (close)="dup_pop = false" (confirm)="handleConfirm('dup')">
+    </app-popup>
+</div>
+
+<!-- Success Popup -->
+<div>
+    <app-popup *ngIf="success_pop" [title]="'SUCCESS MESSAGE !'" [message]="'Register Success !'"
+        [headerColor]="'#CCEFE8'" [confirmButton]="true" (close)="success_pop = false"
+        (confirm)="handleConfirm('success')">
+    </app-popup>
+</div>
+
+<app-captcha-popup *ngIf="showCaptcha" (captchaResolved)="onCaptchaResolved($event)"></app-captcha-popup>
+<app-loading-spinner [isLoading]="isLoading"></app-loading-spinner>

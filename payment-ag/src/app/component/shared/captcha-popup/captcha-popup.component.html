@@ -1,0 +1,12 @@
+<div class="captcha-popup">
+    <h3>Complete the CAPTCHA</h3>
+    
+    <!-- Add the Google reCAPTCHA element -->
+    <re-captcha 
+      [siteKey]="'6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'"
+      (resolved)="onCaptchaCompleted($event)">
+    </re-captcha>
+  
+    <button (click)="closePopup()">Cancel</button>
+  </div>
+  

@@ -2,12 +2,11 @@ USE payment_db;
 
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS pymhdr;
-
-CREATE PROCEDURE pymhdr(
+CREATE PROCEDURE pkgpymnt_insert_pymhdr(
+    IN p_cus_code       VARCHAR(255),
     IN p_payment_no     VARCHAR(255),
-    IN p_sumamt        VARCHAR(255),
-    OUT p_count      VARCHAR(255)
+    IN p_sumamt         VARCHAR(255),
+    OUT p_count         VARCHAR(255)
 )
 BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -17,11 +16,13 @@ BEGIN
     END;
     START TRANSACTION;
     INSERT INTO pymhdr(
-        pyhpymno
+        pyhcuscode
+        , pyhpymno
         , pyhsumamt
     ) VALUES (
-        p_payment_no
-        p_sumamt
+        p_cus_code
+        , p_payment_no
+        , p_sumamt
     );
     COMMIT;
     SET p_count = 1; 

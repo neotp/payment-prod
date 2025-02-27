@@ -1,0 +1,24 @@
+<ul>
+    <div class="image-container centered-img" style="text-align: center">
+        <img src="SIS.png" alt="SIS Logo" class="centered-img">
+    </div>
+    <div class="divider-line"></div>
+    <div class="box1">
+        <li *ngIf="!isLoggedIn()">
+            <a routerLink="payment/loginpage">Login</a>
+        </li>
+
+        <li *ngIf="isLoggedIn() && (accountRole === 'user' || accountRole === 'admin')">
+            <a routerLink="payment/pymntpage" (click)="payment()">Payment</a>
+        </li>
+
+        <li *ngIf="isLoggedIn() && accountRole === 'admin'">
+            <a routerLink="payment/mnusrpage" (click)="manageuser()">Manage User</a>
+        </li>
+    </div>
+    <div class="box2">
+        <li *ngIf="isLoggedIn()">
+            <a class="active" routerLink="payment/loginpage" (click)="logout()">Logout</a>
+        </li>
+    </div>
+</ul>

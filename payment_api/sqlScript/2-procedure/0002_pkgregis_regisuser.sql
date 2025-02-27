@@ -2,9 +2,7 @@ USE payment_db;
 
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS regisuser $$
-
-CREATE PROCEDURE regisuser(
+CREATE PROCEDURE pkgregis_regisuser(
     IN p_usrname     VARCHAR(255),
     IN p_pass        VARCHAR(255),
     IN p_fname       VARCHAR(255),

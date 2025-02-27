@@ -4,36 +4,44 @@ import { RegispageComponent } from './component/regispage/regispage.component';
 import { PymntpageComponent } from './component/pymntpage/pymntpage.component';
 import { MnusrpageComponent } from './component/mnusrpage/mnusrpage.component';
 import { KbankcallbackComponent } from './component/kbankcallback/kbankcallback.component';
+import { AuthGuard } from './auth.guard';
+import { LoadingSpinnerComponent } from './component/shared/loading-spinner/loading-spinner.component';
 
 export const routes: Routes = [
     {
-        path:'',
-        redirectTo:'payment/loginpage',
-        pathMatch:'full'
+        path: '',
+        redirectTo: 'payment/loginpage',  // Default redirect
+        pathMatch: 'full'
     },
     {
-        path:'*',
-        redirectTo:'payment/loginpage',
-        pathMatch:'full'
+        path: 'payment/loginpage',
+        component: LoginpageComponent
     },
     {
-        path:'payment/loginpage',
-        component:LoginpageComponent
+        path: 'payment/regispage',
+        component: RegispageComponent
     },
     {
-        path:'payment/regispage',
-        component:RegispageComponent
+        path: 'payment/pymntpage',
+        component: PymntpageComponent,
+        canActivate: [AuthGuard] 
     },
     {
-        path:'payment/pymntpage',
-        component:PymntpageComponent
+        path: 'payment/mnusrpage',
+        component: MnusrpageComponent,
+        canActivate: [AuthGuard] 
     },
     {
-        path:'payment/mnusrpage',
-        component:MnusrpageComponent
+        path: 'payment/callback',
+        component: KbankcallbackComponent
     },
     {
-        path:'payment/callback',
-        component:KbankcallbackComponent
+        path: 'payment/loading',
+        component: LoadingSpinnerComponent
+    },
+    {
+        path: '**', 
+        redirectTo: 'payment/loginpage',
+        pathMatch: 'full'
     }
 ];

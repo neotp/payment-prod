@@ -3,7 +3,7 @@ CREATE TABLE `usrpss` (
   `usrusrname`  VARCHAR(100) DEFAULT NULL,
   `usrpass`     VARCHAR(100) DEFAULT NULL,
   `usrcuscode`  VARCHAR(100) DEFAULT NULL,
-  `usrcusname`  VARCHAR(45)  DEFAULT NULL,
+  `usrcusname`  VARCHAR(100)  DEFAULT NULL,
   `usrrole`     VARCHAR(45)  DEFAULT NULL,
   `usrstat`     VARCHAR(45)  DEFAULT NULL,
   PRIMARY KEY (`usrid`)

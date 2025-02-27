@@ -1,10 +1,7 @@
 USE payment_db;
 
 DELIMITER $$
-
-DROP PROCEDURE IF EXISTS login;
-
-CREATE PROCEDURE login(
+CREATE PROCEDURE pkglogin_login(
     IN p_usrname VARCHAR(255),
     IN p_pass VARCHAR(255),
     OUT p_usrrole VARCHAR(255)

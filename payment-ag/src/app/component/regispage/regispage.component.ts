@@ -1,37 +1,50 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
-import { FormGroup, FormControl, Validators, ReactiveFormsModule, FormBuilder, FormsModule  } from '@angular/forms';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, OnInit } from '@angular/core';
+import { FormGroup, Validators, ReactiveFormsModule, FormBuilder, FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Register } from '../../interface/register-interface';
 import { ApiService } from '../../service/api.service';
-import { PopupComponent } from '../popup/popup.component';
+import { PopupComponent } from '../shared/popup/popup.component';
 import { CommonModule } from '@angular/common';
+import { RecaptchaModule } from 'ng-recaptcha';
+import { MatDialog } from '@angular/material/dialog';
+import { CaptchaPopupComponent } from '../shared/captcha-popup/captcha-popup.component';
+import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
 
 @Component({
-  imports: [ 
-    FormsModule 
-    ,ReactiveFormsModule
+  imports: [
+    FormsModule
+    , ReactiveFormsModule
     , CommonModule
     , RouterLink
     , PopupComponent
+    , RecaptchaModule
+    , CaptchaPopupComponent
+    , LoadingSpinnerComponent
   ]
   , selector: 'app-regispage'
   , templateUrl: './regispage.component.html'
-  , styleUrls: ['./regispage.component.css'
-    
-  ]
+  , styleUrl: './regispage.component.css'
 })
 export class RegispageComponent implements OnInit {
   public registerForm: FormGroup;
   public dup_pop: boolean = false;
   public success_pop: boolean = false;
+  public captcha_cancel_pop: boolean = false;
   public fail_pop: boolean = false;
   public loadingApp: EventEmitter<boolean> = new EventEmitter(false);
-
+  public captchaToken: string | null = null;
+  public showCaptcha: boolean = false; // Flag to show/hide captcha form
   public registerData = {} as Register;
+  public siteKey: string = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
+  public isSubmitting = false;
+  public isLoading = false;
+
+
   constructor(
     private router: Router
     , private formBuilder: FormBuilder
-        , private api: ApiService
+    , private api: ApiService
+    , public dialog: MatDialog
   ) {
     this.registerForm = this.formBuilder.group({
       fstname: [{ value: null, disabled: false }, [Validators.required]]
@@ -42,12 +55,13 @@ export class RegispageComponent implements OnInit {
       , password: [{ value: null, disabled: false }, [Validators.required]]
       , email: [{ value: null, disabled: false }, [Validators.required]]
       , position: [{ value: null, disabled: false }, [Validators.required]]
-    });}
+    });
+  }
 
   public ngOnInit(): void {
-  //
+    //
   }
-  
+
   private populateForm(): void {
     this.registerData.fstname = this.registerForm.controls['fstname'].value;
     this.registerData.lstname = this.registerForm.controls['lstname'].value;
@@ -59,54 +73,67 @@ export class RegispageComponent implements OnInit {
     this.registerData.position = this.registerForm.controls['position'].value;
   }
 
-  public onSubmit(): void {
-    this.populateForm();
+  public onConfirm(): void {
     if (this.registerForm.valid) {
-        this.api.register(this.registerData).subscribe((result: any) => {
-          if(result.regis === 'success') {
-            this.router.navigate(['payment/loginpage'], {queryParams: { regis: result.regis } });
-          } else if (result.regis === 'dup') {
-            this.popup('dup')
-          } else {
-            this.popup('fail')
-          }
-        }, (error: any) => {
-          console.log('Error during login:', error);
-        });
+      this.showCaptcha = true; 
+    } else {
+      alert('Please fill all required fields.');
     }
   }
 
+  public onCaptchaResolved(token: string | null): void { 
+    if (token) {
+      this.captchaToken = token;
+      this.showCaptcha = false; 
+      this.submitRegistration();
+    } else {
+      this.popup('captcha_cancel');
+      this.showCaptcha = false; 
+    }
+  }
+
+  public submitRegistration(): void {
+    this.populateForm();
+    if (!this.captchaToken) {
+      alert('Please complete the CAPTCHA.');
+      this.showCaptcha = false; 
+      return;
+    }
+    this.isSubmitting = true;
+    this.api.register(this.registerData).subscribe(
+      (result: any) => {
+        if (result.regis === 'success') {
+          this.router.navigate(['payment/loginpage'], {queryParams: { regis: result.regis } });
+        } else {
+          this.popup('dup');
+        }
+      },
+      (error: any) => {
+        console.error('Error:', error);
+        alert('Registration Error');
+      }
+    );
+  }
+
+
+  public popup(pop: string): void {
+    const key = `${pop}_pop` as keyof this;
+    if (typeof this[key] === 'boolean') {
+      (this[key] as boolean) = true;
+    }
+  }
   
-  public popup(pop: string) {
-    switch (pop) {
-      case 'dup':
-        this.dup_pop = true;
-        break;
-      case 'fail':
-        this.fail_pop = true;
-        break;
-      case 'success':
-        this.success_pop = true;
-        break;
+  public handleConfirm(pop: string): void {
+    const key = `${pop}_pop` as keyof this;
+    if (typeof this[key] === 'boolean') {
+      (this[key] as boolean) = false;
     }
   }
-
-  public handleConfirm(pop: string) {
-    switch (pop) {
-      case 'dup':
-        this.dup_pop = false;
-        break;
-      case 'fail':
-        this.fail_pop = false;
-        break;
-      case 'success':
-        this.success_pop = false;
-        break;
-    }
+  
+ 
+  public setLoading(isLoading: boolean) {
+    console.log('Loading status:', isLoading); // Debug
+    this.isLoading = isLoading;
   }
-
-  public setLoading(isLoading: boolean): void {
-    this.loadingApp.emit(isLoading);
-  }
-
 }
+

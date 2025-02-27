@@ -2,10 +2,10 @@ USE payment_db;
 
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS pymdtl;
 
-CREATE PROCEDURE pymdtl(
+CREATE PROCEDURE pkgpymnt_insert_pymdtl(
     IN p_paymentno      VARCHAR(255),
+    IN p_cuscode        VARCHAR(255),
     IN p_invno          VARCHAR(255),
     IN p_docamt         VARCHAR(255),
     IN p_balamt         VARCHAR(255),
@@ -15,6 +15,8 @@ CREATE PROCEDURE pymdtl(
 )
 BEGIN
 
+    DECLARE v_pyhhdrid INT;
+    
     SELECT pyhhdrid
     INTO v_pyhhdrid
     FROM pymhdr
@@ -22,6 +24,7 @@ BEGIN
 
     INSERT INTO pymdtl(
         pydhdrid
+        , pydcuscode
         , pydinvno
         , pyddocamt
         , pydbalamt
@@ -30,6 +33,7 @@ BEGIN
         , pydstat
     ) VALUES (
         v_pyhhdrid
+        , p_cuscode
         , p_invno
         , p_docamt
         , p_balamt

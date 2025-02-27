@@ -1,25 +1,33 @@
-# Stage 1: Build Angular App
-FROM node:18-alpine AS build
+# Use Node.js as base image
+FROM node:20 AS build
 
+# Set working directory
 WORKDIR /app
 
 # Copy package.json and install dependencies
 COPY package.json package-lock.json ./
 RUN npm install --legacy-peer-deps
 
-# Copy the rest of the app and build it
+# Copy the entire project
 COPY . .
-RUN npm run build --configuration=production
 
-# Stage 2: Serve with Nginx
+# Increase Angular budget limits automatically
+RUN sed -i 's/"maximumError": "1.05mb"/"maximumError": "3mb"/g' angular.json
+
+# Build the Angular app
+RUN npx ng build --configuration=production
+
+# Use Nginx for serving the app
 FROM nginx:alpine
 
-# Copy Angular build files to Nginx HTML directory
-COPY --from=build /app/dist/payment-ag/browser/. /usr/share/nginx/html/
+# Copy built Angular files to Nginx
+COPY --from=build /app/dist/payment-ag /usr/share/nginx/html
 
-# Copy a custom Nginx configuration (optional)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+
+# Expose port 80
 EXPOSE 80
 
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

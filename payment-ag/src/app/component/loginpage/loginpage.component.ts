@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, FormsModule, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Login } from '../../interface/loginpage-interface';
 import { ApiService } from '../../service/api.service';
-import { PopupComponent } from '../popup/popup.component';
+import { PopupComponent } from '../shared/popup/popup.component';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
@@ -74,20 +74,27 @@ export class LoginpageComponent implements OnInit {
     if (!this.loginData.username || !this.loginData.password) {
       this.popup('blank')
     } else {
-      // console.log('username :', this.loginData.username);
-      // console.log('password :', this.loginData.password);
-      
-      // Assuming `this.api.login()` returns an observable
-      this.api.login(this.loginData).subscribe((result: any) => {
-        console.log('alert message',result.role);
-        if(result.role === 'admin') {
-          this.router.navigate(['payment/mnusrpage'], {queryParams: this.loginData});
-        } else if (result.role === 'user'){
-          this.router.navigate(['payment/pymntpage'], {queryParams: this.loginData});
-        } else {
-          this.popup('notfound')
-          console.log('alert message',result.role);
-        }
+      this.api.login(this.loginData).subscribe(
+        (result: any) => {
+  
+          if (result.role === 'admin' || result.role === 'user') {
+            localStorage.setItem('accountRole', result.role);
+            localStorage.setItem('username', this.loginData.username);
+            console.log('role', localStorage.getItem('accountRole'));
+  
+            const queryParams = {
+              username: this.loginData.username,
+              role: result.role
+            };
+  
+            if (result.role === 'admin') {
+              this.router.navigate(['payment/mnusrpage'], { queryParams });
+            } else if (result.role === 'user') {
+              this.router.navigate(['payment/pymntpage'], { queryParams });
+            }
+          } else {
+            this.popup('notfound');
+          }
       }, (error: any) => {
         console.log('Error during login:', error);
       });

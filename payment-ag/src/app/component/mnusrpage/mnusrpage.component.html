@@ -9,46 +9,104 @@
 
 <body>
 
-  <div style="position: relative;">
+  <!-- <div style="position: relative;">
     <img src="SIS.png" style="width: 110px; height: auto;">
     <label id="customerLabel" class="tag-name">{{ customerLabel }}</label>
-  </div>
+  </div> -->
   <div [formGroup]="headerForm">
     <div class="row">
-        <label class="tag">User register.</label>
+      <label class="tag">User register.</label>
+      <button class="button save-button" (click)="saveData()">
+        <span class="material-icons">save</span>
+        Save
+      </button>
+      <div class="tag-user">
+        <span class="material-icons username">account_circle</span>
+        <span class="username">{{ username }}</span>
+      </div>
     </div>
   </div>
 
+  <!-- <div class="divider-line"></div>
+  <div class="table-container">
+    <ag-grid-angular 
+      style="width: 100%; height: 600px;" 
+      class="ag-theme-alpine" 
+      [rowData]="allData"
+      [columnDefs]="columnDefs">
+    </ag-grid-angular>
+  </div> -->
+
   <div class="divider-line"></div>
+
   <div class="table-container">
     <table id="filterDataTable">
       <thead>
         <tr>
-          <th class="size-usrname">Username</th>
-          <th class="size-fname">First Name</th>
-          <th class="size-lname">Last Name</th>
-          <th class="size-cuscode">Customer Code</th>
-          <th class="size-cusname">Customer Name</th>
-          <th class="size-email">Email</th>
-          <th class="size-pos">Position</th>
-          <th class="size-role">Role</th>
-          <th class="size-stat">Status</th>
+          <th class="resize-handle" (mousedown)="startResizing($event)">
+            Username
+          </th>
+          <th class="resize-handle" (mousedown)="startResizing($event)">
+            First Name
+          </th>
+          <th class="resize-handle" (mousedown)="startResizing($event)">
+            Last Name
+          </th>
+          <th class="resize-handle" (mousedown)="startResizing($event)">
+            Customer Code
+          </th>
+          <th class="resize-handle" (mousedown)="startResizing($event)">
+            Customer Name
+          </th>
+          <th class="resize-handle" (mousedown)="startResizing($event)">
+            Email
+          </th>
+          <th class="resize-handle" (mousedown)="startResizing($event)">
+            Position
+          </th>
+          <th class="resize-handle" (mousedown)="startResizing($event)">
+            Role
+          </th>
+          <th class="resize-handle" (mousedown)="startResizing($event)">
+            Status
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let record of allData">
-          <th class="text-center size-usrname">{{ record.usrusrname }}</th>
-          <th class="text-center size-fname">{{ record.ushfname }}</th>
-          <th class="text-center size-lname">{{ record.ushlname }}</th>
-          <th class="text-center size-cuscode">{{ record.usrcuscode }}</th>
-          <th class="text-center size-cusname">{{ record.usrcusname }}</th>
-          <th class="text-center size-email">{{ record.ushemail }}</th>
-          <th class="text-center size-pos">{{ record.ushpos }}</th>
-          <th class="text-center size-role">{{ record.usrrole }}</th>
-          <th class="text-center size-stat">{{ record.usrstat }}</th>
+          <td>{{ record.uswusrname }}</td>
+          <td>{{ record.uswfname }}</td>
+          <td>{{ record.uswlname }}</td>
+          <td>{{ record.uswcuscode }}</td>
+          <td>{{ record.uswcusname }}</td>
+          <td>{{ record.uswemail }}</td>
+          <td>{{ record.uswpos }}</td>
+          <td>
+            <select class="ddl create-payment-button" 
+            [(ngModel)]="record.uswrole"
+            (change)="updateRecord(record)">
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
+          </td>
+          <td>
+            <select class="ddl " 
+            [(ngModel)]="record.uswstat" 
+            [ngStyle]="{
+            'background-color': getBackgroundColor(record.uswstat),
+            'border': '1px solid #00317A',
+            'color': getTextColor(record.uswstat)
+            }"
+            (change)="updateRecord(record)">
+              <option value="P" [ngClass]="{'pending-option': record.uswstat === 'P'}">Pending</option>
+              <option value="A" [ngClass]="{'approve-option': record.uswstat === 'A'}">Approve</option>
+              <option value="R" [ngClass]="{'reject-option': record.uswstat === 'R'}">Reject</option>
+            </select>
+          </td>
         </tr>
       </tbody>
     </table>
+
   </div>
 
   <div>
@@ -60,9 +118,9 @@
 
   <!-- Success Popup -->
   <div>
-    <app-popup *ngIf="success_pop" [title]="'SUCCESS MESSAGE !'" [message]="'ขอบคุณที่ใช้บริการ.'"
-      [headerColor]="'#CCEFE8'" [confirmButton]="true" (close)="success_pop = false"
-      (confirm)="handleConfirm('success')">
+    <app-popup *ngIf="savesucess_pop" [title]="'SUCCESS MESSAGE !'" [message]="'บันทึกสำเร็จ!'"
+      [headerColor]="'#CCEFE8'" [confirmButton]="true" (close)="savesucess_pop = false"
+      (confirm)="handleConfirm('savesucess')">
     </app-popup>
   </div>
 
@@ -80,6 +138,9 @@
       (close)="warning_search = false" (confirm)="handleConfirm('search')">
     </app-popup>
   </div>
+
+  
+  <app-loading-spinner [isLoading]="isLoading"></app-loading-spinner>
 
 </body>
 
