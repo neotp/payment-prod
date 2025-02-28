@@ -1,3 +1,4 @@
+from decimal import Decimal
 from fastapi import FastAPI, Request, HTTPException, Depends, logger
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -78,14 +79,18 @@ class GetInv(BaseModel):
     usrcuscode: str
     
 class Payment(BaseModel):
+    username: str
     cuscode: str
-    docType: str
-    docNo: str
-    docDate: str
-    dueDate: str
-    docAmt: str
-    balAmt: str
-    stat: str
+    
+    
+class UpdateFlag(BaseModel):
+    selected: bool
+    cuscode: str
+    docno: str
+    
+class UpdateAllFlag(BaseModel):
+    cuscode: str
+    flag: str
     
     
 # Dependency: SAP Connection
@@ -333,7 +338,6 @@ async def getDataFromSap(usrcuscode: str) -> List[Dict]:
     
     try:
         response = requests.get(f"{api_url}?code={usrcuscode}", headers=headers, cookies=None)
-        
         if response.status_code == 200:
             response_data = response.json()
             if response_data.get('message') == 'Success':
@@ -397,6 +401,9 @@ async def loadDataFromProcedure(conn, usrcuscode: str):
             for i, column in enumerate(row):
                 column_name = column_names[i]
 
+                if isinstance(column, Decimal): 
+                    column = str(column)
+
                 if column_name in ['pywdocdate', 'pywduedate']:
                     formatted_row[column_name] = format_date_ddmmyyyy(column)
                 else:
@@ -432,31 +439,109 @@ async def getDataInvoice(data: GetInv, conn=Depends(get_mysql_connection)):
     finally:
         if conn:
             conn.close()
+            
+@app.post("/updateflag")
+async def updateflag(data: UpdateFlag, conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
+        
+        cursor.callproc("pkgpymnt_update_flag", [
+            data.cuscode
+            , data.selected
+            , data.docno
+            ])
+        conn.commit()
+        
+        formatted_results = await loadDataFromProcedure(conn, data.cuscode)
+        
+        logger.info("data from table pymdp_work : %s", formatted_results)
 
+        return JSONResponse(content={"status": "success", "data": formatted_results})
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
+    finally:
+        if cursor:
+            try:
+                cursor.close()
+            except Exception as e:
+                logger.error(f"Error closing cursor: {e}")
+        if conn:
+            conn.close()
+            
+                        
+@app.post("/updateAllflag")
+async def updateAllflag(data: UpdateAllFlag, conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
+        
+        cursor.callproc("pkgpymnt_update_all_flag", [
+            data.cuscode
+            , data.flag
+            ])
+        conn.commit()
+        
+        formatted_results = await loadDataFromProcedure(conn, data.cuscode)
+        
+        logger.info("data from table pymdp_work : %s", formatted_results)
+
+        return JSONResponse(content={"status": "success", "data": formatted_results})
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
+    finally:
+        if cursor:
+            try:
+                cursor.close()
+            except Exception as e:
+                logger.error(f"Error closing cursor: {e}")
+        if conn:                                                            
+            conn.close()
     
     
 @app.post("/getPayment")
-def getPayment(data: Payment, conn=Depends(get_mysql_connection)):
+async def getPayment(data: Payment, conn=Depends(get_mysql_connection)):
     try:
-        
+        paymentNo = generatePayment()
         cursor = conn.cursor()
-        out_param = cursor.callproc("pkgpymnt_insert_pymdtl", [
+        out_param = cursor.callproc("pkgpymnt_insert_pymhdr", [
             data.username
+            , data.cuscode
+            , paymentNo
             , None
         ])
-        cuscode = out_param[1]
+        stat = out_param[3]
+        
+        if stat == 'success':
+             cursor.callproc("pkgpymnt_update_pymdp_work", [
+                data.cuscode
+            ])
+             
         conn.commit() 
-        return JSONResponse(content={"status": "success", "cuscode": cuscode})
-    except Exception as e:
-        conn.rollback()
-        raise JSONResponse(content=HTTPException(status_code=500, detail=f"Unexpected error: {e}"))
+        
+        formatted_results = await loadDataFromProcedure(conn, data.cuscode)
+        
+        logger.info("data from table pymdp_work : %s", formatted_results)
 
+        return JSONResponse(content={"status": stat, "data": formatted_results})
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
     finally:
-        conn.close()    
+        if cursor:
+            try:
+                cursor.close()
+            except Exception as e:
+                logger.error(f"Error closing cursor: {e}")
+        if conn:                                                            
+            conn.close() 
         
         
 def generatePayment():
-    set_date = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    set_date = datetime.now().strftime("%Y%m%d%H%M%S")
     run_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
     return f"PIM{set_date}{run_number}"
 

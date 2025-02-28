@@ -32,14 +32,14 @@ export class ApiService {
 
   public findCusCode(data: FindCusCode): Observable<any> {
     return this.http.post(
-      `${this.apiUrl}findCusCode/`
+      `${this.apiUrl}findCusCode`
       , data
       , { headers: this.getRequestHeader(), withCredentials: true }
     );
   }
 
   public login(data: Login): Observable<any> {
-    return this.http.post(`${this.apiUrl}login/`, data, {
+    return this.http.post(`${this.apiUrl}login`, data, {
       headers: this.getRequestHeader(),
       withCredentials: true
     }).pipe(
@@ -50,28 +50,49 @@ export class ApiService {
     );
   }
 
-  public register(data: Register): Observable<any> {
-    return this.http.post(`${this.apiUrl}register/`
+  public updateflag(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}updateflag`
       , data
       , { headers: this.getRequestHeader(), withCredentials: true }
-    ); // Example for POST login
+    );
+  }
+
+  public getPayment(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}getPayment`
+      , data
+      , { headers: this.getRequestHeader(), withCredentials: true }
+    );
+  }
+
+  public updateAllflag(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}updateAllflag`
+      , data
+      , { headers: this.getRequestHeader(), withCredentials: true }
+    );
+  }
+
+  public register(data: Register): Observable<any> {
+    return this.http.post(`${this.apiUrl}register`
+      , data
+      , { headers: this.getRequestHeader(), withCredentials: true }
+    ); 
   }
 
   public findDataPending(): Observable<any> {
-    return this.http.post(`${this.apiUrl}findDataPending/`
+    return this.http.post(`${this.apiUrl}findDataPending`
       , { headers: this.getRequestHeader(), withCredentials: true }
     );
   }
 
   public updateDataToWork(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}updateDataToWork/`
+    return this.http.post(`${this.apiUrl}updateDataToWork`
       , data
       , { headers: this.getRequestHeader(), withCredentials: true }
     );
   }
 
   public saveData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}saveData/`
+    return this.http.post(`${this.apiUrl}saveData`
       , { headers: this.getRequestHeader(), withCredentials: true }
     );
   }

@@ -26,7 +26,7 @@
     <div class="divider-line"></div>
     <div class="row">
       <div class="column">
-        <label for="invNo">Invoice No.<span style="color: red;">*</span></label>
+        <label for="invNo" class="username">Invoice No.</label>
         <input autocomplete="off" type="text" id="invNo" formControlName="invNo" placeholder="Enter invoice number"
           required>
       </div> 
@@ -69,9 +69,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let record of allData">
+        <tr *ngFor="let record of dataDisplay">
           <td class="text-center size-cbx">
-            <input type="checkbox" class="checkbox-custom" [(ngModel)]="record.selected" />
+            <input type="checkbox" class="checkbox-custom" 
+            [(ngModel)]="record.selected"  
+            [disabled]="record.stat === 'Process'"
+            (change)="checkFlag(record)" />
           </td>
           <td class="text-center size-doctype">{{ record.docType }}</td>
           <td class="text-center size-docno">{{ record.docNo }}</td>
@@ -79,7 +82,7 @@
           <td class="text-center size-duedate">{{ record.dueDate }}</td>
           <td class="text-right size-docamount">{{ record.docAmt }}</td>
           <td class="text-right size-balamount">{{ record.balAmt }}</td>
-          <td class="text-right size-stat">{{ record.stat }}</td>
+          <td class="text-center size-stat">{{ record.stat }}</td>
         </tr>
       </tbody>
     </table>
@@ -94,7 +97,7 @@
 
   <!-- Success Popup -->
   <div>
-    <app-popup *ngIf="success_pop" [title]="'SUCCESS MESSAGE !'" [message]="'ขอบคุณที่ใช้บริการ.'"
+    <app-popup *ngIf="success_pop" [title]="'SUCCESS MESSAGE !'" [message]="'ทำรายเรียบร้อย.'"
       [headerColor]="'#CCEFE8'" [confirmButton]="true" (close)="success_pop = false"
       (confirm)="handleConfirm('success')">
     </app-popup>

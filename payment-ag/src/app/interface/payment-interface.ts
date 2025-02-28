@@ -17,7 +17,7 @@ export interface InvoiceData {
     docNo: string
     docDate: string
     dueDate: string
-    docAmt: number
-    balAmt: number
+    docAmt: string
+    balAmt: string
     stat:string
 }

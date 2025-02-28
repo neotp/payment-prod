@@ -164,6 +164,8 @@ label {
   border: 1px solid #ccc;
   border-radius: 5px;
   overflow-x: auto;
+  overflow-y: auto;
+  height: 85%; 
 }
 
 table {

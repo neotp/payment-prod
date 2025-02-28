@@ -9,6 +9,7 @@ BEGIN
 
     SELECT 
         pyw.pywid
+        , pyw.pywflag
         , pyw.pywcuscode
         , pyw.pywdoctype
         , pyw.pywdocno

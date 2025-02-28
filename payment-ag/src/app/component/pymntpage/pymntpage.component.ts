@@ -24,7 +24,8 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
 export class PymntpageComponent {
   public paymentForm!: FormGroup;
   public filterData: any[] = [];
-  public allData: InvoiceData[] = []; 
+  public dataDisplay: InvoiceData[] = [];
+  public allData: InvoiceData[] = [];
   public customerLabel: string = '';
   public warning_pop: boolean = false;
   public payment_pop: boolean = false;
@@ -32,14 +33,14 @@ export class PymntpageComponent {
   public fail_pop: boolean = false;
   public warning_search: boolean = false;
   public isLoading = false;
-  public isVisible: any;  
+  public isVisible: any;
   public headerForm!: FormGroup;
   public searchData = {} as SearchInv;
   public findCus = {} as FindCusCode;
   public getInv = {} as GetInv;
-  public username: any;  
-  public customercode: any;  
-  public customername: any;  
+  public username: any;
+  public customercode: any;
+  public customername: any;
   public loadingApp: EventEmitter<boolean> = new EventEmitter(false);
 
   constructor(
@@ -67,11 +68,6 @@ export class PymntpageComponent {
     this.searchData.invno = this.headerForm.controls['invNo'].value;
   }
 
-
-  public loadData(): void {
-   // 
-  }
-
   public async findCusCode(): Promise<void> {
     this.setLoading(true);
     this.findCus.username = this.username;
@@ -79,12 +75,13 @@ export class PymntpageComponent {
       this.getInv.usrcuscode = result.cuscode;
       this.customercode = result.cuscode;
       this.customername = result.cusname;
-      console.log( 'cuscode',this.customercode);
+      console.log('cuscode', this.customercode);
       if (this.getInv.usrcuscode) {
         await this.api.getDataInvoice(this.getInv).subscribe((res: any) => {
           console.log(res);
           this.allData = res.data.map((invoice: any) => ({
-            docType: invoice.pywdoctype
+            selected: this.convertFlag(invoice.pywflag)
+            , docType: invoice.pywdoctype
             , docNo: invoice.pywdocno
             , docDate: this.formatDate(invoice.pywdocdate, '/')
             , dueDate: this.formatDate(invoice.pywduedate, '/')
@@ -92,6 +89,7 @@ export class PymntpageComponent {
             , balAmt: this.formatAmount(invoice.pywbalamt)
             , stat: this.statusInv(invoice.pywstat)
           }));
+          this.dataDisplay = this.allData;
           this.setLoading(false);
         }, (error: any) => {
           console.log('Error during login:', error);
@@ -105,114 +103,175 @@ export class PymntpageComponent {
       console.log('Error during login:', error);
       this.setLoading(false);
     });
-   }
+  }
 
   public async searchPayment(): Promise<void> {
     this.setLoading(true);
-    this.populateForm()
-    
-    if (this.searchData.customer_code && this.searchData.invno){
-      // this.api.testConnect(this.searchData).forEach((result: any) => {
-      //   if(result){
-      //       console.log(result);
-      //   } else {
-      //       console.log('alert message');
-      //   }
-      // });
-      
-      // const result = await firstValueFrom(this.api.getData(this.searchData));
-      // if (result) {
-      //   console.log(result);
-      // } else {
-      //   console.log('alert message');
-      // }
-
-      // console.log('alert message');
-
-
-      // this.api.getData(this.searchData).subscribe({
-      //   next: (result: any) => {
-      //     if (result) {
-      //       console.log(result);
-      //     } else {
-      //       console.log('alert message');
-      //     }
-      //   },
-      //   error: (err: any) => {
-      //     console.error('API call failed:', err);
-      //     console.log('alert message');
-      //   },
-      //   complete: () => {
-      //     this.setLoading(false);
-      //   }
-      // });
+    this.populateForm();
+    if (this.searchData.invno) {
+      this.dataDisplay = this.allData.filter((item: InvoiceData) =>
+        item.docNo === this.searchData.invno
+      );
     } else {
-      this.popup('search');
+      this.dataDisplay = this.allData;
     }
     this.setLoading(false);
   }
 
   public createPayment(): void {
-    // const { cuscode, invNo } = this.paymentForm.value;
-    // this.paymentService.createPayment(cuscode, invNo).subscribe((response) => {
-    //   // Handle the response and show success message or navigate
-    // });
+    const data = {
+        username: this.username
+      , cuscode: this.customercode
+    }
+    this.api.getPayment(data).subscribe((response: any) => {
+      console.log(response);
+      this.allData = response.data.map((invoice: any) => ({
+        selected: this.convertFlag(invoice.pywflag)
+        , docType: invoice.pywdoctype
+        , docNo: invoice.pywdocno
+        , docDate: this.formatDate(invoice.pywdocdate, '/')
+        , dueDate: this.formatDate(invoice.pywduedate, '/')
+        , docAmt: this.formatAmount(invoice.pywdocamt)
+        , balAmt: this.formatAmount(invoice.pywbalamt)
+        , stat: this.statusInv(invoice.pywstat)
+      }));
+      this.dataDisplay = this.allData;
+      this.setLoading(false);
+      this.popup(response.status);
+    }, (error: any) => {
+        console.error('Error updating user:', error);
+      }
+    );
+  }
+
+  public checkFlag(record: InvoiceData): void {
+    this.setLoading(true);
+    console.log(record);
+    const data = {
+      selected: record.selected,  // Assuming this is your unique key to identify the record
+      cuscode: this.customercode,
+      docno: record.docNo
+    }
+    this.api.updateflag(data).subscribe((response: any) => {
+      console.log(response);
+      this.allData = response.data.map((invoice: any) => ({
+        selected: this.convertFlag(invoice.pywflag)
+        , docType: invoice.pywdoctype
+        , docNo: invoice.pywdocno
+        , docDate: this.formatDate(invoice.pywdocdate, '/')
+        , dueDate: this.formatDate(invoice.pywduedate, '/')
+        , docAmt: this.formatAmount(invoice.pywdocamt)
+        , balAmt: this.formatAmount(invoice.pywbalamt)
+        , stat: this.statusInv(invoice.pywstat)
+      }));
+      this.dataDisplay = this.allData;
+      this.setLoading(false);
+    }, (error: any) => {
+      console.log('Error during login:', error);
+      this.setLoading(false);
+    });
   }
 
   public toggleSelectAll(table: string): void {
-    const data = table === 'filtered' ? this.filterData : this.allData;
-    const allSelected = data.every((item: any) => item.selected);
-    data.forEach((item: any) => (
-      item.selected = !allSelected
-    ));
+    this.setLoading(true);
+    const data = this.allData;
+    const allSelected = data.every((item: any) => item.stat === 'Process' || item.selected);
+    data.forEach((item: any) => {
+      if (item.stat !== 'Process') {
+        item.selected = !allSelected;
+      }
+    });
+    this.updateFlagAll(!allSelected);
+  }
+
+  public updateFlagAll(flag: boolean): void {
+    let flagAll = flag ? '1' : '0';
+    const data = {
+      cuscode: this.customercode
+      , flag: flagAll
+    }
+    this.api.updateAllflag(data).subscribe((response: any) => {
+      console.log(response);
+      this.allData = response.data.map((invoice: any) => ({
+        selected: this.convertFlag(invoice.pywflag)
+        , docType: invoice.pywdoctype
+        , docNo: invoice.pywdocno
+        , docDate: this.formatDate(invoice.pywdocdate, '/')
+        , dueDate: this.formatDate(invoice.pywduedate, '/')
+        , docAmt: this.formatAmount(invoice.pywdocamt)
+        , balAmt: this.formatAmount(invoice.pywbalamt)
+        , stat: this.statusInv(invoice.pywstat)
+      }));
+      this.dataDisplay = this.allData;
+      this.setLoading(false);
+    }, (error: any) => {
+      console.log('Error during login:', error);
+      this.setLoading(false);
+    });
   }
 
   public isAllSelected(): boolean {
-    return this.allData.length > 0 && this.allData.every(item => item.selected);
+    return (
+      this.allData.length > 0 &&
+      this.allData
+        .filter(item => item.stat !== 'Process')
+        .every(item => item.selected)
+    );
   }
-  
-  
+
+
   public popup(pop: string): void {
     const key = `${pop}_pop` as keyof this;
     if (typeof this[key] === 'boolean') {
       (this[key] as boolean) = true;
     }
   }
-  
+
   public handleConfirm(pop: string): void {
     const key = `${pop}_pop` as keyof this;
     if (typeof this[key] === 'boolean') {
       (this[key] as boolean) = false;
     }
   }
-  
+
   public formatDate(date: string | number | Date, separator: '-' | '/'): string {
     if (date instanceof Date) {
-        let day = String(date.getDate()).padStart(2, '0');
-        let month = String(date.getMonth() + 1).padStart(2, '0');
-        let year = date.getFullYear();
-        return `${day}${separator}${month}${separator}${year}`;
+      let day = String(date.getDate()).padStart(2, '0');
+      let month = String(date.getMonth() + 1).padStart(2, '0');
+      let year = date.getFullYear();
+      return `${day}${separator}${month}${separator}${year}`;
     }
 
     if (typeof date === 'number') {
-        date = date.toString(); 
+      date = date.toString();
     }
 
     if (typeof date === 'string' && date.length === 8) {
-        let day = date.slice(0, 2);
-        let month = date.slice(2, 4);
-        let year = date.slice(4, 8); 
-        return `${day}${separator}${month}${separator}${year}`;
+      let day = date.slice(0, 2);
+      let month = date.slice(2, 4);
+      let year = date.slice(4, 8);
+      return `${day}${separator}${month}${separator}${year}`;
     }
 
-    return ''; 
+    return '';
   }
 
-  public formatAmount (amount: string | number): string  {
+  public formatAmount(amount: string | number): string {
     return Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
-  public statusInv (stat: string ): string  {
+  public convertFlag(flag: string | null): boolean {
+    let flagRe = false
+    if (flag === '0' || !flag) {
+      flagRe = false
+    } else if (flag === '1') {
+      flagRe = true;
+    }
+    return flagRe
+  };
+
+
+  public statusInv(stat: string): string {
     let statinv = ''
     if (stat === 'N') {
       statinv = 'Not yet paid';
@@ -221,10 +280,10 @@ export class PymntpageComponent {
     }
     return statinv
   };
-  
+
   public setLoading(isLoading: boolean) {
     console.log('Loading status:', isLoading); // Debug
     this.isLoading = isLoading;
   }
-  
+
 }
