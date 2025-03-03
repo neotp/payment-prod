@@ -7,6 +7,7 @@ import { FindCusCode, GetInv, InvoiceData, SearchInv } from '../../interface/pay
 import { ApiService } from '../../service/api.service';
 import { firstValueFrom } from 'rxjs';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
+import { Router ,RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-pymntpage',
@@ -36,6 +37,7 @@ export class PymntpageComponent {
   public isVisible: any;
   public headerForm!: FormGroup;
   public searchData = {} as SearchInv;
+  public paymentData = {} as SearchInv;
   public findCus = {} as FindCusCode;
   public getInv = {} as GetInv;
   public username: any;
@@ -46,6 +48,7 @@ export class PymntpageComponent {
   constructor(
     private formBuilder: FormBuilder
     , private api: ApiService
+    , private router: Router
   ) {
     this.headerForm = this.formBuilder.group({
       cuscode: [{ value: null, disabled: false }]
@@ -125,17 +128,31 @@ export class PymntpageComponent {
     }
     this.api.getPayment(data).subscribe((response: any) => {
       console.log(response);
-      this.allData = response.data.map((invoice: any) => ({
-        selected: this.convertFlag(invoice.pywflag)
-        , docType: invoice.pywdoctype
-        , docNo: invoice.pywdocno
-        , docDate: this.formatDate(invoice.pywdocdate, '/')
-        , dueDate: this.formatDate(invoice.pywduedate, '/')
-        , docAmt: this.formatAmount(invoice.pywdocamt)
-        , balAmt: this.formatAmount(invoice.pywbalamt)
-        , stat: this.statusInv(invoice.pywstat)
+      this.paymentData = response.data.map((payment: any) => ({
+        merchantId: ''
+        , amount:  payment.amount
+        , orderRef:  payment.paymentno
+        , currCode: ''
+        , successUrl:  ''
+        , failUrl: ''
+        , cancelUrl: ''
+        , payType: ''
+        , lang: 'E'
+        , TxType: ''
+        , Term: ''
+        , promotionType:  ''
+        , supplierId:  ''
+        , productId:  ''
+        , serialNo:  ''
+        , model:  ''
+        , itemTotal:  ''
+        , redeemPoint:  ''
+        , paymentSkip:  ''
+        , memberPay_service: ''
+        , memberPay_memberId: ''
+        , secureHash: ''
       }));
-      this.dataDisplay = this.allData;
+      this.router.navigate(['/payment-redirect'], { queryParams: this.paymentData });
       this.setLoading(false);
       this.popup(response.status);
     }, (error: any) => {
@@ -274,7 +291,7 @@ export class PymntpageComponent {
   public statusInv(stat: string): string {
     let statinv = ''
     if (stat === 'N') {
-      statinv = 'Not yet paid';
+      statinv = 'Unpaid';
     } else if (stat === 'P') {
       statinv = 'Process';
     }

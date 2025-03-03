@@ -539,7 +539,6 @@ async def getPayment(data: Payment, conn=Depends(get_mysql_connection)):
         if conn:                                                            
             conn.close() 
         
-        
 def generatePayment():
     set_date = datetime.now().strftime("%Y%m%d%H%M%S")
     run_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))

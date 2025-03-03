@@ -6,6 +6,7 @@ import { MnusrpageComponent } from './component/mnusrpage/mnusrpage.component';
 import { KbankcallbackComponent } from './component/kbankcallback/kbankcallback.component';
 import { AuthGuard } from './auth.guard';
 import { LoadingSpinnerComponent } from './component/shared/loading-spinner/loading-spinner.component';
+import { PaymentRedirectComponent } from './component/payment-redirect/payment-redirect.component';
 
 export const routes: Routes = [
     {
@@ -38,6 +39,10 @@ export const routes: Routes = [
     {
         path: 'payment/loading',
         component: LoadingSpinnerComponent
+    },
+    {
+        path: 'payment/payment-redirect',
+        component: PaymentRedirectComponent 
     },
     {
         path: '**', 
