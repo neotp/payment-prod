@@ -4,8 +4,18 @@ DELIMITER $$
 
 CREATE PROCEDURE pkgpymnt_load_data(
     IN p_cuscode            VARCHAR(50)
+    , IN p_offset             INT
+    , IN p_limit              INT
 )
 BEGIN
+
+    DECLARE total_count INT;
+    SELECT COUNT(*) 
+    INTO total_count
+    FROM pymdp_work pyw
+    WHERE pyw.pywcuscode = p_cuscode;
+
+    SELECT total_count AS total_count;
 
     SELECT 
         pyw.pywid
@@ -20,7 +30,8 @@ BEGIN
         , pyw.pywstat
     FROM pymdp_work pyw
     WHERE pyw.pywcuscode = p_cuscode
-    ORDER BY pyw.pywduedate ASC;
+    ORDER BY pyw.pywduedate ASC
+    LIMIT p_limit OFFSET p_offset;
 
 END $$
 
