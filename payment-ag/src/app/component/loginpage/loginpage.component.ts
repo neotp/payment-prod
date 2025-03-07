@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, PLATFORM_ID, Inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, FormsModule, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Login } from '../../interface/loginpage-interface';
 import { ApiService } from '../../service/api.service';
 import { PopupComponent } from '../shared/popup/popup.component';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -25,20 +25,34 @@ export class LoginpageComponent implements OnInit {
   public blank_pop: boolean = false;
   public loginData = {} as Login;
   public regis: string | null = null;
+  public isMobile: boolean = false; 
+  private isBrowser: boolean; 
 
   constructor(
     private router: Router
     , private formBuilder: FormBuilder
     , private api: ApiService
     , private route: ActivatedRoute
+    , @Inject(PLATFORM_ID) private platformId: Object
   ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
     this.loginForm = this.formBuilder.group({
       usr: [{ value: null, disabled: false }, [Validators.required]]
       , pss: [{ value: null, disabled: false }, [Validators.required]]
     });
   }
 
+  @HostListener('window:resize', ['$event'])
+  public onResize(event: any) {
+    if (this.isBrowser) {
+      this.checkScreenSize();
+    }
+  }
+
   public ngOnInit(): void {
+    if (this.isBrowser) {
+      this.checkScreenSize();
+    }
     this.loginForm.reset();
     this.clearValue();
     this.route.queryParams.subscribe(params => {
@@ -52,6 +66,12 @@ export class LoginpageComponent implements OnInit {
           });
       }
     });
+  }
+
+  public checkScreenSize() {
+    if (this.isBrowser) {
+      this.isMobile = window.innerWidth <= 768;
+    }
   }
 
   public onSubmit() {
@@ -88,9 +108,9 @@ export class LoginpageComponent implements OnInit {
             };
   
             if (result.role === 'admin') {
-              this.router.navigate(['payment/mnusrpage'], { queryParams });
+              this.router.navigate(['payment/mnusrpage'], { queryParams , queryParamsHandling: 'preserve'} );
             } else if (result.role === 'user') {
-              this.router.navigate(['payment/pymntpage'], { queryParams });
+              this.router.navigate(['payment/pymntpage'], { queryParams , queryParamsHandling: 'preserve'});
             }
           } else {
             this.popup('notfound');
@@ -151,4 +171,3 @@ export class LoginpageComponent implements OnInit {
     }
   }
 }
-

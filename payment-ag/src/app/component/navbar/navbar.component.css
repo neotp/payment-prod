@@ -1,50 +1,155 @@
+/* General Reset */
 body {
-    margin: 0;
-  }
-  
-  ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    width: 15%;
-    background-color: #f1f1f1;
-    position: fixed;
-    height: 100%;
-    overflow: auto;
-  }
-  
-  li a {
-    display: block;
-    color: #5b3b4f;
-    padding: 8px 16px;
-    text-decoration: none;
-  }
-  
-  li a.active {
-    background-color: #d84444;
-    color: white;
-  }
-  
-  li a:hover:not(.active) {
-    background-color: #5b3b4f;
-    color: rgb(255, 255, 255);
+  margin: 0;
+}
+
+/* Common styles for both desktop and mobile */
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+li a {
+  display: block;
+  color: #5b3b4f;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+li a.active {
+  background-color: #5b3b4f;
+  color: white;
+}
+
+li a.logactive {
+  background-color: #d84444;
+  color: white;
+}
+li a:hover:not(.active) {
+  background-color: #5b3b4f;
+  color: white;
+}
+
+.divider-line {
+  width: 100%;
+  height: 2px;
+  background-color: #bb9b9a;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+/* Desktop Layout */
+.desktop-layout ul {
+  width: 15%;
+  background-color: #f1f1f1;
+  position: fixed;
+  height: 100%;
+  overflow: auto;
+  padding-top: 10px;
+}
+
+.desktop-layout .box1, .desktop-layout .box2 {
+  padding: 10px;
+}
+
+.desktop-layout .box1 {
+  margin-top: 0%;
+  height: 45%;
+}
+
+.desktop-layout .box2 {
+  margin-top: 50%;
+  height: 10%;
+}
+
+/* Mobile Layout */
+.mobile-layout ul {
+  width: 100%;
+  background-color: #f1f1f1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-y: auto;
+  height: 89px;
+}
+
+.mobile-layout .header-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 68px; 
+}
+
+.mobile-layout .image-container {
+  width: 90px; 
+  height: 68px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mobile-layout .centered-img {
+  text-align: left;
+  margin-left: 5px;
+  margin-top: 5px;
+  width: 90px;
+  height: 68px; 
+}
+
+.mobile-layout .nav-links {
+  margin-top: 5px;
+  justify-content: space-between;
+  display: flex;
+  align-items: flex-end; 
+  height: 100%; 
+}
+
+.mobile-layout .nav-links li {
+  list-style-type: none;
+  text-align: center;
+  margin-left: 7px;
+}
+
+.mobile-layout .divider-line {
+  width: 100%;
+  height: 1px;
+  background-color: #bb9b9a;
+  margin: 10px 0;
+}
+
+.mobile-layout .box2 {
+  display: flex;
+}
+
+.mobile-layout .box2 li {
+  text-align: center;
+}
+
+/* Media Query for Mobile Responsiveness */
+@media (max-width: 768px) {
+  .mobile-layout ul {
+    padding-top: 0;
   }
 
-  .box1{
-    margin-top: 0%;
-    height: 50%;
-  }
-
-  .box2{
-    margin-top: 50%;
-    height: 10%;
-  }
-
-  .divider-line {
+  .mobile-layout .header-container {
+    flex-direction: row; 
+    display: flex;
+    align-items: center;
     width: 100%;
-    height: 2px;
-    background-color: #bb9b9a;
-    margin-top: 10px;
-    margin-bottom: 20px;
+    height: 68px;
   }
-  
+
+  .mobile-layout .nav-links {
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 100%; 
+  }
+}

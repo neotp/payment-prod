@@ -5,8 +5,11 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:ssr": "ng build --prod && ng run payment-ag:server",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "lint": "ng lint",
+    "e2e": "ng e2e",
     "serve:ssr:payment-ag": "node dist/payment-ag/server/server.mjs"
   },
   "private": true,

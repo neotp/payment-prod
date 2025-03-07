@@ -1,24 +1,82 @@
-<ul>
-    <div class="image-container centered-img" style="text-align: center">
-        <img src="SIS.png" alt="SIS Logo" class="centered-img">
-    </div>
-    <div class="divider-line"></div>
-    <div class="box1">
-        <li *ngIf="!isLoggedIn()">
-            <a routerLink="payment/loginpage">Login</a>
-        </li>
+<!-- Laptop, Notebook, Tablet Layout -->
+<div *ngIf="!isMobile" class="desktop-layout">
+    <ul>
+        <div class="image-container centered-img" style="text-align: center;">
+            <img src="SIS.png" alt="SIS Logo" class="centered-img">
+        </div>
+        <div class="divider-line"></div>
+        <div class="box1">
+            <li *ngIf="!isLoggedIn()">
+                <a routerLink="payment/loginpage"
+                    routerLinkActive="active"  
+                    [routerLinkActiveOptions]="{exact: true}"
+                    [class.active]="activeRoute === '/payment/loginpage'">
+                    Login</a>
+            </li>
+            
+            <li *ngIf="isLoggedIn() && accountRole === 'admin'">
+                <a routerLink="payment/mnusrpage" (click)="manageuser()"  
+                routerLinkActive="active"  
+                [routerLinkActiveOptions]="{exact: true}" 
+                [class.active]="activeRoute === '/payment/mnusrpage'">
+                Manage User</a>
+            </li>
 
-        <li *ngIf="isLoggedIn() && (accountRole === 'user' || accountRole === 'admin')">
-            <a routerLink="payment/pymntpage" (click)="payment()">Payment</a>
-        </li>
+            <li *ngIf="isLoggedIn() && (accountRole === 'user' || accountRole === 'admin')">
+                <a routerLink="payment/pymntpage" (click)="payment()"
+                routerLinkActive="active"  
+                [routerLinkActiveOptions]="{exact: true}" 
+                [class.active]="activeRoute === '/payment/pymntpage'">
+                Payment</a>
+            </li>
 
-        <li *ngIf="isLoggedIn() && accountRole === 'admin'">
-            <a routerLink="payment/mnusrpage" (click)="manageuser()">Manage User</a>
-        </li>
-    </div>
-    <div class="box2">
-        <li *ngIf="isLoggedIn()">
-            <a class="active" routerLink="payment/loginpage" (click)="logout()">Logout</a>
-        </li>
-    </div>
-</ul>
+        </div>
+        <div class="box2">
+            <li *ngIf="isLoggedIn()">
+                <a class="logactive" routerLink="payment/loginpage" (click)="logout()">Logout</a>
+            </li>
+        </div>
+    </ul>
+</div>
+
+<!-- Mobile Layout -->
+<div *ngIf="isMobile" class="mobile-layout">
+    <ul>
+        <!-- Logo and Navigation links in the same row -->
+        <div class="header-container">
+            <div class="image-container centered-img">
+                <img src="SIS.png" alt="SIS Logo" class="centered-img">
+            </div>
+
+            <div class="nav-links">
+                <li *ngIf="!isLoggedIn()">
+                    <a routerLink="payment/loginpage" 
+                    routerLinkActive="active"  
+                    [routerLinkActiveOptions]="{exact: true}"
+                    [class.active]="activeRoute === '/payment/loginpage'">
+                    Login</a>
+                </li>
+                <li *ngIf="isLoggedIn() && accountRole === 'admin'">
+                    <a routerLink="payment/mnusrpage" (click)="manageuser()"  
+                    routerLinkActive="active"  
+                    [routerLinkActiveOptions]="{exact: true}" 
+                    [class.active]="activeRoute === '/payment/mnusrpage'">
+                    Manage User</a>
+                </li>
+                <li *ngIf="isLoggedIn() && (accountRole === 'user' || accountRole === 'admin')">
+                    <a routerLink="payment/pymntpage" (click)="payment()"  
+                    routerLinkActive="active"  
+                    [routerLinkActiveOptions]="{exact: true}" 
+                    [class.active]="activeRoute === '/payment/pymntpage'">
+                    Payment</a>
+                </li>
+                <li *ngIf="isLoggedIn()" style="right: 1px;">
+                    <a class="logactive" routerLink="/payment/loginpage" (click)="logout()">Logout</a>
+                </li>
+            </div>
+        </div>
+
+        <div class="divider-line"></div>
+    </ul>
+</div>
+

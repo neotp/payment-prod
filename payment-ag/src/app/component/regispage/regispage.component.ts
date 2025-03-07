@@ -1,10 +1,10 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, OnInit } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, HostListener, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { FormGroup, Validators, ReactiveFormsModule, FormBuilder, FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Register } from '../../interface/register-interface';
 import { ApiService } from '../../service/api.service';
 import { PopupComponent } from '../shared/popup/popup.component';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { MatDialog } from '@angular/material/dialog';
 import { CaptchaPopupComponent } from '../shared/captcha-popup/captcha-popup.component';
@@ -38,6 +38,8 @@ export class RegispageComponent implements OnInit {
   public siteKey: string = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
   public isSubmitting = false;
   public isLoading = false;
+  public isMobile: boolean = false; 
+  private isBrowser: boolean; 
 
 
   constructor(
@@ -45,7 +47,9 @@ export class RegispageComponent implements OnInit {
     , private formBuilder: FormBuilder
     , private api: ApiService
     , public dialog: MatDialog
+    , @Inject(PLATFORM_ID) private platformId: Object
   ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
     this.registerForm = this.formBuilder.group({
       fstname: [{ value: null, disabled: false }, [Validators.required]]
       , lstname: [{ value: null, disabled: false }, [Validators.required]]
@@ -59,7 +63,23 @@ export class RegispageComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    //
+    if (this.isBrowser) {
+      this.checkScreenSize();
+    }
+  }
+
+  @HostListener('window:resize', ['$event'])
+  public onResize(event: any) {
+    if (this.isBrowser) {
+      this.checkScreenSize();
+    }
+  }
+
+  
+  public checkScreenSize() {
+    if (this.isBrowser) {
+      this.isMobile = window.innerWidth <= 768;
+    }
   }
 
   private populateForm(): void {
@@ -103,7 +123,7 @@ export class RegispageComponent implements OnInit {
     this.api.register(this.registerData).subscribe(
       (result: any) => {
         if (result.regis === 'success') {
-          this.router.navigate(['payment/loginpage'], {queryParams: { regis: result.regis } });
+          this.router.navigate(['payment/loginpage'], {queryParams: { regis: result.regis } , queryParamsHandling: 'preserve'});
         } else {
           this.popup('dup');
         }

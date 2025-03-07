@@ -1,8 +1,8 @@
-<div class="container">
-    <nav class="sidebar">
+<div class="container" [ngClass]="{ 'mobile-container': isMobile }">
+    <nav class="sidebar" [ngClass]="{ 'mobile-sidebar': isMobile }">
         <app-navbar></app-navbar>
     </nav>
-    <main class="content">
+    <main [ngClass]="isMobile ? 'mobile-content' : 'content'">
         <router-outlet></router-outlet>
     </main>
 </div>

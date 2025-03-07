@@ -1,13 +1,17 @@
-import { Component, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { PopupComponent } from "../shared/popup/popup.component";
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FindCusCode, GetInv, InvoiceData, SearchInv } from '../../interface/payment-interface';
 import { ApiService } from '../../service/api.service';
 import { firstValueFrom } from 'rxjs';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
 import { Router ,RouterLink } from '@angular/router';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { PagingComponent } from '../shared/paging/paging.component';
 
 @Component({
   selector: 'app-pymntpage',
@@ -18,6 +22,10 @@ import { Router ,RouterLink } from '@angular/router';
     , FormsModule
     , ReactiveFormsModule
     , LoadingSpinnerComponent
+    , MatTableModule
+    , MatPaginatorModule
+    , MatSortModule
+    , PagingComponent
   ],
   templateUrl: './pymntpage.component.html',
   styleUrl: './pymntpage.component.css'
@@ -44,12 +52,23 @@ export class PymntpageComponent {
   public customercode: any;
   public customername: any;
   public loadingApp: EventEmitter<boolean> = new EventEmitter(false);
+  public isMobile: boolean = false; 
+  private isBrowser: boolean; 
+  public page_start: number = 1;
+  public page_limit: number = 10;
+  public totalRecords: number = 0;
+  public pageSizeOptions: number[] = [ 10, 20, 50, 100];
+
+  public displayedColumns: string[] = ['selected', 'docType', 'docNo', 'docDate', 'dueDate', 'docAmt', 'balAmt', 'stat'];
+  public dataSource = new MatTableDataSource<any>([]);
 
   constructor(
     private formBuilder: FormBuilder
     , private api: ApiService
     , private router: Router
+    , @Inject(PLATFORM_ID) private platformId: Object
   ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
     this.headerForm = this.formBuilder.group({
       cuscode: [{ value: null, disabled: false }]
       , invNo: [{ value: null, disabled: false }]
@@ -64,8 +83,24 @@ export class PymntpageComponent {
       this.username = '';
     }
     this.findCusCode();
+    if (this.isBrowser) {
+      this.checkScreenSize();
+    }
   }
 
+  @HostListener('window:resize', ['$event'])
+    public onResize(event: any) {
+      if (this.isBrowser) {
+        this.checkScreenSize();
+      }
+    }
+    
+    public checkScreenSize() {
+      if (this.isBrowser) {
+        this.isMobile = window.innerWidth <= 768;
+      }
+    }
+    
   private populateForm(): void {
     this.searchData.customer_code = this.headerForm.controls['cuscode'].value;
     this.searchData.invno = this.headerForm.controls['invNo'].value;
@@ -82,18 +117,9 @@ export class PymntpageComponent {
       if (this.getInv.usrcuscode) {
         await this.api.getDataInvoice(this.getInv).subscribe((res: any) => {
           console.log(res);
-          this.allData = res.data.map((invoice: any) => ({
-            selected: this.convertFlag(invoice.pywflag)
-            , docType: invoice.pywdoctype
-            , docNo: invoice.pywdocno
-            , docDate: this.formatDate(invoice.pywdocdate, '/')
-            , dueDate: this.formatDate(invoice.pywduedate, '/')
-            , docAmt: this.formatAmount(invoice.pywdocamt)
-            , balAmt: this.formatAmount(invoice.pywbalamt)
-            , stat: this.statusInv(invoice.pywstat)
-          }));
-          this.dataDisplay = this.allData;
-          this.setLoading(false);
+          if(res.status ==='success'){
+            this.loadData()
+          }
         }, (error: any) => {
           console.log('Error during login:', error);
           this.setLoading(false);
@@ -108,6 +134,41 @@ export class PymntpageComponent {
     });
   }
 
+  public loadData (): void {
+    const data = {
+      usrcuscode:this.customercode
+      , page_start: this.page_start 
+      , page_limit: this.page_limit
+    }
+     this.api.loadData(data).subscribe((res: any) => {
+      console.log(res);
+      this.allData = res.data.map((invoice: any) => ({
+        selected: this.convertFlag(invoice.pywflag)
+        , docType: invoice.pywdoctype
+        , docNo: invoice.pywdocno
+        , docDate: this.formatDate(invoice.pywdocdate, '/')
+        , dueDate: this.formatDate(invoice.pywduedate, '/')
+        , docAmt: this.formatAmount(invoice.pywdocamt)
+        , balAmt: this.formatAmount(invoice.pywbalamt)
+        , stat: this.statusInv(invoice.pywstat)
+      }));
+      this.dataDisplay = this.allData;
+      this.dataSource.data = this.dataDisplay;  // Bind data to dataSource (for table)
+      this.totalRecords = res.total; // Set total items for pagination
+      this.setLoading(false);
+    }, (error: any) => {
+      console.log('Error during login:', error);
+      this.setLoading(false);
+    });
+
+  }
+
+  public onPageChanged(event: { pageStart: number, pageLimit: number }) {
+    this.page_start = event.pageStart;
+    this.page_limit = event.pageLimit;
+    this.loadData();
+  }
+
   public async searchPayment(): Promise<void> {
     this.setLoading(true);
     this.populateForm();
@@ -115,8 +176,10 @@ export class PymntpageComponent {
       this.dataDisplay = this.allData.filter((item: InvoiceData) =>
         item.docNo === this.searchData.invno
       );
+      this.dataSource.data = this.dataDisplay;
     } else {
       this.dataDisplay = this.allData;
+      this.dataSource.data = this.dataDisplay;
     }
     this.setLoading(false);
   }
@@ -130,8 +193,8 @@ export class PymntpageComponent {
       console.log(response);
       this.paymentData = response.data.map((payment: any) => ({
         merchantId: ''
-        , amount:  payment.amount
-        , orderRef:  payment.paymentno
+        , amount:  payment.pyhsumamt
+        , orderRef:  payment.pyhpymno
         , currCode: ''
         , successUrl:  ''
         , failUrl: ''
@@ -152,7 +215,8 @@ export class PymntpageComponent {
         , memberPay_memberId: ''
         , secureHash: ''
       }));
-      this.router.navigate(['/payment-redirect'], { queryParams: this.paymentData });
+      console.log(this.paymentData);
+      this.router.navigate(['/payment-redirect'], { queryParams: this.paymentData , queryParamsHandling: 'preserve'});
       this.setLoading(false);
       this.popup(response.status);
     }, (error: any) => {
@@ -171,18 +235,9 @@ export class PymntpageComponent {
     }
     this.api.updateflag(data).subscribe((response: any) => {
       console.log(response);
-      this.allData = response.data.map((invoice: any) => ({
-        selected: this.convertFlag(invoice.pywflag)
-        , docType: invoice.pywdoctype
-        , docNo: invoice.pywdocno
-        , docDate: this.formatDate(invoice.pywdocdate, '/')
-        , dueDate: this.formatDate(invoice.pywduedate, '/')
-        , docAmt: this.formatAmount(invoice.pywdocamt)
-        , balAmt: this.formatAmount(invoice.pywbalamt)
-        , stat: this.statusInv(invoice.pywstat)
-      }));
-      this.dataDisplay = this.allData;
-      this.setLoading(false);
+      if(response.status ==='success'){
+        this.loadData()
+      }
     }, (error: any) => {
       console.log('Error during login:', error);
       this.setLoading(false);
@@ -209,18 +264,9 @@ export class PymntpageComponent {
     }
     this.api.updateAllflag(data).subscribe((response: any) => {
       console.log(response);
-      this.allData = response.data.map((invoice: any) => ({
-        selected: this.convertFlag(invoice.pywflag)
-        , docType: invoice.pywdoctype
-        , docNo: invoice.pywdocno
-        , docDate: this.formatDate(invoice.pywdocdate, '/')
-        , dueDate: this.formatDate(invoice.pywduedate, '/')
-        , docAmt: this.formatAmount(invoice.pywdocamt)
-        , balAmt: this.formatAmount(invoice.pywbalamt)
-        , stat: this.statusInv(invoice.pywstat)
-      }));
-      this.dataDisplay = this.allData;
-      this.setLoading(false);
+          if(response.status ==='success'){
+            this.loadData()
+          }
     }, (error: any) => {
       console.log('Error during login:', error);
       this.setLoading(false);
@@ -273,9 +319,11 @@ export class PymntpageComponent {
     return '';
   }
 
-  public formatAmount(amount: string | number): string {
-    return Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
+  public formatAmount(amount: string | number): number {
+    const parsedAmount = typeof amount === 'string' ? +amount : amount; // Convert to number
+    return isNaN(parsedAmount) ? 0 : parsedAmount; // Return 0 if invalid number
+  }
+  
 
   public convertFlag(flag: string | null): boolean {
     let flagRe = false

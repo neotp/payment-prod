@@ -1,40 +1,75 @@
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, HostListener, Inject, PLATFORM_ID } from '@angular/core';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule
+    , RouterModule ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
+  public isMobile: boolean = false; 
+  private isBrowser: boolean;
+  public activeRoute: string = '';
+
   constructor(
     private router: Router,
-    @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+    @Inject(PLATFORM_ID) private platformId: Object,
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId); 
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.activeRoute = event.url; // Get the current route
+        console.log('Current Route:', this.activeRoute);
+      }
+    });
+  }
+
+  // ✅ Only listen for window resize in the browser
+  @HostListener('window:resize', ['$event'])
+  public onResize(event: any) {
+    if (this.isBrowser) {
+      this.checkScreenSize();
+    }
+  }
+
+  // ✅ Initialize on component load (only in browser)
+  public ngOnInit() {
+    if (this.isBrowser) {
+      this.checkScreenSize();
+    }
+  }
+
+  public checkScreenSize() {
+    if (this.isBrowser) {
+      this.isMobile = window.innerWidth <= 768;
+    }
+  }
 
   public isLoggedIn(): boolean {
-    return isPlatformBrowser(this.platformId) && !!localStorage.getItem('accountRole');
+    return this.isBrowser && !!localStorage.getItem('accountRole');
   }
 
   public logout(): void {
-    if (isPlatformBrowser(this.platformId)) {
+    if (this.isBrowser) {
       localStorage.removeItem('accountRole');
       this.router.navigate(['payment/loginpage']);
     }
   }
 
   public payment(): void {
-      this.router.navigate(['payment/pymntpage']);
+    this.router.navigate(['payment/pymntpage']);
   }
 
   public manageuser(): void {
-      this.router.navigate(['payment/mnusrpage']);
+    this.router.navigate(['payment/mnusrpage']);
   }
 
   public get accountRole(): string | null {
-    return isPlatformBrowser(this.platformId) ? localStorage.getItem('accountRole') : null;
+    return this.isBrowser ? localStorage.getItem('accountRole') : null;
   }
 }

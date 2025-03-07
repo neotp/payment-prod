@@ -92,6 +92,14 @@ class UpdateAllFlag(BaseModel):
     cuscode: str
     flag: str
     
+class DataPending(BaseModel):
+    page_start: int
+    page_limit: int
+    
+class LoadDate(BaseModel):
+    usrcuscode: str
+    page_start: int
+    page_limit: int
     
 # Dependency: SAP Connection
 # def get_sap_connection():
@@ -187,29 +195,39 @@ def login(data: RegisterData, conn=Depends(get_mysql_connection)):
 # -------------------------- mnusr function begin --------------------------
 
 @app.post("/findDataPending")
-def findDataPending(conn=Depends(get_mysql_connection)):
+def findDataPending(data: DataPending,conn=Depends(get_mysql_connection)):
+    
+    offset = (data.page_start - 1) * data.page_limit
+    
     try:
         cursor1 = conn.cursor()
         cursor2 = conn.cursor()
         
         cursor1.callproc("pkgmnusr_insert_usrpss_work")
-        cursor2.callproc("pkgmnusr_load_data")
+        cursor2.callproc("pkgmnusr_load_data",[
+            offset
+            , data.page_limit
+        ])
         
         conn.commit()
         results = []
         for result in cursor2.stored_results():
-            results = result.fetchall() 
+            total_count = result.fetchone()[0] 
             break  
+        cursor2.nextset()
 
         logger.info("datadip: %s", results)
 
-        column_names = [desc[0] for desc in result.description] 
-        formatted_results = [dict(zip(column_names, row)) for row in results]
+        for result in cursor2.stored_results():
+            results = result.fetchall()
+            column_names = [desc[0] for desc in result.description]  
+            formatted_results = [dict(zip(column_names, row)) for row in results]
         
-        logger.info("data: %s", results)
+        logger.info("total: %s", total_count)
+        logger.info("data: %s", formatted_results)
         
         if result:
-            return JSONResponse(content={"status": "success", "data": formatted_results})
+            return JSONResponse(content={"status": "success", "total": total_count, "data": formatted_results})
         else:
             raise HTTPException(status_code=401, detail="Invalid credentials or user not active")
     except Exception as e:
@@ -227,11 +245,24 @@ def findDataPending(conn=Depends(get_mysql_connection)):
                 cursor2.close()
             except Exception as e:
                 logger.error(f"Error closing cursor2: {e}")
-        
+                
         if conn:
             conn.close()
         
+@app.post("/updateDataNow")
+def updateDataNow(conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
         
+        cursor.callproc("pkgmnusr_reload_usrpss_work")
+        conn.commit()
+        return JSONResponse(content={"status": "success", "message": "User updated successfully"})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
         
 @app.post("/updateDataToWork")
 def updateDataToWork(data: UpdateDateUser, conn=Depends(get_mysql_connection)):
@@ -318,6 +349,10 @@ def get_request_headers() -> dict:
         'Content-Type': 'application/json',
         'Token': generate_token(),
     }
+    
+
+def convert_decimal(value):
+    return float(value) if isinstance(value, Decimal) else value
 
 def format_date_ddmmyyyy(date_obj):
     """Convert a date object or string (YYYYMMDD) to 'DDMMYYYY' string format."""
@@ -373,7 +408,7 @@ async def insertOutstandingData(conn, outstanding_data: List[Dict]):
                     , record["DOC_AMOUNT"]
                     , record["BALANCE_AMOUNT"]
                 ]
-            )
+            ) 
         conn.commit()
     except Exception as e:
         logger.error(f"Error inserting outstanding data: {e}")
@@ -382,16 +417,30 @@ async def insertOutstandingData(conn, outstanding_data: List[Dict]):
         cursor.close()
 
 
-async def loadDataFromProcedure(conn, usrcuscode: str):
+        
+@app.post("/loadData")
+async def loadData(data: LoadDate, conn=Depends(get_mysql_connection)):
     cursor = conn.cursor()
+    offset = (data.page_start - 1) * data.page_limit
+
     try:
-        cursor.callproc("pkgpymnt_load_data", [usrcuscode])
+        cursor.callproc("pkgpymnt_load_data", [
+            data.usrcuscode,
+            offset,
+            data.page_limit
+        ])
         conn.commit()
 
         results = []
+        total_count = None
         for result in cursor.stored_results():
-            results = result.fetchall()
-            break
+            if total_count is None:
+                total_count = result.fetchone()[0]
+            else:
+                results = result.fetchall()
+
+        if not results:
+            return JSONResponse(content={"status": "success", "total": 0, "data": []})
 
         column_names = [desc[0] for desc in result.description]
         formatted_results = []
@@ -400,8 +449,7 @@ async def loadDataFromProcedure(conn, usrcuscode: str):
             formatted_row = {}
             for i, column in enumerate(row):
                 column_name = column_names[i]
-
-                if isinstance(column, Decimal): 
+                if isinstance(column, Decimal):
                     column = str(column)
 
                 if column_name in ['pywdocdate', 'pywduedate']:
@@ -411,13 +459,17 @@ async def loadDataFromProcedure(conn, usrcuscode: str):
 
             formatted_results.append(formatted_row)
 
-        return formatted_results
+        logger.info("Total count: %s", total_count)
+        logger.info("Data: %s", formatted_results)
+
+        return JSONResponse(content={"status": "success", "total": total_count, "data": formatted_results})
+
     except Exception as e:
         logger.error(f"Error loading data from procedure: {e}")
         raise HTTPException(status_code=500, detail=f"Error loading data from procedure: {e}")
+
     finally:
-        cursor.close()  
-        
+        cursor.close() 
  
 @app.post("/getDataInvoice")
 async def getDataInvoice(data: GetInv, conn=Depends(get_mysql_connection)):
@@ -427,11 +479,7 @@ async def getDataInvoice(data: GetInv, conn=Depends(get_mysql_connection)):
         
         await insertOutstandingData(conn, outstanding_data)
 
-        formatted_results = await loadDataFromProcedure(conn, data.usrcuscode)
-        
-        logger.info("data from table pymdp_work : %s", formatted_results)
-
-        return JSONResponse(content={"status": "success", "data": formatted_results})
+        return JSONResponse(content={"status": "success"})
 
     except Exception as e:
         logger.error(f"Error: {e}")
@@ -452,11 +500,8 @@ async def updateflag(data: UpdateFlag, conn=Depends(get_mysql_connection)):
             ])
         conn.commit()
         
-        formatted_results = await loadDataFromProcedure(conn, data.cuscode)
-        
-        logger.info("data from table pymdp_work : %s", formatted_results)
 
-        return JSONResponse(content={"status": "success", "data": formatted_results})
+        return JSONResponse(content={"status": "success"})
 
     except Exception as e:
         logger.error(f"Error: {e}")
@@ -481,12 +526,8 @@ async def updateAllflag(data: UpdateAllFlag, conn=Depends(get_mysql_connection))
             , data.flag
             ])
         conn.commit()
-        
-        formatted_results = await loadDataFromProcedure(conn, data.cuscode)
-        
-        logger.info("data from table pymdp_work : %s", formatted_results)
 
-        return JSONResponse(content={"status": "success", "data": formatted_results})
+        return JSONResponse(content={"status": "success"})
 
     except Exception as e:
         logger.error(f"Error: {e}")
@@ -506,6 +547,8 @@ async def getPayment(data: Payment, conn=Depends(get_mysql_connection)):
     try:
         paymentNo = generatePayment()
         cursor = conn.cursor()
+        cursor1 = conn.cursor()
+        cursor2 = conn.cursor()
         out_param = cursor.callproc("pkgpymnt_insert_pymhdr", [
             data.username
             , data.cuscode
@@ -515,13 +558,24 @@ async def getPayment(data: Payment, conn=Depends(get_mysql_connection)):
         stat = out_param[3]
         
         if stat == 'success':
-             cursor.callproc("pkgpymnt_update_pymdp_work", [
+            cursor1.callproc("pkgpymnt_update_pymdp_work", [
                 data.cuscode
             ])
+            cursor2.callproc("pkgpymnt_find_data_payment", [
+                paymentNo
+            ])
              
-        conn.commit() 
-        
-        formatted_results = await loadDataFromProcedure(conn, data.cuscode)
+        conn.commit()
+        results = []
+        for result in cursor2.stored_results():
+            results = result.fetchall() 
+            column_names = [desc[0] for desc in result.description] 
+            break  
+
+        formatted_results = [
+            {column: convert_decimal(value) for column, value in zip(column_names, row)}
+            for row in results
+        ]
         
         logger.info("data from table pymdp_work : %s", formatted_results)
 
@@ -530,14 +584,17 @@ async def getPayment(data: Payment, conn=Depends(get_mysql_connection)):
     except Exception as e:
         logger.error(f"Error: {e}")
         raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
+
     finally:
         if cursor:
             try:
                 cursor.close()
+                cursor1.close()
+                cursor2.close()
             except Exception as e:
                 logger.error(f"Error closing cursor: {e}")
-        if conn:                                                            
-            conn.close() 
+        if conn:
+            conn.close()
         
 def generatePayment():
     set_date = datetime.now().strftime("%Y%m%d%H%M%S")

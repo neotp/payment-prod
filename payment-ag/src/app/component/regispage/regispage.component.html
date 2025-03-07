@@ -1,116 +1,238 @@
-<div class="screen">
-    <div class="container-register">
-        <div class="image-container">
-            <img src="SIS.png" alt="SIS Logo" class="centered-img">
-        </div>
-        <h2>Register</h2>
-        <form [formGroup]="registerForm" (ngSubmit)="onConfirm()">
-
-            <!-- label name customer -->
-            <div class="row">
-                <div class="column">
-                    <label for="fstname">Name<span style="color: red;">*</span></label>
-                </div>
-                <div class="column">
-                    <label for="username">Customer<span style="color: red;">*</span></label>
-                </div>
+<div *ngIf="!isMobile" class="desktop-layout">
+    <div class="screen">
+        <div class="container-register">
+            <div class="image-container">
+                <img src="SIS.png" alt="SIS Logo" class="centered-img">
             </div>
+            <h2>Register</h2>
+            <form [formGroup]="registerForm" (ngSubmit)="onConfirm()">
 
-            <div class="row">
-                <!-- name-->
-                <div class="column bordor">
-                    <div class="row">
-                        <div class="column">
-                            <input type="text" formControlName="fstname" id="fstname" required
-                                placeholder="Enter First Name" autocomplete="off">
-                            <label class="desc">First Name</label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="column">
-                            <input type="text" formControlName="lstname" id="lstname" required
-                                placeholder="Enter Last Name" autocomplete="off">
-                            <label class="desc">Last Name</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- customer-->
-                <div class="column bordor">
-                    <div class="row">
-                        <div class="column">
-                            <input type="text" formControlName="customercode" id="customercode" required
-                                placeholder="Enter Customer code" autocomplete="off">
-                            <label class="desc">Customer code</label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="column">
-                            <input type="text" formControlName="customername" id="customername" required
-                                placeholder="Enter Customer Name" autocomplete="off">
-                            <label class="desc">Customer Name</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- label username -->
-            <div class="row">
-                <div class="column">
-                    <label for="username">Username<span style="color: red;">*</span></label>
-                </div>
-            </div>
-
-            <div class="row bordor">
-                <!-- username pass -->
-                <div class="column">
-                    <div class="row">
-                        <div class="column">
-                            <input type="text" formControlName="username" id="username" required
-                                placeholder="Enter Username" autocomplete="off">
-                            <label class="desc">Username</label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="column">
-                            <input type="password" formControlName="password" id="password" required
-                                placeholder="Enter password" autocomplete="off">
-                            <label class="desc">Password</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- email position-->
-                <div class="column">
-                    <div class="row">
-                        <div class="column">
-                            <input type="email" formControlName="email" id="email" required placeholder="Enter Email"
-                                autocomplete="off">
-                            <label class="desc">example&#64;gmail.com</label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="column">
-                            <input type="text" formControlName="position" id="position" required
-                                placeholder="Enter Position" autocomplete="off">
-                            <label class="desc">Position</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="reg-page">
+                <!-- label name customer -->
                 <div class="row">
-                    <div class="column bot">
-                        <a routerLink="/payment/loginpage" class="link for-pass">Back</a>
+                    <div class="column">
+                        <label for="fstname">Name<span style="color: red;">*</span></label>
                     </div>
                     <div class="column">
-                        <button class="confirm-button" type="button" [disabled]="!registerForm.valid" (click)="onConfirm()">Confirm</button>
+                        <label for="username">Customer<span style="color: red;">*</span></label>
                     </div>
                 </div>
+
+                <div class="row">
+                    <!-- name-->
+                    <div class="column bordor">
+                        <div class="row">
+                            <div class="column">
+                                <input type="text" formControlName="fstname" id="fstname" required
+                                    placeholder="Enter First Name" autocomplete="off">
+                                <label class="desc">First Name</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <input type="text" formControlName="lstname" id="lstname" required
+                                    placeholder="Enter Last Name" autocomplete="off">
+                                <label class="desc">Last Name</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- customer-->
+                    <div class="column bordor">
+                        <div class="row">
+                            <div class="column">
+                                <input type="text" formControlName="customercode" id="customercode" required
+                                    placeholder="Enter Customer code" autocomplete="off">
+                                <label class="desc">Customer code</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <input type="text" formControlName="customername" id="customername" required
+                                    placeholder="Enter Customer Name" autocomplete="off">
+                                <label class="desc">Customer Name</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- label username -->
+                <div class="row">
+                    <div class="column">
+                        <label for="username">Username<span style="color: red;">*</span></label>
+                    </div>
+                </div>
+
+                <div class="row bordor">
+                    <!-- username pass -->
+                    <div class="column">
+                        <div class="row">
+                            <div class="column">
+                                <input type="text" formControlName="username" id="username" required
+                                    placeholder="Enter Username" autocomplete="off">
+                                <label class="desc">Username</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <input type="password" formControlName="password" id="password" required
+                                    placeholder="Enter password" autocomplete="off">
+                                <label class="desc">Password</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- email position-->
+                    <div class="column">
+                        <div class="row">
+                            <div class="column">
+                                <input type="email" formControlName="email" id="email" required
+                                    placeholder="Enter Email" autocomplete="off">
+                                <label class="desc">example&#64;gmail.com</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <input type="text" formControlName="position" id="position" required
+                                    placeholder="Enter Position" autocomplete="off">
+                                <label class="desc">Position</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="reg-page">
+                    <div class="row">
+                        <div class="column bot">
+                            <a routerLink="payment/loginpage" class="link for-pass">Back</a>
+                        </div>
+                        <div class="column">
+                            <button class="confirm-button" type="button" [disabled]="!registerForm.valid"
+                                (click)="onConfirm()">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isMobile" class="mobile-layout">
+    <div class="screen">
+        <div class="container-register">
+            <div class="image-container">
+                <img src="SIS.png" alt="SIS Logo" class="centered-img">
             </div>
-        </form>
+            <h2>Register</h2>
+            <form [formGroup]="registerForm" (ngSubmit)="onConfirm()">
+
+                <!-- label name customer -->
+                <div class="row">
+                    <div class="column">
+                        <label for="fstname">Name<span style="color: red;">*</span></label>
+                    </div>
+                    <div class="column">
+                        <label for="username">Customer<span style="color: red;">*</span></label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- name-->
+                    <div class="column bordor">
+                        <div class="row">
+                            <div class="column">
+                                <input type="text" formControlName="fstname" id="fstname" required
+                                    placeholder="Enter First Name" autocomplete="off">
+                                <label class="desc">First Name</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <input type="text" formControlName="lstname" id="lstname" required
+                                    placeholder="Enter Last Name" autocomplete="off">
+                                <label class="desc">Last Name</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- customer-->
+                    <div class="column bordor">
+                        <div class="row">
+                            <div class="column">
+                                <input type="text" formControlName="customercode" id="customercode" required
+                                    placeholder="Enter Customer code" autocomplete="off">
+                                <label class="desc">Customer code</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <input type="text" formControlName="customername" id="customername" required
+                                    placeholder="Enter Customer Name" autocomplete="off">
+                                <label class="desc">Customer Name</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- label username -->
+                <div class="row">
+                    <div class="column">
+                        <label for="username">Username<span style="color: red;">*</span></label>
+                    </div>
+                </div>
+
+                <div class="row bordor">
+                    <!-- username pass -->
+                    <div class="column">
+                        <div class="row">
+                            <div class="column">
+                                <input type="text" formControlName="username" id="username" required
+                                    placeholder="Enter Username" autocomplete="off">
+                                <label class="desc">Username</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <input type="password" formControlName="password" id="password" required
+                                    placeholder="Enter password" autocomplete="off">
+                                <label class="desc">Password</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- email position-->
+                    <div class="column">
+                        <div class="row">
+                            <div class="column">
+                                <input type="email" formControlName="email" id="email" required
+                                    placeholder="Enter Email" autocomplete="off">
+                                <label class="desc">example&#64;gmail.com</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <input type="text" formControlName="position" id="position" required
+                                    placeholder="Enter Position" autocomplete="off">
+                                <label class="desc">Position</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="reg-page">
+                    <div class="row">
+                        <div class="column bot">
+                            <a routerLink="payment/loginpage" class="link for-pass">Back</a>
+                        </div>
+                        <div class="column">
+                            <button class="confirm-button" type="button" [disabled]="!registerForm.valid"
+                                (click)="onConfirm()">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -124,7 +246,8 @@
 <!-- cancelcaptcha Popup -->
 <div>
     <app-popup *ngIf="captcha_cancel_pop" [title]="'FAIL MESSAGE !'" [message]="'Registration failed  !'"
-        [headerColor]="'#FFDBDB'" [confirmButton]="true" (close)="captcha_cancel_pop = false" (confirm)="handleConfirm('captcha_cancel')">
+        [headerColor]="'#FFDBDB'" [confirmButton]="true" (close)="captcha_cancel_pop = false"
+        (confirm)="handleConfirm('captcha_cancel')">
     </app-popup>
 </div>
 
