@@ -164,6 +164,7 @@ export class PymntpageComponent {
   }
 
   public onPageChanged(event: { pageStart: number, pageLimit: number }) {
+    this.setLoading(true);
     this.page_start = event.pageStart;
     this.page_limit = event.pageLimit;
     this.loadData();
@@ -215,8 +216,7 @@ export class PymntpageComponent {
         , memberPay_memberId: ''
         , secureHash: ''
       }));
-      console.log(this.paymentData);
-      this.router.navigate(['/payment-redirect'], { queryParams: this.paymentData , queryParamsHandling: 'preserve'});
+      this.router.navigate(['payment/payment-redirect'], { queryParams: this.paymentData , queryParamsHandling: 'preserve'});
       this.setLoading(false);
       this.popup(response.status);
     }, (error: any) => {

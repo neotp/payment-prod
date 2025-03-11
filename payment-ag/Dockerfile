@@ -1,23 +1,26 @@
-# Stage 1: Build Angular Universal App
-FROM node:19 AS build
+# Stage 1: Build the Angular Universal (SSR) app
+FROM node:18 AS build
 
 WORKDIR /app
+
 COPY package.json package-lock.json ./
 RUN npm install --legacy-peer-deps
 
-COPY . .
+COPY . . 
 RUN npm run build:ssr
 
 # Stage 2: Serve App with Nginx
 FROM nginx:latest
 
-# Copy Angular SSR output
+# Remove the default Nginx configuration
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy the Angular Universal SSR output
 COPY --from=build /app/dist/payment-ag/browser /usr/share/nginx/html
 COPY --from=build /app/dist/payment-ag/server /app/server
 
-# Copy custom Nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy the custom Nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/
 
-EXPOSE 80
-
+EXPOSE 7070
 CMD ["nginx", "-g", "daemon off;"]

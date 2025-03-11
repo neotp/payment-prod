@@ -87,59 +87,59 @@
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
     
         <!-- Select All Column -->
-        <ng-container matColumnDef="selected">
-          <th mat-header-cell *matHeaderCellDef>
+        <ng-container matColumnDef="selected" style="width: 8%;">
+          <th mat-header-cell *matHeaderCellDef class="text-center">
             <input type="checkbox" class="checkbox-custom" [checked]="isAllSelected()" (change)="toggleSelectAll('all')" />
           </th>
-          <td mat-cell *matCellDef="let record">
+          <td mat-cell *matCellDef="let record" class="text-center">
             <input type="checkbox" class="checkbox-custom" [(ngModel)]="record.selected"
               [disabled]="record.stat === 'Process'" (change)="checkFlag(record)" />
           </td>
         </ng-container>
     
         <!-- Doc. Type Column -->
-        <ng-container matColumnDef="docType">
-          <th mat-header-cell *matHeaderCellDef> Doc. Type </th>
-          <td mat-cell *matCellDef="let record"> {{ record.docType }} </td>
+        <ng-container matColumnDef="docType" style="width: 15%;">
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Doc. Type </th>
+          <td mat-cell *matCellDef="let record" class="text-center"> {{ record.docType }} </td>
         </ng-container>
     
         <!-- Doc. No. Column -->
-        <ng-container matColumnDef="docNo">
-          <th mat-header-cell *matHeaderCellDef> Doc. No. </th>
-          <td mat-cell *matCellDef="let record"> {{ record.docNo }} </td>
+        <ng-container matColumnDef="docNo" style="width: 15%;">
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Doc. No. </th>
+          <td mat-cell *matCellDef="let record" class="text-center"> {{ record.docNo }} </td>
         </ng-container>
     
         <!-- Doc. Date Column -->
-        <ng-container matColumnDef="docDate">
-          <th mat-header-cell *matHeaderCellDef> Doc. Date </th>
-          <td mat-cell *matCellDef="let record"> {{ record.docDate }} </td>
+        <ng-container matColumnDef="docDate" style="width: 15%;">
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Doc. Date </th>
+          <td mat-cell *matCellDef="let record" class="text-center"> {{ record.docDate }} </td>
         </ng-container>
     
         <!-- Due Date Column -->
-        <ng-container matColumnDef="dueDate">
-          <th mat-header-cell *matHeaderCellDef> Due Date </th>
-          <td mat-cell *matCellDef="let record"> {{ record.dueDate }} </td>
+        <ng-container matColumnDef="dueDate" style="width: 15%;">
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Due Date </th>
+          <td mat-cell *matCellDef="let record" class="text-center"> {{ record.dueDate }} </td>
         </ng-container>
     
         <!-- Doc. Amount Column -->
-        <ng-container matColumnDef="docAmt">
-          <th mat-header-cell *matHeaderCellDef> Amount </th>
-          <td mat-cell *matCellDef="let record">
+        <ng-container matColumnDef="docAmt" style="width: 11%;">
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Amount </th>
+          <td mat-cell *matCellDef="let record" class="text-right">
             {{ (record.docAmt ? +record.docAmt : 0) | number:'1.2-2' }}
           </td>
         </ng-container>
     
         <!-- Balance Amount Column -->
-        <ng-container matColumnDef="balAmt">
-          <th mat-header-cell *matHeaderCellDef> Balance </th>
-          <td mat-cell *matCellDef="let record">
+        <ng-container matColumnDef="balAmt" style="width: 11%;">
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Balance </th>
+          <td mat-cell *matCellDef="let record" class="text-right">
             {{ (record.balAmt ? +record.balAmt : 0) | number:'1.2-2' }}
           </td>
         </ng-container>
     
         <!-- Status Column -->
-        <ng-container matColumnDef="stat">
-          <th mat-header-cell *matHeaderCellDef> Status </th>
+        <ng-container matColumnDef="stat" style="width: 10%;">
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Status </th>
           <td mat-cell *matCellDef="let record" class="text-center"
               [ngClass]="{'wait': record.stat === 'Process', 'unpaid': record.stat === 'Unpaid'}">
             {{ record.stat }}

@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  # Backend service (API)
+  payment-api:
+    build:
+      context: ./payment_api  # path to your backend code (adjust accordingly)
+    ports:
+      - "7000:7000"  # Expose port for the backend API
+    environment:
+      - PORT=7000
+    networks:
+      - app-network
+
+  # Frontend service (Angular SSR)
+  payment-ag:
+    build:
+      context: ./payment-ag  # path to your frontend Angular project (adjust accordingly)
+    ports:
+      - "7070:7070"  # Expose port for frontend (SSR)
+    depends_on:
+      - payment-api  # Ensure API is up before frontend starts
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -28,50 +28,50 @@
 
         <!-- Username Column -->
         <ng-container matColumnDef="uswusrname">
-          <th mat-header-cell *matHeaderCellDef> Username </th>
-          <td mat-cell *matCellDef="let record"> {{ record.uswusrname }} </td>
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Username </th>
+          <td mat-cell *matCellDef="let record" class="text-left"> {{ record.uswusrname }} </td>
         </ng-container>
 
         <!-- First Name Column -->
         <ng-container matColumnDef="uswfname">
-          <th mat-header-cell *matHeaderCellDef> First Name </th>
-          <td mat-cell *matCellDef="let record"> {{ record.uswfname }} </td>
+          <th mat-header-cell *matHeaderCellDef class="text-center"> First Name </th>
+          <td mat-cell *matCellDef="let record" class="text-left"> {{ record.uswfname }} </td>
         </ng-container>
 
         <!-- Last Name Column -->
         <ng-container matColumnDef="uswlname">
-          <th mat-header-cell *matHeaderCellDef> Last Name </th>
-          <td mat-cell *matCellDef="let record"> {{ record.uswlname }} </td>
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Last Name </th>
+          <td mat-cell *matCellDef="let record" class="text-left"> {{ record.uswlname }} </td>
         </ng-container>
 
         <!-- Customer Code Column -->
         <ng-container matColumnDef="uswcuscode">
-          <th mat-header-cell *matHeaderCellDef> Customer Code </th>
-          <td mat-cell *matCellDef="let record"> {{ record.uswcuscode }} </td>
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Customer Code </th>
+          <td mat-cell *matCellDef="let record" class="text-center"> {{ record.uswcuscode }} </td>
         </ng-container>
 
         <!-- Customer Name Column -->
         <ng-container matColumnDef="uswcusname">
-          <th mat-header-cell *matHeaderCellDef> Customer Name </th>
-          <td mat-cell *matCellDef="let record"> {{ record.uswcusname }} </td>
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Customer Name </th>
+          <td mat-cell *matCellDef="let record" class="text-left"> {{ record.uswcusname }} </td>
         </ng-container>
 
         <!-- Email Column -->
         <ng-container matColumnDef="uswemail">
-          <th mat-header-cell *matHeaderCellDef> Email </th>
-          <td mat-cell *matCellDef="let record"> {{ record.uswemail }} </td>
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Email </th>
+          <td mat-cell *matCellDef="let record" class="text-left"> {{ record.uswemail }} </td>
         </ng-container>
 
         <!-- Position Column -->
         <ng-container matColumnDef="uswpos">
-          <th mat-header-cell *matHeaderCellDef> Position </th>
-          <td mat-cell *matCellDef="let record"> {{ record.uswpos }} </td>
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Position </th>
+          <td mat-cell *matCellDef="let record" class="text-left"> {{ record.uswpos }} </td>
         </ng-container>
 
         <!-- Role Column -->
         <ng-container matColumnDef="uswrole">
-          <th mat-header-cell *matHeaderCellDef> Role </th>
-          <td mat-cell *matCellDef="let record">
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Role </th>
+          <td mat-cell *matCellDef="let record" class="text-center">
             <select class="ddl-role create-payment-button" [(ngModel)]="record.uswrole" (change)="updateRecord(record)">
               <option value="admin">Admin</option>
               <option value="user">User</option>

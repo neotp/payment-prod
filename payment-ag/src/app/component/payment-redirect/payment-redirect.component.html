@@ -1,5 +1,6 @@
 <h2>Redirecting to payment...</h2>
 
+<!-- Payment form that will be submitted to the bank's payment URL -->
 <form id="paymentForm" method="post" [action]="bankUrl">
   <input *ngFor="let key of objectKeys(paymentData)" type="hidden" [name]="key" [value]="paymentData[key]" />
   <button type="submit">Click here if not redirected</button>

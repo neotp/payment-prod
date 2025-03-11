@@ -3,7 +3,7 @@ from fastapi import FastAPI, Request, HTTPException, Depends, logger
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 # from pyrfc import Connection, ABAPApplicationError, ABAPRuntimeError, LogonError, CommunicationError
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Dict, List
 import mysql.connector
 import datetime
@@ -33,6 +33,10 @@ if not logger.handlers:
 origins = [
     "http://localhost:4200",
     "http://webapp.sisthai:4200",
+    "http://localhost:7070",
+    "http://webapp.sisthai:7070",
+    "http://172.31.144.1:7070",
+    "http://172.31.20.11:7070",
     # "http://your-angular-domain.com"  # Add your production domain here
 ]
 
@@ -100,6 +104,30 @@ class LoadDate(BaseModel):
     usrcuscode: str
     page_start: int
     page_limit: int
+    
+class TestSubmit(BaseModel):
+    merchantId: str = Field(..., description="Merchant ID")
+    amount: float = Field(..., description="Payment amount")
+    orderRef: str = Field(..., description="Order reference")
+    currCode: str = Field(..., description="Currency code")
+    successUrl: str = Field(..., description="URL for success")
+    failUrl: str = Field(..., description="URL for failure")
+    cancelUrl: str = Field(..., description="URL for cancellation")
+    payType: str = Field(..., description="Payment type")
+    lang: str = Field(default="E", description="Language")
+    TxType: str = Field(..., description="Transaction type")
+    Term: str = Field(..., description="Term information")
+    promotionType: str = Field(..., description="Promotion type")
+    supplierId: str = Field(..., description="Supplier ID")
+    productId: str = Field(..., description="Product ID")
+    serialNo: str = Field(..., description="Serial number")
+    model: str = Field(..., description="Model information")
+    itemTotal: str = Field(..., description="Total items")
+    redeemPoint: str = Field(..., description="Redeem points")
+    paymentSkip: str = Field(..., description="Payment skip flag")
+    memberPay_service: str = Field(..., description="Member pay service")
+    memberPay_memberId: str = Field(..., description="Member pay member ID")
+    secureHash: str = Field(..., description="Secure hash for validation")
     
 # Dependency: SAP Connection
 # def get_sap_connection():
@@ -373,6 +401,7 @@ async def getDataFromSap(usrcuscode: str) -> List[Dict]:
     
     try:
         response = requests.get(f"{api_url}?code={usrcuscode}", headers=headers, cookies=None)
+        logger.info(f"data from sap {response}")
         if response.status_code == 200:
             response_data = response.json()
             if response_data.get('message') == 'Success':
@@ -397,19 +426,33 @@ async def insertOutstandingData(conn, outstanding_data: List[Dict]):
             except ValueError as ve:
                 logger.error(f"Invalid date format for record {record}: {ve}")
                 continue
+            
+            status = None
+            
             cursor.callproc(
                 "pkgpymnt_insert_pymdp_work",
                 [   
-                    record["PAYER"]
-                    , record["DOC_TYPE_DISPLAY"]
-                    , record["BILL_DOC"]
-                    , doc_date
-                    , due_date
-                    , record["DOC_AMOUNT"]
-                    , record["BALANCE_AMOUNT"]
+                    record["PAYER"],
+                    record["DOC_TYPE_DISPLAY"],
+                    record["BILL_DOC"],
+                    doc_date,
+                    due_date,
+                    record["DOC_AMOUNT"],
+                    record["BALANCE_AMOUNT"],
+                    status  # Output parameter for status
                 ]
-            ) 
+            )
+            
+            # Fetch the status from the stored procedure
+            cursor.fetchone()  # This is necessary to get the output of the procedure
+            
+            if status == 'success':
+                logger.info(f"Record for {record['BILL_DOC']} inserted successfully.")
+            else:
+                logger.warning(f"Record for {record['BILL_DOC']} already exists.")
+                
         conn.commit()
+        return "success"  # Return success if everything goes fine
     except Exception as e:
         logger.error(f"Error inserting outstanding data: {e}")
         raise HTTPException(status_code=500, detail=f"Error inserting outstanding data: {e}")
@@ -477,9 +520,12 @@ async def getDataInvoice(data: GetInv, conn=Depends(get_mysql_connection)):
         outstanding_data = await getDataFromSap(data.usrcuscode)
         logger.info("data from outstanding : %s", outstanding_data)
         
-        await insertOutstandingData(conn, outstanding_data)
+        status = await insertOutstandingData(conn, outstanding_data)
 
-        return JSONResponse(content={"status": "success"})
+        if status == 'success':
+            return JSONResponse(content={"status": "success"})
+        else:
+            return JSONResponse(content={"status": "fail"})
 
     except Exception as e:
         logger.error(f"Error: {e}")
@@ -628,3 +674,11 @@ def hello():
 @app.get("/example/")
 def example_route():
     return JSONResponse(content={"status": "success", "data": "Example response"})
+
+
+@app.post("/submit-payment")
+async def submit_payment(data: TestSubmit):
+    try:
+        return JSONResponse(content={"message": "Payment data received", "data": data.dict()})
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error processing the payment data: {e}")
