@@ -12,6 +12,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { PagingComponent } from '../shared/paging/paging.component';
+import { AuthService } from '../../auth.service';
 
 @Component({
   selector: 'app-pymntpage',
@@ -66,6 +67,7 @@ export class PymntpageComponent {
     private formBuilder: FormBuilder
     , private api: ApiService
     , private router: Router
+    , private authService: AuthService
     , @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -75,16 +77,28 @@ export class PymntpageComponent {
     });
   }
 
+  @HostListener('window:mousemove', ['$event'])
+  public onMouseMove(event: MouseEvent) {
+    this.authService.resetOnUserActivity();
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  public onKeyDown(event: KeyboardEvent) {
+    this.authService.resetOnUserActivity();
+  }
+
   public ngOnInit(): void {
     const accountUserName = localStorage.getItem('username');
     if (accountUserName) {
       this.username = accountUserName;
+      this.authService.resetOnUserActivity();
     } else {
       this.username = '';
     }
     this.findCusCode();
     if (this.isBrowser) {
       this.checkScreenSize();
+      this.authService.resetOnUserActivity();
     }
   }
 

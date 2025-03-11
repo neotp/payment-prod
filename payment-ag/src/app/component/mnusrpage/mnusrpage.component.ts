@@ -12,6 +12,8 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { PagingComponent } from '../shared/paging/paging.component';
+import { AuthService } from '../../auth.service'; // Make sure to import the AuthService
+
 
 @Component({
   selector: 'app-mnusrpage',
@@ -66,6 +68,7 @@ export class MnusrpageComponent {
   constructor(
     private formBuilder: FormBuilder
     , private api: ApiService
+    , private authService: AuthService
     , @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -74,6 +77,8 @@ export class MnusrpageComponent {
       , invNo: [{ value: null, disabled: false }]
     });
   }
+
+  
 
   public ngOnInit(): void {
     this.setLoading(true);
@@ -96,6 +101,7 @@ export class MnusrpageComponent {
     }
     this.findData();
     this.updateDataNow();
+    this.authService.resetOnUserActivity();
   }
 
   public ngAfterViewInit() {
@@ -214,6 +220,7 @@ export class MnusrpageComponent {
   @HostListener('document:mousemove', ['$event'])
   onMouseMove = (event: MouseEvent): void => {
     if (this.resizing && this.currentColumn) {
+      this.authService.resetOnUserActivity();
       const deltaX = event.clientX - this.startX;
       this.currentColumn.style.width = `${this.startWidth + deltaX}px`;
     }
@@ -222,6 +229,7 @@ export class MnusrpageComponent {
   // This will handle the mouseup event to stop resizing
   @HostListener('document:mouseup', [])
   onMouseUp = (): void => {
+    this.authService.resetOnUserActivity();
     this.resizing = false;
     this.currentColumn = null;
     document.removeEventListener('mousemove', this.onMouseMove as EventListener);

@@ -37,7 +37,7 @@ origins = [
     "http://webapp.sisthai:7070",
     "http://172.31.144.1:7070",
     "http://172.31.20.11:7070",
-    # "http://your-angular-domain.com"  # Add your production domain here
+    # "https://webapp.sisthai.com"  # Add your production domain here
 ]
 
 app.add_middleware(

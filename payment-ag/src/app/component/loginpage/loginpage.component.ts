@@ -6,6 +6,7 @@ import { ApiService } from '../../service/api.service';
 import { PopupComponent } from '../shared/popup/popup.component';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../auth.service';
 
 @Component({
   imports: [ 
@@ -33,6 +34,7 @@ export class LoginpageComponent implements OnInit {
     , private formBuilder: FormBuilder
     , private api: ApiService
     , private route: ActivatedRoute
+    , private authService: AuthService // Inject the AuthService
     , @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -66,6 +68,7 @@ export class LoginpageComponent implements OnInit {
           });
       }
     });
+    this.authService.checkSessionTimeout(); // Check session timeout when component loads
   }
 
   public checkScreenSize() {
@@ -87,7 +90,6 @@ export class LoginpageComponent implements OnInit {
     this.loginForm.controls['usr'].setValue('');
     this.loginForm.controls['pss'].setValue('');
   }
-
 
   public login(): void {
     this.populateForm();
@@ -112,6 +114,10 @@ export class LoginpageComponent implements OnInit {
             } else if (result.role === 'user') {
               this.router.navigate(['payment/pymntpage'], { queryParams , queryParamsHandling: 'preserve'});
             }
+
+            // After successful login, set the last activity time and reset the timeout timer
+            this.authService.setLastActivityTime();
+            this.authService.resetTimeoutTimer();
           } else {
             this.popup('notfound');
           }
@@ -136,15 +142,6 @@ export class LoginpageComponent implements OnInit {
       case 'blank':
         this.blank_pop = false;
         break;
-      // case 'payment':
-      //   this.payment_pop = false;
-      //   break;
-      // case 'fail':
-      //   this.fail_pop = false;
-      //   break;
-      // case 'search':
-      //   this.warning_search= false;
-      //   break;
     }
   }
 
@@ -159,15 +156,6 @@ export class LoginpageComponent implements OnInit {
       case 'blank':
         this.blank_pop = true;
         break;
-      // case 'payment':
-      //   this.payment_pop = true;
-      //   break;
-      // case 'fail':
-      //   this.fail_pop = true;
-      //   break;
-      // case 'search':
-      //   this.warning_search = true;
-      //   break;
     }
   }
 }

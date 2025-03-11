@@ -11,6 +11,7 @@ services:
       - PORT=7000
     networks:
       - app-network
+    image: neotp/payment-api  # Image name for the backend
 
   # Frontend service (Angular SSR)
   payment-ag:
@@ -22,6 +23,7 @@ services:
       - payment-api  # Ensure API is up before frontend starts
     networks:
       - app-network
+    image: neotp/payment-web  # Image name for the frontend
 
 networks:
   app-network:

@@ -9,7 +9,8 @@ import { Register } from '../interface/register-interface';
   providedIn: 'root', // No `imports` here
 })
 export class ApiService {
-  private apiUrl = 'http://172.31.144.1:7000/';
+  private apiUrl = 'http://172.31.20.11:7070/';
+  
 
   constructor(private http: HttpClient) { }
 
