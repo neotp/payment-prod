@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Your Angular App</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <div *ngIf="!isMobile" class="desktop-layout">
+        <div class="row-tag">
+            <div class="column-tag">
+                <div class="row-tag">
+                    <div class="column-tag">
+                        <div class="tag">
+                            <span class="material-icons username">receipt</span>
+                            <span class="username">Detail Payment.</span>
+                        </div>
+                    </div>
+                    <div class="column-tag">
+                        <a class="text-link" style="margin-left: 10px;" (click)="navigateToPage()">
+                            Back
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="column-tag">
+                <div class="tag-user">
+                    <span class="material-icons username">account_circle</span>:
+                    <span class="username">{{ username }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="divider-line"></div>
+        <div [formGroup]="headerForm">
+            <div class="box">
+                <div class="row">
+                    <div class="column">
+                        <label for="payNo" class="username">Payment No.</label>
+                        <input autocomplete="off" type="text" id="payNo" formControlName="payNo" />
+                    </div>
+                    <div class="column">
+                        <label for="cuscode" class="username">Customer Code.</label>
+                        <input autocomplete="off" type="text" id="cuscode" formControlName="cuscode" />
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        <label for="creusr" class="username">Create User.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="creusr" formControlName="creusr" />
+                    </div>
+                    <div class="column">
+                        <label for="credate" class="username">Create Date.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="credate" formControlName="credate" />
+                    </div>
+                    <div class="column">
+                        <label for="bank" class="username">Bank.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="bank" formControlName="bank" />
+                    </div>
+                    <div class="column">
+                        <label for="card" class="username">Card.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="card" formControlName="card" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        <label for="amt" class="username">Amount.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="amt" formControlName="amt" />
+                    </div>
+                    <div class="column">
+                        <label for="feeAmt" class="username">Fee Amount.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="feeAmt" formControlName="feeAmt" />
+                    </div>
+                    <div class="column">
+                        <label for="totalAmt" class="username">Total Amount.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="totalAmt"
+                            formControlName="totalAmt" />
+                    </div>
+                    <div class="column">
+                        <label for="status" class="username">Status.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="status" formControlName="status" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="table-container">
+            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+                <!-- Username Column -->
+                <ng-container matColumnDef="docType">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Doc Type </th>
+                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.docType }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="docNo">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Doc No </th>
+                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.docNo }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="docDate">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Doc Date </th>
+                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.docDate }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="dueDate">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Due Date </th>
+                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.dueDate }} </td>
+                </ng-container>
+
+                <!-- First Name Column -->
+                <ng-container matColumnDef="docAmt">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Amount </th>
+                    <td mat-cell *matCellDef="let record" class="text-right">
+                        {{ (record.docAmt ? +record.docAmt : 0) | number:'1.2-2' }}
+                    </td>
+                </ng-container>
+
+                <!-- Last Name Column -->
+                <ng-container matColumnDef="balAmt">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Balance Amt </th>
+                    <td mat-cell *matCellDef="let record" class="text-right">
+                        {{ (record.balAmt ? +record.balAmt : 0) | number:'1.2-2' }}
+                    </td>
+                </ng-container>
+
+                <!-- Customer Code Column -->
+                <ng-container matColumnDef="paidAmt">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Paid Amt </th>
+                    <td mat-cell *matCellDef="let record" class="text-right">
+                        {{ (record.paidAmt ? +record.paidAmt : 0) | number:'1.2-2' }}
+                    </td>
+
+                </ng-container>
+
+                <!-- Customer Name Column -->
+                <ng-container matColumnDef="refDoc">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Ref Doc </th>
+                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.refDoc }} </td>
+                </ng-container>
+
+                <!-- Position Column -->
+                <ng-container matColumnDef="term">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Term </th>
+                    <td mat-cell *matCellDef="let record" class="text-left"> {{ record.term }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="stat">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Status </th>
+                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.stat }} </td>
+                </ng-container>
+                <!-- Email Column -->
+                <ng-container matColumnDef="note">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Comment </th>
+                    <td mat-cell *matCellDef="let record" class="text-left"> {{ record.note }} </td>
+                </ng-container>
+
+
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+
+        </div>
+        <app-paging [totalRecords]="totalRecords" [pageSize]="page_limit" [pageIndex]="page_start"
+            [pageSizeOptions]="pageSizeOptions" (pageChanged)="onPageChanged($event)">
+        </app-paging>
+
+    </div>
+
+    <div *ngIf="isMobile" class="mobile-layout">
+        <div [formGroup]="headerForm">
+            <div class="row">
+                <div class="tag">
+                    <span class="material-icons username">receipt</span>
+                    <span class="username">Detail Payment.</span>
+                </div>
+                <div class="tag-user">
+                    <span class="material-icons username">account_circle</span>:
+                    <span class="username">{{ username }}</span>
+                </div>
+            </div>
+            <div class="divider-line-top"></div>
+            <div class="row-btn">
+                <a class="text-link" (click)="navigateToPage()">
+                    Back
+                </a>
+            </div>
+
+            <div class="box">
+                <div class="row-cl">
+                    <div class="column-in">
+                        <label for="payNo" class="username" style="font-size: 14px;">Payment No.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="payNo" formControlName="payNo" />
+                    </div>
+                    <div class="column-in-right">
+                        <label for="cuscode" class="username" style="font-size: 14px;">Customer Code.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="cuscode" formControlName="cuscode" />
+
+                    </div>
+                </div>
+                <div class="row-cl">
+                    <div class="column-in">
+                        <label for="creusr" class="username" style="font-size: 14px;">Create User.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="creusr" formControlName="creusr" />
+                    </div>
+                    <div class="column-in-right">
+                        <label for="credate" class="username" style="font-size: 14px;">Create Date.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="credate" formControlName="credate" />
+                    </div>
+                </div>
+                <div class="row-cl">
+                    <div class="column-in">
+                        <label for="bank" class="username" style="font-size: 14px;">Bank.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="bank" formControlName="bank" />
+                    </div>
+                    <div class="column-in-right">
+                        <label for="card" class="username" style="font-size: 14px;">Card.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="card" formControlName="card" />
+                    </div>
+                </div>
+                <div class="row-cl">
+                    <div class="column-in">
+                        <label for="amt" class="username" style="font-size: 14px;">Amount.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="amt" formControlName="amt" />
+                    </div>
+                    <div class="column-in-right">
+                        <label for="feeAmt" class="username" style="font-size: 14px;">Fee Amount.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="feeAmt" formControlName="feeAmt" />
+                    </div>
+                </div>
+                <div class="row-cl">
+                    <div class="column-in">
+                        <label for="totalAmt" class="username" style="font-size: 14px;">Total Amount.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="totalAmt"
+                            formControlName="totalAmt" />
+                    </div>
+                    <div class="column-in-right">
+                        <label for="status" class="username" style="font-size: 14px;">Status.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="status" formControlName="status" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="divider-line"></div>
+            <div class="card" *ngFor="let record of allData">
+                <div class="card-content">
+
+                    <div class="card-row mb-color"><strong>Doc Type : </strong> {{ record.docType }}</div>
+                    <div class="card-row mb-color"><strong>Doc No : </strong> {{ record.docNo }}</div>
+                    <div class="card-row mb-color"><strong>Doc Date : </strong> {{ record.docDate }}</div>
+                    <div class="card-row mb-color"><strong>Due Date : </strong> {{ record.dueDate }}</div>
+                    <div class="card-row mb-color"><strong>Amount Amount : </strong> {{ record.docAmt | number:'1.2-2' }}</div>
+                    <div class="card-row mb-color"><strong>Balance Amt : </strong> {{ record.balAmt | number:'1.2-2' }}</div>
+                    <div class="card-row mb-color"><strong>Paid Amt : </strong> {{ record.paidAmt | number:'1.2-2' }}</div>
+                    <div class="card-row mb-color"><strong>Ref Doc : </strong> {{ record.refDoc }}</div>
+                    <div class="card-row mb-color"><strong>Term : </strong> {{ record.term }}</div>
+                    <div class="card-row mb-color"><strong>Status : </strong> {{ record.stat }}</div>
+                    <div class="card-row mb-color"><strong>Comment : </strong> {{ record.note }}</div>
+
+                </div>
+            </div>
+        </div>
+        <app-paging [totalRecords]="totalRecords" [pageSize]="page_limit" [pageIndex]="page_start"
+            [pageSizeOptions]="pageSizeOptions" (pageChanged)="onPageChanged($event)">
+        </app-paging>
+    </div>
+
+    <div>
+        <app-popup *ngIf="warning_pop" [title]="'WARNING MESSAGE'"
+            [message]="'คุณยังไม่ได้เลือกรายการ กรุณาเลือกรายการก่อน ทำการ Payment.'" [headerColor]="'#FCD69D'"
+            [confirmButton]="true" (close)="warning_pop = false" (confirm)="handleConfirm('warning')">
+        </app-popup>
+    </div>
+
+    <!-- Success Popup -->
+    <div>
+        <app-popup *ngIf="savesucess_pop" [title]="'SUCCESS MESSAGE !'" [message]="'บันทึกสำเร็จ!'"
+            [headerColor]="'#CCEFE8'" [confirmButton]="true" (close)="savesucess_pop = false"
+            (confirm)="handleConfirm('savesucess')">
+        </app-popup>
+    </div>
+
+    <!-- Fail Popup -->
+    <div>
+        <app-popup *ngIf="fail_pop" [title]="'FAIL MESSAGE !'" [message]="'ทำรายการไม่สำเร็จ.'"
+            [headerColor]="'#FFDBDB'" [confirmButton]="true" (close)="fail_pop = false"
+            (confirm)="handleConfirm('fail')">
+        </app-popup>
+    </div>
+
+    <!-- Fail Popup -->
+    <div>
+        <app-popup *ngIf="warning_search" [title]="'WARNING MESSAGE !'"
+            [message]="'กรุณากรอก Customer Code. และ Invoice No.'" [headerColor]="'#FCD69D'" [confirmButton]="true"
+            (close)="warning_search = false" (confirm)="handleConfirm('search')">
+        </app-popup>
+    </div>
+
+
+    <app-loading-spinner [isLoading]="isLoading"></app-loading-spinner>
+
+</body>
+
+</html>
+
+<!-- Same for allDataTable -->

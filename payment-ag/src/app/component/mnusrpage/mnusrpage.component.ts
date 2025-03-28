@@ -12,7 +12,9 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { PagingComponent } from '../shared/paging/paging.component';
-import { AuthService } from '../../auth.service'; // Make sure to import the AuthService
+import { AuthService } from '../../auth.service';
+import { CreatUser } from '../../interface/manageuser-interface';
+import { CreusrPopupComponent } from '../shared/creusr-popup/creusr-popup.component';
 
 
 @Component({
@@ -29,6 +31,7 @@ import { AuthService } from '../../auth.service'; // Make sure to import the Aut
       , MatPaginatorModule
       , MatSortModule
       , PagingComponent
+      , CreusrPopupComponent
     ],
   templateUrl: './mnusrpage.component.html',
   styleUrl: './mnusrpage.component.css',
@@ -45,12 +48,17 @@ export class MnusrpageComponent {
   public customerLabel: string = '';
   public warning_pop: boolean = false;
   public payment_pop: boolean = false;
+  public delete_pop: boolean = false;
   public savesucess_pop: boolean = false;
+  public creusr_pop: boolean = false;
   public fail_pop: boolean = false;
   public warning_search: boolean = false;
   public isVisible: any;  
   public username: any;  
+  public createUserData = {} as CreatUser;
   public searchData = {} as SearchInv;
+  public deleteData: any = {} ;
+  public messageDelete: any;
   public loadingApp: EventEmitter<boolean> = new EventEmitter(false);
   public headerForm!: FormGroup;
   public isLoading = false;
@@ -60,7 +68,7 @@ export class MnusrpageComponent {
   public totalRecords: number = 0;
   public pageSizeOptions: number[] = [ 10, 20, 50, 100];
 
-  public displayedColumns: string[] = ['uswusrname', 'uswfname', 'uswlname', 'uswcuscode', 'uswcusname', 'uswemail', 'uswpos', 'uswrole', 'uswstat'];
+  public displayedColumns: string[] = ['uswusrname', 'uswfname', 'uswlname', 'uswemail', 'uswpos', 'uswrole', 'uswstat', 'delete'];
   public dataSource = new MatTableDataSource<any>([]);
   private isBrowser: boolean; 
 
@@ -99,7 +107,6 @@ export class MnusrpageComponent {
     } else {
       this.username = '';
     }
-    this.findData();
     this.updateDataNow();
     this.authService.resetOnUserActivity();
   }
@@ -153,8 +160,7 @@ export class MnusrpageComponent {
         this.allData = []; // Clear data for 'user' role
         this.setLoading(false);
       } else {
-        // Process data for other roles (not 'user')
-        this.allData = result.data;  // Data from API
+        this.allData = result.data; 
         this.dataSource.data = this.allData;  // Bind data to dataSource (for table)
         this.totalRecords = result.total; // Set total items for pagination
         this.setLoading(false); // Hide loading state
@@ -164,13 +170,6 @@ export class MnusrpageComponent {
       this.setLoading(false); // Hide loading state if error occurs
     });
   }
-
-  // public onPageChange(event: any): void {
-  //   console.log('Page changed:', event);
-  //   this.page_start = event.pageIndex + 1; // Update page_start when page changes
-  //   this.page_limit = event.pageSize;      // Update page_limit when page size changes
-  //   this.findData();  // Trigger data fetch
-  // }
 
   public onPageChanged(event: { pageStart: number, pageLimit: number }) {
     this.page_start = event.pageStart;
@@ -193,10 +192,33 @@ export class MnusrpageComponent {
     );
   }
 
-  public updateDataNow(): void {
+  public async updateDataNow(): Promise<void> {
     this.setLoading(true);
-    this.api.updateDataNow().subscribe((response: any) => {
+    await this.api.updateDataNow().subscribe((response: any) => {
       this.popup(response.status);
+      this.findData();
+    }, (error: any) => {
+        console.error('Error updating user:', error);
+      }
+    );
+  }
+
+  public deleteUser(record: any): void {
+    this.setLoading(true);
+    console.log(record);
+    
+    this.deleteData.usrid = record.uswid;
+    this.deleteData.usrname = record.uswusrname;
+    this.messageDelete = record.uswusrname
+    this.popup('delete')
+    this.setLoading(false);
+  }
+
+  public ConfirmDeleteUser(): void {
+    this.setLoading(true);
+    this.api.deleteUser(this.deleteData).subscribe((response: any) => {
+      this.findData();
+      this.delete_pop = false;
     }, (error: any) => {
         console.error('Error updating user:', error);
       }
@@ -214,6 +236,36 @@ export class MnusrpageComponent {
     );
   }
 
+  public createUsr(): void {  
+    this.setLoading(true);
+    this.popup('creusr');
+    this.setLoading(false);
+  }
+
+  public closeUserPopup(): void {
+    this.creusr_pop = false; 
+  }
+
+  public confirmUser(event: CreatUser): void {  
+    this.setLoading(true);
+    this.createUserData.username = event.username
+    this.createUserData.password = event.password
+    this.createUserData.fstname = event.fstname
+    this.createUserData.lstname = event.lstname
+    this.createUserData.email = event.email
+    this.createUserData.pos = event.pos
+    this.createUserData.role = event.role
+    this.api.createUser(this.createUserData).subscribe((response: any) => {
+      this.closeUserPopup();
+      this.findData();
+      this.popup(response.status);
+      this.setLoading(false);
+    }, (error: any) => {
+        console.error('Error updating user:', error);
+        this.setLoading(false);
+      }
+    );
+  }
 
   
  // This will handle mousemove event when resizing

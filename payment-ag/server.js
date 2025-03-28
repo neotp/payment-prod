@@ -13,8 +13,8 @@ const options = {
 app.use(express.static('dist/payment-ag'));
 
 // Redirect all requests to `index.html` for Angular SPA routing
-app.get('/payment/callback', (req, res) => {
-    res.sendFile(__dirname + '/dist/payment-ag/browser/payment/callback/index.html');
+app.get('/callback', (req, res) => {
+    res.sendFile(__dirname + '/dist/payment-ag/browser/callback/index.html');
 });
 
 app.get('*', (req, res) => {
@@ -22,7 +22,7 @@ app.get('*', (req, res) => {
 })
 
 app.get('', (req, res) => {
-    res.redirect('https://172.31.20.11:443/payment/loginpage/'); // Replace with the target URL
+    res.redirect('https://172.31.20.11:443/loginpage/'); // Replace with the target URL
 });
 
 // Start the HTTPS server

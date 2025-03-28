@@ -6,24 +6,24 @@ import { LoadingSpinnerComponent } from './component/shared/loading-spinner/load
 export const routes: Routes = [
     {
         path: '',
-        redirectTo: 'payment/pymntpage',  // Default redirect
+        redirectTo: 'pymntpage',  // Default redirect
         pathMatch: 'full'
     },
     {
-        path: 'payment/pymntpage',
+        path: 'pymntpage',
         component: PymntpageComponent,
     },
     {
-        path: 'payment/loading',
+        path: 'loading',
         component: LoadingSpinnerComponent
     },
     // {
-    //     path: 'payment/payment-redirect',
+    //     path: 'payment-redirect',
     //     component: PaymentRedirectComponent 
     // },
     {
         path: '**', 
-        redirectTo: 'payment/pymntpage',
+        redirectTo: 'pymntpage',
         pathMatch: 'full'
     }
 ];

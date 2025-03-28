@@ -17,31 +17,39 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender,
   },
   {
-    path: 'payment/loginpage',
+    path: 'loginpage',
     renderMode: RenderMode.Prerender,
   },
   {
-    path: 'payment/regispage',
+    path: 'regispage',
     renderMode: RenderMode.Prerender,
   },
   {
-    path: 'payment/pymntpage',
+    path: 'pymntpage',
     renderMode: RenderMode.Prerender,
   },
   {
-    path: 'payment/mnusrpage',
+    path: 'mnusrpage',
     renderMode: RenderMode.Prerender,
   },
   {
-    path: 'payment/callback',
+    path: 'callback',
     renderMode: RenderMode.Prerender,
   },
   {
-    path: 'payment/loading',
+    path: 'loading',
     renderMode: RenderMode.Prerender,
   },
   {
-    path: 'payment/payment-redirect',
+    path: 'payment-redirect',
+    renderMode: RenderMode.Prerender,
+  },
+  {
+    path: 'history-header',
+    renderMode: RenderMode.Prerender,
+  },
+  {
+    path: 'history-detail',
     renderMode: RenderMode.Prerender,
   },
 ];

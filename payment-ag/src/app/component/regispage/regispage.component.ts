@@ -123,7 +123,7 @@ export class RegispageComponent implements OnInit {
     this.api.register(this.registerData).subscribe(
       (result: any) => {
         if (result.regis === 'success') {
-          this.router.navigate(['payment/loginpage'], {queryParams: { regis: result.regis } , queryParamsHandling: 'preserve'});
+          this.router.navigate(['loginpage'], {queryParams: { regis: result.regis } , queryParamsHandling: 'preserve'});
         } else {
           this.popup('dup');
         }

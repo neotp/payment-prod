@@ -1,0 +1,127 @@
+
+
+
+
+
+	
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+  
+  <HTML>
+    <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+    <META name="viewport" content="width=device-width, initial-scale=1.0" />
+    <META http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <TITLE>
+    KTC GATEWAY - Online Payment Gateway Service
+    </TITLE>
+    <script type="text/javascript" src="https://testpaygate.ktc.co.th/static/js/common.js">//</script>
+    
+    <link rel="stylesheet" href="https://testpaygate.ktc.co.th/static/payment/css/fonts.css"/>
+    <link rel="stylesheet" href="https://testpaygate.ktc.co.th/static/payment/css/bootstrap-material-design.min.css"/>
+    <link rel="stylesheet" href="https://testpaygate.ktc.co.th/static/payment/css/font-awesome/all.min.css" />
+    <link rel="stylesheet" href="https://testpaygate.ktc.co.th/static/payment/css/style.css" />
+    
+    <script LANGUAGE="javascript">
+      function formSubmit(action){
+              var form = document.getElementById("payForm");
+              var paytype = document.getElementById("payType");
+              if(action=='ALIPAY'){
+                  if (paytype=='H')
+                      form.action =  "payALIPAYONL-PRE.jsp";
+                  else
+                      form.action =  "payALIPAYONL.jsp";
+              } else if (action=='TPN'){
+                  form.action =  "payTPN.jsp";
+              } else {
+                  form.action =  "payForm2.jsp";
+              }
+              form.submit();
+      }
+  
+  </script>
+  
+    </HEAD>
+    
+  
+    
+      <BODY onload="javascript:formSubmit('NP')" BGCOLOR="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" >
+    
+            <div class="en_text" align="center">
+                <b>Now loading payment page ...</b>
+            </div>
+        
+     
+  
+    
+    
+    <form name="payForm" id="payForm" method="post" action="payForm2.jsp">
+      <input type="hidden" name="masterMerId" value="1">
+      <input type="hidden" name="merchantId" value="4948">
+      <input type="hidden" name="successUrl" value="">
+      <input type="hidden" name="failUrl" value="">
+      <input type="hidden" name="cancelUrl" value="">
+      <input type="hidden" name="remark" value="">
+      <input type="hidden" name="appId" value="">
+      <input type="hidden" name="appRef" value="">
+      <input type="hidden" name="amount" value="6223.25">
+      <input type="hidden" name="currCode" value="764">
+      <input type="hidden" name="orderRef" value="PIM2025032710543724a903d">
+      <input type="hidden" name="print" value="null">
+      <input type="hidden" name="sessionId" value="534642">
+      <input type="hidden" name="lang" value="E">
+      <input type="hidden" name="redirect" value="-1">
+      <input type="hidden" name="payType" value="N">
+      <input type="hidden" name="eMail" value="">  
+      <input type="hidden" name="dTime" value="">  
+      <input type="hidden" name="prefix" value="">  
+      <input type="hidden" name="prefixCard" value=""> 
+      <input type="hidden" name="cardNo" value=""> 
+      <input type="hidden" name="epMonth" value=""> 
+      <input type="hidden" name="epYear" value=""> 
+      <input type="hidden" name="epMonth2" value=""> 
+      <input type="hidden" name="epYear2" value=""> 
+      
+      
+      
+          <input type="hidden" name="threeDSCustomerEmail" value="" ><input type="hidden" name="threeDSCustomerIP" value="" ><input type="hidden" name="threeDSMobilePhoneCountryCode" value="" ><input type="hidden" name="threeDSMobilePhoneNumber" value="" ><input type="hidden" name="threeDSHomePhoneCountryCode" value="" ><input type="hidden" name="threeDSHomePhoneNumber" value="" ><input type="hidden" name="threeDSWorkPhoneCountryCode" value="" ><input type="hidden" name="threeDSWorkPhoneNumber" value="" ><input type="hidden" name="threeDSTransType" value="" ><input type="hidden" name="threeDSIsFirstTimeItemOrder" value="" ><input type="hidden" name="threeDSRecurringFrequency" value="" ><input type="hidden" name="threeDSRecurringExpiry" value="" ><input type="hidden" name="threeDSBillingCountryCode" value="" ><input type="hidden" name="threeDSBillingState" value="" ><input type="hidden" name="threeDSBillingCity" value="" ><input type="hidden" name="threeDSBillingLine1" value="" ><input type="hidden" name="threeDSBillingLine2" value="" ><input type="hidden" name="threeDSBillingLine3" value="" ><input type="hidden" name="threeDSBillingPostalCode" value="" ><input type="hidden" name="threeDSDeliveryTime" value="" ><input type="hidden" name="threeDSDeliveryEmail" value="" ><input type="hidden" name="threeDSShippingDetails" value="" ><input type="hidden" name="threeDSShippingCountryCode" value="" ><input type="hidden" name="threeDSShippingState" value="" ><input type="hidden" name="threeDSShippingCity" value="" ><input type="hidden" name="threeDSShippingLine1" value="" ><input type="hidden" name="threeDSShippingLine2" value="" ><input type="hidden" name="threeDSShippingLine3" value="" ><input type="hidden" name="threeDSShippingPostalCode" value="" ><input type="hidden" name="threeDSIsAddrMatch" value="" ><input type="hidden" name="threeDSGiftCardAmount" value="" ><input type="hidden" name="threeDSGiftCardCurr" value="" ><input type="hidden" name="threeDSGiftCardCount" value="" ><input type="hidden" name="threeDSPreOrderReason" value="" ><input type="hidden" name="threeDSPreOrderReadyDate" value="" ><input type="hidden" id="browserScreenHeight" name="browserScreenHeight" value="" ><input type="hidden" id="browserScreenWidth" name="browserScreenWidth" value="" ><input type="hidden" id="browserJavaEnabled"name="browserJavaEnabled" value="" ><input type="hidden" id="browserJavascriptEnabled" name="browserJavascriptEnabled" value="" ><input type="hidden" id="browserColorDepth" name="browserColorDepth" value="" ><input type="hidden" id="browserLanguage" name="browserLanguage" value="" ><input type="hidden" id="browserTimeZone" name="browserTimeZone" value="" ><input type="hidden" name="threeDSAcctCreateDate" value="" ><input type="hidden" name="threeDSAcctAgeInd" value="" ><input type="hidden" name="threeDSAcctLastChangeDate" value="" ><input type="hidden" name="threeDSAcctLastChangeInd" value="" ><input type="hidden" name="threeDSAcctPwChangeDate" value="" ><input type="hidden" name="threeDSAcctPwChangeInd" value="" ><input type="hidden" name="threeDSAcctPurchaseCount" value="" ><input type="hidden" name="threeDSAcctCardProvisionAttempt" value="" ><input type="hidden" name="threeDSAcctNumTransDay" value="" ><input type="hidden" name="threeDSAcctNumTransYear" value="" ><input type="hidden" name="threeDSAcctPaymentAcctDate" value="" ><input type="hidden" name="threeDSAcctPaymentAcctInd" value="" ><input type="hidden" name="threeDSAcctShippingAddrLastChangeDate" value="" ><input type="hidden" name="threeDSAcctShippingAddrLastChangeInd" value="" ><input type="hidden" name="threeDSAcctIsShippingAcctNameSame" value="" ><input type="hidden" name="threeDSAcctIsSuspiciousAcct" value="" ><input type="hidden" name="threeDSAcctAuthMethod" value="" ><input type="hidden" name="threeDSAcctAuthTimestamp" value="" ><input type="hidden" name="payTokenInd" value="" ><input type="hidden" name="threeDSChallengePreference" value="" >
+      
+        
+         
+      
+                  
+      <input type="hidden" name="TxType" value="Retail">
+      
+      
+  
+  
+  
+      <!-- Add by May Member payment -->
+      <input type="hidden" name="mpService" value="F"> 
+      <input type="hidden" name="LoginId" value="991308799">
+      
+      
+    </form>
+    </BODY>
+    </HTML>
+    
+  
+  
+  
+  
+  

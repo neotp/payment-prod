@@ -10,35 +10,22 @@
 <body>
   <div *ngIf="!isMobile" class="desktop-layout">
 
-    <div [formGroup]="headerForm">
-      <div class="row">
-        <div class="container">
-          <label class="tag">Invoice No Unpaid</label>
-        </div>
-        <div class="tag-user">
-          <span class="material-icons username">account_circle</span>:
-          <span class="username">{{ username }}</span>
-        </div>
-      </div>
-      <div class="divider-line"></div>
-      <div class="row">
-        <div class="column">
-          <label for="invNo" class="username">Invoice No.</label>
-          <input autocomplete="off" type="text" id="invNo" formControlName="invNo" placeholder="Enter invoice number"
-            required>
-        </div>
-        <div class="tag-cus">
-          <span class="material-icons username">assignment_ind</span>:
-          <span class="username">{{ customercode }}</span>
+    <div class="row">
+      <div class="column">
+        <div class="row">
+          <div class="tag">
+            <span class="material-icons username">article</span>
+            <span class="username">Invoice No Unpaid.</span>
+          </div>
 
-          <span class="material-icons username">label</span>:
-          <span class="username">{{ customername }}</span>
-        </div>
-        <div class="column-btn">
           <div class="row-btn">
             <button class="button search-button" type="button" (click)="searchPayment()">
               <span class="material-icons">search</span>
               Search
+            </button>
+            <button class="button create-dummy-button" type="button" (click)="createDummy()">
+              <span class="material-icons">post_add</span>
+              Create Dummy
             </button>
             <button class="button create-payment-button" type="button" (click)="createPayment()">
               <span class="material-icons">payment</span>
@@ -47,80 +34,70 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- <div class="table-container">
-      <table id="filterDataTable">
-        <thead>
-          <tr>
-            <th class="size-cbx">
-              <input type="checkbox" class="checkbox-custom" [checked]="isAllSelected()"
-                (change)="toggleSelectAll('all')" />
-            </th>
-            <th class="size-doctype">Doc. Type</th>
-            <th class="size-docno">Doc. No.</th>
-            <th class="size-docdate">Doc. Date</th>
-            <th class="size-duedate">Due Date</th>
-            <th class="size-docamount">Amount</th>
-            <th class="size-balamount">Balance</th>
-            <th class="size-stat">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let record of dataDisplay">
-            <td class="text-center size-cbx">
-              <input type="checkbox" class="checkbox-custom" [(ngModel)]="record.selected"
-                [disabled]="record.stat === 'Process'" (change)="checkFlag(record)" />
-            </td>
-            <td class="text-center size-doctype">{{ record.docType }}</td>
-            <td class="text-center size-docno">{{ record.docNo }}</td>
-            <td class="text-center size-docdate">{{ record.docDate }}</td>
-            <td class="text-center size-duedate">{{ record.dueDate }}</td>
-            <td class="text-right size-docamount">{{ record.docAmt }}</td>
-            <td class="text-right size-balamount">{{ record.balAmt }}</td>
-            <td class="text-center size-stat" [ngClass]="{'wait': record.stat === 'Process', 'unpaid': record.stat === 'Unpaid'}">{{ record.stat }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div> -->
+      <div class="column">
+        <div class="tag-user">
+          <span class="material-icons username">account_circle</span>:
+          <span class="username">{{ username }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="divider-line"></div>
+    <div [formGroup]="headerForm">
+      <div class="box">
+        <div class="row">
+          <div class="column-input">
+            <label for="cusCode" class="username">Customer Code.</label>
+            <input autocomplete="off" type="text" id="cusCode" formControlName="cusCode"
+              placeholder="Enter Customer Code" required>
+          </div>
+          <div class="column-input">
+            <label for="invNo" class="username">Invoice No.</label>
+            <input autocomplete="off" type="text" id="invNo" formControlName="invNo" placeholder="Enter invoice number"
+              required>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="table-container">
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-    
+
         <!-- Select All Column -->
         <ng-container matColumnDef="selected" style="width: 8%;">
           <th mat-header-cell *matHeaderCellDef class="text-center">
-            <input type="checkbox" class="checkbox-custom" [checked]="isAllSelected()" (change)="toggleSelectAll('all')" />
+            <input type="checkbox" class="checkbox-custom" [checked]="isAllSelected()"
+              (change)="toggleSelectAll('all')" />
           </th>
           <td mat-cell *matCellDef="let record" class="text-center">
             <input type="checkbox" class="checkbox-custom" [(ngModel)]="record.selected"
               [disabled]="record.stat === 'Process'" (change)="checkFlag(record)" />
           </td>
         </ng-container>
-    
+
         <!-- Doc. Type Column -->
         <ng-container matColumnDef="docType" style="width: 15%;">
-          <th mat-header-cell *matHeaderCellDef class="text-center"> Doc. Type </th>
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Doc Type </th>
           <td mat-cell *matCellDef="let record" class="text-center"> {{ record.docType }} </td>
         </ng-container>
-    
+
         <!-- Doc. No. Column -->
         <ng-container matColumnDef="docNo" style="width: 15%;">
-          <th mat-header-cell *matHeaderCellDef class="text-center"> Doc. No. </th>
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Doc No </th>
           <td mat-cell *matCellDef="let record" class="text-center"> {{ record.docNo }} </td>
         </ng-container>
-    
+
         <!-- Doc. Date Column -->
         <ng-container matColumnDef="docDate" style="width: 15%;">
-          <th mat-header-cell *matHeaderCellDef class="text-center"> Doc. Date </th>
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Doc Date </th>
           <td mat-cell *matCellDef="let record" class="text-center"> {{ record.docDate }} </td>
         </ng-container>
-    
+
         <!-- Due Date Column -->
         <ng-container matColumnDef="dueDate" style="width: 15%;">
           <th mat-header-cell *matHeaderCellDef class="text-center"> Due Date </th>
           <td mat-cell *matCellDef="let record" class="text-center"> {{ record.dueDate }} </td>
         </ng-container>
-    
+
         <!-- Doc. Amount Column -->
         <ng-container matColumnDef="docAmt" style="width: 11%;">
           <th mat-header-cell *matHeaderCellDef class="text-center"> Amount </th>
@@ -128,35 +105,44 @@
             {{ (record.docAmt ? +record.docAmt : 0) | number:'1.2-2' }}
           </td>
         </ng-container>
-    
+
         <!-- Balance Amount Column -->
         <ng-container matColumnDef="balAmt" style="width: 11%;">
-          <th mat-header-cell *matHeaderCellDef class="text-center"> Balance </th>
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Balance Amt</th>
           <td mat-cell *matCellDef="let record" class="text-right">
             {{ (record.balAmt ? +record.balAmt : 0) | number:'1.2-2' }}
           </td>
         </ng-container>
-    
+
+        <ng-container matColumnDef="paidamt" style="width: 11%;">
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Paid Amt </th>
+          <td mat-cell *matCellDef="let record" class="text-right">
+            <input style="width: 100px;" matInput [(ngModel)]="record.paidamt" (blur)="updatePaidAmt(record)"
+              type="text" class="text-right" [attr.data-id]="record.id" placeholder="0.00" [max]="record.balAmt" />
+          </td>
+        </ng-container>
+
         <!-- Status Column -->
         <ng-container matColumnDef="stat" style="width: 10%;">
           <th mat-header-cell *matHeaderCellDef class="text-center"> Status </th>
           <td mat-cell *matCellDef="let record" class="text-center"
-              [ngClass]="{'wait': record.stat === 'Process', 'unpaid': record.stat === 'Unpaid'}">
+            [ngClass]="{'wait': record.stat === 'Process', 'unpaid': record.stat === 'Unpaid'}">
             {{ record.stat }}
           </td>
         </ng-container>
-    
+
+        <ng-container matColumnDef="note" style="width: 11%;">
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Comment </th>
+          <td mat-cell *matCellDef="let record" class="text-left">{{ record.note }}</td>
+        </ng-container>
+
         <!-- Header and Row Definitions -->
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
-    </div> 
-    <app-paging 
-      [totalRecords]="totalRecords" 
-      [pageSize]="page_limit" 
-      [pageIndex]="page_start"
-      [pageSizeOptions]="pageSizeOptions" 
-      (pageChanged)="onPageChanged($event)">
+    </div>
+    <app-paging [totalRecords]="totalRecords" [pageSize]="page_limit" [pageIndex]="page_start"
+      [pageSizeOptions]="pageSizeOptions" (pageChanged)="onPageChanged($event)">
     </app-paging>
 
   </div>
@@ -166,18 +152,17 @@
   <div *ngIf="isMobile" class="mobile-layout">
     <div [formGroup]="headerForm">
       <div class="row">
-        <div class="container-a">
-          <label class="tag">Invoice No Unpaid</label>
+        <div class="tag">
+          <span class="material-icons username">article</span>
+          <span class="username" style="font-size: 16px;">Invoice No Unpaid.</span>
         </div>
-        <div class="container-b">
-          <div class="tag-user">
-            <span class="material-icons username">account_circle</span>:
-            <span class="username">{{ username }}</span>
-          </div>
+        <div class="tag-user">
+          <span class="material-icons username">account_circle</span>:
+          <span class="username">{{ username }}</span>
         </div>
       </div>
       <div class="divider-line-top"></div>
-      <div class="row-cl">
+      <!-- <div class="row-cl">
         <div class="container-a">
           <div class="tag-cus">
             <span class="material-icons username">assignment_ind</span>:
@@ -190,32 +175,39 @@
             <span class="username">{{ customername }}</span>
           </div>
         </div>
+      </div> -->
+      <div class="row-btn">
+        <button class="button search-button" type="button" (click)="searchPayment()">
+          <span class="material-icons" style="font-size: 16px;">search</span>
+          Search
+        </button>
+        <button class="button create-dummy-button" type="button" (click)="createDummy()">
+          <span class="material-icons" style="font-size: 16px;">post_add</span>
+          Create Dummy
+        </button>
+        <button class="button create-payment-button" type="button" (click)="createPayment()">
+          <span class="material-icons" style="font-size: 16px;">payment</span>
+          Create Payment
+        </button>
       </div>
-      <div class="row">
-        <div class="column">
-          <label for="invNo" class="username">Invoice No.</label>
-          <input autocomplete="off" type="text" id="invNo" formControlName="invNo" placeholder="Enter invoice number"
-            required>
-        </div>
-      </div>
-      <div class="row-cl">
-        <div class="column-btn">
-          <div class="row-btn">
-            <button class="button search-button" type="button" (click)="searchPayment()">
-              <span class="material-icons">search</span>
-              Search
-            </button>
-            <button class="button create-payment-button" type="button" (click)="createPayment()">
-              <span class="material-icons">payment</span>
-              Create Payment
-            </button>
+      <div class="box">
+        <div class="row-cl">
+          <div class="column">
+            <label for="cusCode" class="username" style="font-size: 14px;">Customer Code.</label>
+            <input class="input-A" autocomplete="off" type="text" id="cusCode" formControlName="cusCode"
+              placeholder="Enter Customer Code" required>
+          </div>
+          <div class="column">
+            <label for="invNo" class="username" style="font-size: 14px;">Invoice No.</label>
+            <input class="input-A" autocomplete="off" type="text" id="invNo" formControlName="invNo"
+              placeholder="Enter invoice number" required>
           </div>
         </div>
       </div>
     </div>
-    <div class="divider-line"></div>
 
     <div class="card-container">
+      <div class="divider-line"></div>
       <div *ngFor="let record of dataDisplay" class="card">
         <div class="card-header">
           <input type="checkbox" class="checkbox-custom" [(ngModel)]="record.selected"
@@ -233,27 +225,46 @@
             <strong>Due Date:</strong> <span>{{ record.dueDate }}</span>
           </div>
           <div class="card-row mb-color">
-            <strong>Amount:</strong> <span class="text-right">{{ record.docAmt }}</span>
+            <strong>Amount:</strong> <span class="text-right">{{ record.docAmt | number:'1.2-2' }}</span>
           </div>
           <div class="card-row mb-color">
-            <strong>Balance:</strong> <span class="text-right">{{ record.balAmt }}</span>
+            <strong>Balance Amt:</strong> <span class="text-right">{{ record.balAmt | number:'1.2-2' }}</span>
           </div>
-          <div class="card-row mb-color" >
-            <strong>Status:</strong> <span [ngClass]="{'wait': record.stat === 'Process', 'unpaid': record.stat === 'Unpaid'}">{{ record.stat }}</span>
+          <div class="card-row mb-color">
+            <strong>Paid Amt:</strong>
+            <input matInput class="text-right input-B" style="width: 100px;" [(ngModel)]="record.paidamt"
+              (blur)="updatePaidAmt(record)" type="text" class="text-right" placeholder="0.00" [max]="record.balAmt" />
+          </div>
+          <div class="card-row mb-color">
+            <strong>Status:</strong> <span
+              [ngClass]="{'wait': record.stat === 'Process', 'unpaid': record.stat === 'Unpaid'}">{{ record.stat
+              }}</span>
+          </div>
+          <div class="card-row mb-color">
+            <strong>Comment:</strong> <span class="text-left">{{ record.note }}</span>
           </div>
         </div>
       </div>
     </div>
-    <app-paging 
-      [totalRecords]="totalRecords" 
-      [pageSize]="page_limit" 
-      [pageIndex]="page_start"
-      [pageSizeOptions]="pageSizeOptions" 
-      (pageChanged)="onPageChanged($event)">
+    <app-paging [totalRecords]="totalRecords" [pageSize]="page_limit" [pageIndex]="page_start"
+      [pageSizeOptions]="pageSizeOptions" (pageChanged)="onPageChanged($event)">
     </app-paging>
 
   </div>
 
+  <div>
+    <app-bank-popup *ngIf="bank_pop" [title]="'Payment Details'" [balanceAmount]="balanceAmount"
+      (close)="closeBankPopup()" (confirm)="confirmPayment($event)">
+    </app-bank-popup>
+  </div>
+
+  <div>
+    <app-dummy-popup *ngIf="dummy_pop" [title]="'For Order Release'" (close)="closeDummyPopup()"
+      (confirm)="confirmDummy($event)">
+    </app-dummy-popup>
+  </div>
+  <!-- [serviceCharge]="serviceCharge" 
+      [totalAmount]="totalAmount" -->
 
   <div>
     <app-popup *ngIf="warning_pop" [title]="'WARNING MESSAGE'"
@@ -276,14 +287,42 @@
     </app-popup>
   </div>
 
-  <!-- Fail Popup -->
+  <!-- input Popup -->
   <div>
-    <app-popup *ngIf="warning_search" [title]="'WARNING MESSAGE !'"
-      [message]="'กรุณากรอก Customer Code. และ Invoice No.'" [headerColor]="'#FCD69D'" [confirmButton]="true"
-      (close)="warning_search = false" (confirm)="handleConfirm('search')">
+    <app-popup *ngIf="input_pop" [title]="'WARNING MESSAGE !'" [message]="'กรุณากรอก Customer Code.'"
+      [headerColor]="'#FCD69D'" [confirmButton]="true" (close)="input_pop = false" (confirm)="handleConfirm('input')">
     </app-popup>
   </div>
 
+  <!-- bal Popup -->
+  <div>
+    <app-popup *ngIf="bal_pop" [title]="'WARNING MESSAGE !'"
+      [message]="'ไม่สามารถกรอก Paid Amt มากกว่า Balance Amt ได้'" [headerColor]="'#FCD69D'" [confirmButton]="true"
+      (close)="bal_pop = false" (confirm)="handleConfirm('bal')">
+    </app-popup>
+  </div>
+
+  <!-- CN Popup -->
+  <div>
+    <app-popup *ngIf="cn_pop" [title]="'WARNING MESSAGE !'" [message_list]="message_list" [headerColor]="'#FCD69D'"
+      [confirmButton]="true" (close)="cn_pop = false" (confirm)="handleConfirm('cn')">
+    </app-popup>
+  </div>
+  
+    <!-- less_zero Popup -->
+    <div>
+      <app-popup *ngIf="less_zero_pop" [title]="'WARNING MESSAGE !'" [message]="'ยอดชำระ <= 0'" [headerColor]="'#FCD69D'"
+        [confirmButton]="true" (close)="less_zero_pop = false" (confirm)="handleConfirm('less_zero')">
+      </app-popup>
+    </div>
+  
+    <!-- link Popup  -->
+    <div>
+      <app-link-popup *ngIf="link_pop" [title]="'Craete Payment Success !'" [linkToCopy]="linkMessage" [headerColor]="'#CCEFE8'"
+        [closeButton]="true" (close)="link_pop = false">
+      </app-link-popup >
+    </div>
+  
   <app-loading-spinner [isLoading]="isLoading"></app-loading-spinner>
 
 </body>

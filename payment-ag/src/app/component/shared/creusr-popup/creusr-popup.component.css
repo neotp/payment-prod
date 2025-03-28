@@ -1,0 +1,315 @@
+.desktop-layout .radio-group {
+  margin-top: 20px;
+}
+
+.desktop-layout .radio-group label {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 14px;
+  color: #684C69;
+  display: block;
+  margin: 10px 20px;
+}
+
+.desktop-layout .popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.desktop-layout .popup-content {
+  background: white;
+  border-radius: 8px;
+  width: 450px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.desktop-layout .popup-header {
+  padding: 15px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #e3f2fd;
+  border: #503651;
+  color: #503651;
+}
+
+.desktop-layout .popup-body {
+  padding: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+.desktop-layout .popup-footer {
+  padding: 10px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #eaeaea;
+}
+
+.desktop-layout .button-ok {
+  background-color: #e3f2fd;
+  border: 1px solid #00317A;
+  color: #00317A;
+  padding: 5px 15px;
+  border-radius: 4px;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 2px;
+  gap: 5px;
+}
+
+.desktop-layout .button-ok .icon {
+  margin-right: 5px;
+  color: #1e8b50;
+}
+
+.desktop-layout .button-ok:hover {
+  background-color: #bbdefb; /* Slightly darker on hover */
+}
+
+.desktop-layout .button-close {
+  background-color: #FFDBDB; /* Light aqua background */
+  border: 1px solid #684C69; /* Green border */
+  color: #684C69; /* Green text color */
+  padding: 5px 15px;
+  border-radius: 4px;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 2px;
+}
+
+.desktop-layout .button-close .icon {
+  margin-right: 5px;
+  color: #684C69;
+}
+
+.desktop-layout .button-close:hover {
+  background-color: #f8d1d1; /* Slightly darker on hover */
+}
+
+.desktop-layout .text-header {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 16px;
+  color: #684C69; /* Slightly darker on hover */
+}
+
+.desktop-layout .text-detail {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 14px;
+  color: #684C69; /* Slightly darker on hover */
+  display: block;
+  margin: 10px 20px;
+}
+
+.desktop-layout .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.desktop-layout .row-img {
+  display: flex;
+  align-items: left;
+}
+
+.desktop-layout .balance-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.desktop-layout .column {
+  border-radius: 5px;
+  width: 50%;
+}
+
+.desktop-layout .box {
+  margin: 5px 10px;
+}
+
+.desktop-layout .logo {
+  height: 45px;
+}
+.desktop-layout .input-text {
+  width: 60%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 2px solid #f9e3e2;
+  border-radius: 5px;
+  color: #684C69;
+}
+  
+
+
+
+
+
+.mobile-layout .radio-group {
+  margin-top: 20px;
+}
+
+.mobile-layout .radio-group label {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 14px;
+  color: #684C69;
+  display: block;
+  margin: 10px 20px;
+}
+
+.mobile-layout .popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.mobile-layout .popup-content {
+  background: white;
+  border-radius: 8px;
+  width: 350px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-layout .popup-header {
+  padding: 15px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #e3f2fd;
+  border: #503651;
+  color: #503651;
+}
+
+.mobile-layout .popup-body {
+  padding: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+.mobile-layout .popup-footer {
+  padding: 10px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #eaeaea;
+}
+
+.mobile-layout .button-ok {
+  background-color: #e3f2fd;
+  border: 1px solid #00317A;
+  color: #00317A;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 2px;
+  gap: 5px;
+}
+
+.mobile-layout .button-ok .icon {
+  margin-right: 5px;
+  color: #1e8b50;
+}
+
+.mobile-layout .button-ok:hover {
+  background-color: #bbdefb; /* Slightly darker on hover */
+}
+
+.mobile-layout .button-close {
+  background-color: #FFDBDB; /* Light aqua background */
+  border: 1px solid #684C69; /* Green border */
+  color: #684C69; /* Green text color */
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 2px;
+}
+
+.mobile-layout .button-close .icon {
+  margin-right: 5px;
+  color: #684C69;
+}
+
+.mobile-layout .button-close:hover {
+  background-color: #f8d1d1; /* Slightly darker on hover */
+}
+
+.mobile-layout .text-header {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 16px;
+  color: #684C69; /* Slightly darker on hover */
+}
+
+.mobile-layout .text-detail {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 14px;
+  color: #684C69; /* Slightly darker on hover */
+  display: block;
+  margin: 10px 5px;
+}
+
+.mobile-layout .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mobile-layout .row-img {
+  display: flex;
+  align-items: left;
+}
+
+.mobile-layout .balance-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.mobile-layout .column {
+  border-radius: 5px;
+  width: 50%;
+}
+
+.mobile-layout .box {
+  margin: 5px 10px;
+}
+
+.mobile-layout .logo {
+  height: 45px;
+}
+.mobile-layout .input-text {
+  width: 60%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 2px solid #f9e3e2;
+  border-radius: 5px;
+  color: #684C69;
+}
+    
+      
+    

@@ -16,21 +16,65 @@
   align-items: center;
 }
 
+.desktop-layout .create-dummy-button {
+  background-color: #e3fde5;
+  border: 1px solid #005534;
+  color: #005534;
+}
+
+.desktop-layout .create-dummy-button:hover {
+  background-color: #c2fbbb;
+}
+
+.desktop-layout .button-row {
+  display: flex;
+  align-items: center;
+  padding: 3px 8px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  gap:8px;
+}
+
+.desktop-layout .delete-button {
+  background-color: #fde3e3;
+  border: 1px solid #550000;
+  color: #550000;
+}
+
+.desktop-layout .delete-button:hover {
+  background-color: #fbbbbb;
+}
+
 .desktop-layout .button {
   display: flex;
   align-items: center;
   padding: 5px 10px;
   font-size: 16px;
   border-radius: 8px;
-  margin: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  border: 1px solid transparent;
   margin-left: 10px;
 }
 
+.desktop-layout .tag {
+  background-color: #e3f2fd;
+  display: flex;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 5px 10px;
+  border-bottom: 1px solid #00317A;
+  color: #503651;
+  border-radius: 4px;
+  gap: 8px;
+  align-items: center;
+}
+
 .desktop-layout .tag-user {
-  position: absolute;
+  /* position: absolute; */
   right: 10px;
   display: flex;
   align-items: center;
@@ -167,6 +211,7 @@
 .desktop-layout .row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .desktop-layout .row-btn {
@@ -175,10 +220,7 @@
 }
 
 .desktop-layout .column {
-  margin: 0 10px;
-  padding: 10px;
   border-radius: 5px;
-  width: 35%;
 }
 
 .desktop-layout .column-btn {
@@ -349,17 +391,7 @@
   margin: 0;
 }
 
-.desktop-layout .tag {
-  background-color: #e3f2fd;
-  font-weight: bold;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding: 8px 12px;
-  border-bottom: 1px solid #00317A;
-  color: #503651;
-  border-radius: 4px;
-}
+
 
 .desktop-layout .tag-name {
   background-color: #e3f2fd;
@@ -734,9 +766,8 @@
   width: 100%;
   height: 2px;
   background-color: #bb9b9a;
-  margin: 20px auto;
-  margin-top: 10px;
-  margin-bottom: 20px;
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
 
 
@@ -766,14 +797,13 @@
 .mobile-layout .button {
   display: flex;
   align-items: center;
-  padding: 5px 10px;
-  font-size: 16px;
+  padding: 8px 10px;
+  font-size: 14px;
   border-radius: 8px;
-  margin: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   border: 1px solid transparent;
-  margin-left: 10px;
+  
 }
 
 .mobile-layout .container-a {
@@ -871,6 +901,10 @@
   margin-right: 8px;
 }
 
+.mobile-layout .button .icons {
+  font-size: 18px;
+}
+
 .mobile-layout .container {
   width: 100%;
   padding: 10px;
@@ -879,11 +913,15 @@
 .mobile-layout .row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .mobile-layout .row-btn {
+  margin-top: 15px;
   display: flex;
   align-items: center;
+  gap:10px;
+  margin-left: 10px;
 }
 
 .mobile-layout .column {
@@ -1023,14 +1061,17 @@
 
 .mobile-layout .tag {
   background-color: #e3f2fd;
+  display: flex;
   font-weight: bold;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding: 8px 12px;
+  padding: 5px 10px;
   border-bottom: 1px solid #00317A;
   color: #503651;
   border-radius: 4px;
+  gap: 8px;
+  align-items: center;
   margin-left: 10px;
 }
 
@@ -1049,6 +1090,10 @@
   right: 0%;
   display: none;
 }
+/* .mobile-layout .right {
+  justify-self: right;
+  margin-bottom: 10px;
+} */
 
 /* Custom alert box styling */
 .mobile-layout .custom-warning {
@@ -1403,14 +1448,38 @@
   /* Initially hidden */
 }
 
-.mobile-layout .divider-line {
+.mobile-layout .divider-line-top {
   width: 100%;
   height: 2px;
   background-color: #bb9b9a;
-  margin: 20px auto;
-  margin-top: 10px;
-  margin-bottom: 20px;
+  margin-top: 15px;
 }
+
+.mobile-layout .divider-line {
+  width: 95%;
+  height: 2px;
+  background-color: #bb9b9a;
+  margin-top: 15px;
+}
+.mobile-layout .button-row {
+  display: flex;
+  align-items: center;
+  padding: 2px 3px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.mobile-layout .delete-button {
+  background-color: #fde3e3;
+  border: 1px solid #550000;
+  color: #550000;
+}
+
+.mobile-layout .delete-button:hover {
+  background-color: #fbbbbb;
+}
+
 
 
 .card-container {
@@ -1470,4 +1539,14 @@ h3 {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px;
 }

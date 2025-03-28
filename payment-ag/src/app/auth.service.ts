@@ -39,14 +39,14 @@ export class AuthService {
   public logout(): void {
     localStorage.removeItem('accountRole');
     localStorage.removeItem('username');
-    this.router.navigate(['/payment/loginpage']);
+    this.router.navigate(['/loginpage']);
   }
 
   // Keep resetting the session timeout on user activity
   public resetTimeoutTimer(): void {
     clearTimeout(this.timeoutTimer);
     clearInterval(this.logTimer); // Stop the logging when the timer resets
-    this.startLogTimer(); 
+    // this.startLogTimer(); 
     this.timeoutTimer = setTimeout(() => {
       this.logout(); // Logout after inactivity
     }, this.inactivityTimeout);
@@ -88,7 +88,7 @@ export class AuthService {
 
   // Handle user activity
   private handleUserActivity(): void {
-    console.log('User activity detected');
+    // console.log('User activity detected');
     this.setLastActivityTime();
     this.resetTimeoutTimer(); // Reset the session timeout when there's user activity
   }

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Your Angular App</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <div *ngIf="!isMobile" class="desktop-layout">
+        <div class="row-tag">
+            <div class="column-tag">
+                <div class="row-tag">
+                    <div class="column-tag">
+                        <div class="tag">
+                            <span class="material-icons username">receipt_long</span>
+                            <span class="username">History Payment.</span>
+                        </div>
+                    </div>
+                    <div class="column-tag">
+                        <button class="button search-button" type="button" (click)="searchPayment()">
+                            <span class="material-icons">search</span>
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="column-tag">
+                <div class="tag-user">
+                    <span class="material-icons username">account_circle</span>:
+                    <span class="username">{{ username }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="divider-line"></div>
+        <div [formGroup]="headerForm">
+            <div class="box">
+                <div class="row">
+                    <div class="column">
+                        <label for="payNo" class="username">Payment No.</label>
+                        <input autocomplete="off" type="text" id="payNo" formControlName="payNo"
+                            placeholder="Enter Payment No." required>
+                    </div>
+                    <div class="column">
+                        <div class="row-incol">
+                            <div class="column-in">
+                                <label for="bank" class="username">Bank.</label>
+                                <select id="bank" formControlName="bank">
+                                    <option value="visa">KTC</option>
+                                    <option value="master">KTB</option>
+                                    <option value="other">K-BANK</option>
+                                    <option value="all">All</option>
+                                </select>
+                            </div>
+                            <div class="column-in-right">
+                                <label for="card" class="username">Card.</label>
+                                <select id="card" formControlName="card">
+                                    <option value="visa">Visa</option>
+                                    <option value="master">MasterCard</option>
+                                    <option value="other">jBC-UPI</option>
+                                    <option value="all">All</option>
+                                </select>
+                            </div>
+                            <div class="column-in-right">
+                                <label for="status" class="username">Status.</label>
+                                <select id="status" formControlName="status">
+                                    <option value="Y">Success</option>
+                                    <option value="N">Process</option>
+                                    <option value="all">All</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        <div class="row-incol">
+                            <div class="column-in">
+                                <label for="cuscode" class="username">Customer Code.</label>
+                                <input class="input-A" autocomplete="off" type="text" id="cuscode"
+                                    formControlName="cuscode" placeholder="Enter Create User" required />
+                            </div>
+                            <div class="column-in-right">
+                                <label for="creusr" class="username ">Craete User.</label>
+                                <input class="input-A" autocomplete="off" type="text" id="creusr"
+                                    formControlName="creusr" placeholder="Enter Create User" required />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="row-incol">
+                            <div class="column-in">
+                                <label for="credateFrom" class="username">Create Date From.</label>
+                                <input class="input-A" autocomplete="off" type="date" id="credateFrom"
+                                    formControlName="credateFrom" placeholder="Enter Create Date">
+                            </div>
+                            <div class="column-in-right">
+                                <label for="credateFromTo" class="username">Create Date To.</label>
+                                <input class="input-A" autocomplete="off" type="date" id="credateTo"
+                                    formControlName="credateTo" placeholder="Enter Create Date">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="table-container">
+            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+                <!-- Username Column -->
+                <ng-container matColumnDef="payNo">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Payment No. </th>
+                    <td mat-cell *matCellDef="let record" class="text-left">
+                        <a class="text-link" (click)="navigateToPage(record)">
+                            {{ record.payNo }}
+                        </a>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="cuscode">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Customer Code. </th>
+                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.cuscode }} </td>
+                </ng-container>
+
+                <!-- First Name Column -->
+                <ng-container matColumnDef="amt">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Amount </th>
+                    <td mat-cell *matCellDef="let record" class="text-right">
+                        {{ (record.amt ? +record.amt : 0) | number:'1.2-2' }}
+                    </td>
+                </ng-container>
+
+                <!-- Last Name Column -->
+                <ng-container matColumnDef="feeAmt">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Fee Amount </th>
+                    <td mat-cell *matCellDef="let record" class="text-right">
+                        {{ (record.feeAmt ? +record.feeAmt : 0) | number:'1.2-2' }}
+                    </td>
+                </ng-container>
+
+                <!-- Customer Code Column -->
+                <ng-container matColumnDef="totolAmt">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Total Amount </th>
+                    <td mat-cell *matCellDef="let record" class="text-right">
+                        {{ (record.totalAmt ? +record.totalAmt : 0) | number:'1.2-2' }}
+                    </td>
+
+                </ng-container>
+
+                <!-- Customer Name Column -->
+                <ng-container matColumnDef="bank">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Bank </th>
+                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.bank }} </td>
+                </ng-container>
+
+                <!-- Email Column -->
+                <ng-container matColumnDef="card">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Card </th>
+                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.card }} </td>
+                </ng-container>
+
+                <!-- Position Column -->
+                <ng-container matColumnDef="credate">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Craete Date </th>
+                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.credate }} </td>
+                </ng-container>
+
+                <!-- Role Column -->
+                <ng-container matColumnDef="creusr">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Create User </th>
+                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.creusr }} </td>
+                </ng-container>
+
+                <!-- Role Column -->
+                <ng-container matColumnDef="link">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Link to Pay </th>
+                    <td mat-cell *matCellDef="let record" class="text-left"> {{ record.link }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="stat">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Status </th>
+                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.stat }} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+
+        </div>
+        <app-paging [totalRecords]="totalRecords" [pageSize]="page_limit" [pageIndex]="page_start"
+            [pageSizeOptions]="pageSizeOptions" (pageChanged)="onPageChanged($event)">
+        </app-paging>
+
+    </div>
+
+    <div *ngIf="isMobile" class="mobile-layout">
+        <div [formGroup]="headerForm">
+            <div class="row">
+                <div class="tag">
+                    <span class="material-icons username">receipt_long</span>
+                    <span class="username" style="font-size: 16px;">History Payment.</span>
+                </div>
+                <div class="tag-user">
+                    <span class="material-icons username">account_circle</span>:
+                    <span class="username">{{ username }}</span>
+                </div>
+            </div>
+            <div class="divider-line-top"></div>
+            <div class="row-btn">
+                <button class="button search-button" type="button" (click)="searchPayment()">
+                    <span class="material-icons" style="font-size: 16px;">search</span>
+                    Search
+                </button>
+            </div>
+            <div class="box">
+                <div class="row-cl">
+                    <div class="column-in">
+                        <label for="payNo" class="username" style="font-size: 14px;">Payment No.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="payNo" formControlName="payNo"
+                            placeholder="Enter Payment No." required>
+                    </div>
+                    <div class="column-in-right">
+                        <label for="cuscode" class="username" style="font-size: 14px;">Customer Code.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="cuscode" formControlName="cuscode"
+                            placeholder="Enter Create User" required />
+                    </div>
+                </div>
+                <div class="row-cl">
+                    <div class="column-in">
+                        <label for="creusr" class="username" style="font-size: 14px;">Craete User.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="creusr" formControlName="creusr"
+                            placeholder="Enter Create User" required />
+                    </div>
+                    <div class="column-in-right">
+                        <label for="cuscode" class="username" style="font-size: 14px;">Customer Code.</label>
+                        <input class="input-A" autocomplete="off" type="text" id="cuscode" formControlName="cuscode"
+                            placeholder="Enter Create User" required />
+                    </div>
+                </div>
+                <div class="row-cl">
+                    <div class="column-in">
+                        <label for="credateFrom" class="username" style="font-size: 14px;">Create Date From.</label>
+                        <input class="input-B" autocomplete="off" type="date" id="credateFrom"
+                            formControlName="credateFrom" placeholder="Enter Create Date">
+                    </div>
+                </div>
+                <div class="row-cl">
+                    <div class="column-in">
+                        <label for="credateFromTo" class="username" style="font-size: 14px;">Create Date To.</label>
+                        <input class="input-B" autocomplete="off" type="date" id="credateTo" formControlName="credateTo"
+                            placeholder="Enter Create Date">
+                    </div>
+                </div>
+                <div class="row-cl">
+                    <div class="column-in">
+                        <label for="bank" class="username" style="font-size: 14px;">Bank.</label>
+                        <select id="bank" formControlName="bank">
+                            <option value="visa">KTC</option>
+                            <option value="master">KTB</option>
+                            <option value="other">K-BANK</option>
+                            <option value="all">All</option>
+                        </select>
+                    </div>
+                    <div class="column-in-right">
+                        <label for="card" class="username" style="font-size: 14px;">Card.</label>
+                        <select id="card" formControlName="card">
+                            <option value="visa">Visa</option>
+                            <option value="master">MasterCard</option>
+                            <option value="other">jBC-UPI</option>
+                            <option value="all">All</option>
+                        </select>
+                    </div>
+                    <div class="column-in-right">
+                        <label for="status" class="username" style="font-size: 14px;">Status.</label>
+                        <select id="status" formControlName="status">
+                            <option value="Y">Success</option>
+                            <option value="N">Process</option>
+                            <option value="all">All</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+
+        <div class="card-container">
+            <div class="divider-line"></div>
+            <div class="card" *ngFor="let record of allData">
+                <div class="card-content">
+
+                    <div class="card-row mb-color"><strong>Payment No. : </strong> 
+                        <a class="text-link" (click)="navigateToPage(record)">
+                        {{ record.payNo }}
+                    </a></div>
+                    <div class="card-row mb-color"><strong>Customer Code. : </strong> {{ record.cuscode }}</div>
+                    <div class="card-row mb-color"><strong>Amount : </strong> {{ record.amt | number:'1.2-2' }}</div>
+                    <div class="card-row mb-color"><strong>Fee Amount : </strong> {{ record.feeAmt | number:'1.2-2' }}</div>
+                    <div class="card-row mb-color"><strong>Total Amount : </strong> {{ record.totalAmt | number:'1.2-2' }}</div>
+                    <div class="card-row mb-color"><strong>Bank : </strong> {{ record.bank }}</div>
+                    <div class="card-row mb-color"><strong>Card : </strong> {{ record.card }}</div>
+                    <div class="card-row mb-color"><strong>Craete Date : </strong> {{ record.credate }}</div>
+                    <div class="card-row mb-color"><strong>Create User : </strong> {{ record.creusr }}</div>
+                    <div class="card-row mb-color"><strong>Link to Pay : </strong> {{ record.link }}</div>
+                    <div class="card-row mb-color"><strong>Status : </strong> {{ record.stat }}</div>
+
+                </div>
+            </div>
+        </div>
+        <app-paging [totalRecords]="totalRecords" [pageSize]="page_limit" [pageIndex]="page_start"
+            [pageSizeOptions]="pageSizeOptions" (pageChanged)="onPageChanged($event)">
+        </app-paging>
+    </div>
+
+    <div>
+        <app-popup *ngIf="warning_pop" [title]="'WARNING MESSAGE'"
+            [message]="'คุณยังไม่ได้เลือกรายการ กรุณาเลือกรายการก่อน ทำการ Payment.'" [headerColor]="'#FCD69D'"
+            [confirmButton]="true" (close)="warning_pop = false" (confirm)="handleConfirm('warning')">
+        </app-popup>
+    </div>
+
+    <!-- Success Popup -->
+    <div>
+        <app-popup *ngIf="savesucess_pop" [title]="'SUCCESS MESSAGE !'" [message]="'บันทึกสำเร็จ!'"
+            [headerColor]="'#CCEFE8'" [confirmButton]="true" (close)="savesucess_pop = false"
+            (confirm)="handleConfirm('savesucess')">
+        </app-popup>
+    </div>
+
+    <!-- Fail Popup -->
+    <div>
+        <app-popup *ngIf="fail_pop" [title]="'FAIL MESSAGE !'" [message]="'ทำรายการไม่สำเร็จ.'"
+            [headerColor]="'#FFDBDB'" [confirmButton]="true" (close)="fail_pop = false"
+            (confirm)="handleConfirm('fail')">
+        </app-popup>
+    </div>
+
+    <!-- Fail Popup -->
+    <div>
+        <app-popup *ngIf="warning_search" [title]="'WARNING MESSAGE !'"
+            [message]="'กรุณากรอก Customer Code. และ Invoice No.'" [headerColor]="'#FCD69D'" [confirmButton]="true"
+            (close)="warning_search = false" (confirm)="handleConfirm('search')">
+        </app-popup>
+    </div>
+
+
+    <app-loading-spinner [isLoading]="isLoading"></app-loading-spinner>
+
+</body>
+
+</html>
+
+<!-- Same for allDataTable -->

@@ -5,6 +5,7 @@ DELIMITER $$
 
 CREATE PROCEDURE pkgmnusr_insert_usrpss_work()
 BEGIN
+    DELETE FROM usrpss_work;
 
     INSERT INTO usrpss_work (
         uswusrname
@@ -28,10 +29,7 @@ BEGIN
         , usr.usrrole
         , usr.usrstat
     FROM usrhis ush
-    JOIN usrpss usr ON ush.ushusrname = usr.usrusrname
-    WHERE NOT EXISTS (
-        SELECT 1 FROM usrpss_work WHERE usrpss_work.uswusrname = usr.usrusrname
-    );
+    JOIN usrpss usr ON ush.ushusrname = usr.usrusrname;
 END $$
 
 DELIMITER ;

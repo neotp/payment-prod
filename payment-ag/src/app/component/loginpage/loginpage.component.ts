@@ -110,9 +110,9 @@ export class LoginpageComponent implements OnInit {
             };
   
             if (result.role === 'admin') {
-              this.router.navigate(['payment/mnusrpage'], { queryParams , queryParamsHandling: 'preserve'} );
+              this.router.navigate(['mnusrpage'], { queryParams , queryParamsHandling: 'preserve'} );
             } else if (result.role === 'user') {
-              this.router.navigate(['payment/pymntpage'], { queryParams , queryParamsHandling: 'preserve'});
+              this.router.navigate(['pymntpage'], { queryParams , queryParamsHandling: 'preserve'});
             }
 
             // After successful login, set the last activity time and reset the timeout timer
@@ -128,7 +128,7 @@ export class LoginpageComponent implements OnInit {
   }
 
   public register(): void {
-    this.router.navigate(['payment/regispage']);
+    this.router.navigate(['regispage']);
   }
 
   public handleConfirm(pop: string) {

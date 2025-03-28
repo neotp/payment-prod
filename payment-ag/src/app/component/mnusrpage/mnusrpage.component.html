@@ -9,20 +9,34 @@
 
 <body>
   <div *ngIf="!isMobile" class="desktop-layout">
-    <div [formGroup]="headerForm">
-      <div class="row">
-        <label class="tag">Manage User.</label>
-        <button class="button save-button" (click)="saveData()">
-          <span class="material-icons">save</span>
-          Save
-        </button>
+    <!-- <div [formGroup]="headerForm"> -->
+    <div class="row">
+      <div class="column">
+        <div class="row-btn">
+          <div class="tag">
+            <span class="material-icons username">manage_accounts</span>
+            <span class="username">Manage User.</span>
+          </div>
+          <button class="button create-payment-button" (click)="createUsr()">
+            <span class="material-icons">person_add</span>
+            Create User
+          </button>
+          <button class="button create-dummy-button" (click)="saveData()">
+            <span class="material-icons">save</span>
+            Save
+          </button>
+        </div>
+      </div>
+      <div class="column">
         <div class="tag-user">
-          <span class="material-icons username">account_circle</span>
+          <span class="material-icons username">account_circle</span>:
           <span class="username">{{ username }}</span>
         </div>
       </div>
     </div>
+    <!-- </div> -->
     <div class="divider-line"></div>
+
     <div class="table-container">
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
@@ -43,19 +57,6 @@
           <th mat-header-cell *matHeaderCellDef class="text-center"> Last Name </th>
           <td mat-cell *matCellDef="let record" class="text-left"> {{ record.uswlname }} </td>
         </ng-container>
-
-        <!-- Customer Code Column -->
-        <ng-container matColumnDef="uswcuscode">
-          <th mat-header-cell *matHeaderCellDef class="text-center"> Customer Code </th>
-          <td mat-cell *matCellDef="let record" class="text-center"> {{ record.uswcuscode }} </td>
-        </ng-container>
-
-        <!-- Customer Name Column -->
-        <ng-container matColumnDef="uswcusname">
-          <th mat-header-cell *matHeaderCellDef class="text-center"> Customer Name </th>
-          <td mat-cell *matCellDef="let record" class="text-left"> {{ record.uswcusname }} </td>
-        </ng-container>
-
         <!-- Email Column -->
         <ng-container matColumnDef="uswemail">
           <th mat-header-cell *matHeaderCellDef class="text-center"> Email </th>
@@ -95,24 +96,21 @@
           </td>
         </ng-container>
 
+        <ng-container matColumnDef="delete">
+          <th mat-header-cell *matHeaderCellDef class="text-center"> </th>
+          <td mat-cell *matCellDef="let record" class="text-center">
+            <button class="button-row delete-button" (click)="deleteUser(record)">
+              <span class="material-icons">person_remove</span>
+              Delete
+            </button>
+          </td>
+        </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
-
-      <!-- <mat-paginator 
-      [length]="totalRecords"
-      [pageSizeOptions]="pageSizeOptions"
-      [pageSize]="page_limit"
-      [pageIndex]="page_start - 1" 
-      (page)="onPageChange($event)">
-      </mat-paginator> -->
     </div>
-    <app-paging 
-      [totalRecords]="totalRecords" 
-      [pageSize]="page_limit" 
-      [pageIndex]="page_start"
-      [pageSizeOptions]="pageSizeOptions" 
-      (pageChanged)="onPageChanged($event)">
+    <app-paging [totalRecords]="totalRecords" [pageSize]="page_limit" [pageIndex]="page_start"
+      [pageSizeOptions]="pageSizeOptions" (pageChanged)="onPageChanged($event)">
     </app-paging>
 
   </div>
@@ -120,33 +118,39 @@
   <div *ngIf="isMobile" class="mobile-layout">
     <div [formGroup]="headerForm">
       <div class="row">
-        <div class="container-a">
-          <div class="row">
-            <label class="tag">Manage User.</label>
-            <button class="button save-button" (click)="saveData()">
-              <span class="material-icons">save</span>
-              Save
-            </button>
-          </div>
+        <div class="tag">
+          <span class="material-icons username">manage_accounts</span>
+          <span class="username" style="font-size: 16px;">Manage User.</span>
         </div>
-        <div class="container-b">
-          <div class="tag-user">
-            <span class="material-icons username">account_circle</span>
-            <span class="username">{{ username }}</span>
-          </div>
+        <div class="tag-user">
+          <span class="material-icons username">account_circle</span>:
+          <span class="username">{{ username }}</span>
         </div>
       </div>
     </div>
-    <div class="divider-line"></div>
+    <div class="divider-line-top"></div>
+    <div class="row-btn">
+      <button class="button create-payment-button" (click)="createUsr()">
+        <span class="material-icons" style="font-size: 16px;">person_add</span>
+        Create User
+      </button>
+      <button class="button save-button" (click)="saveData()">
+        <span class="material-icons" style="font-size: 16px;">save</span>
+        Save
+      </button>
+    </div>
     <div class="card-container">
+      <div class="divider-line"></div>
       <div class="card" *ngFor="let record of allData">
+        <div class="row card-header">
+          <button class="button-row delete-button" (click)="deleteUser(record)">
+            <span class="material-icons icons" style="font-size: 18px;">cancel</span>
+          </button>
+        </div>
         <div class="card-content">
-
           <div class="card-row mb-color"><strong>Username : </strong> {{ record.uswusrname }}</div>
           <div class="card-row mb-color"><strong>First Name : </strong> {{ record.uswfname }}</div>
           <div class="card-row mb-color"><strong>Last Name : </strong> {{ record.uswlname }}</div>
-          <div class="card-row mb-color"><strong>Customer Code : </strong> {{ record.uswcuscode }}</div>
-          <div class="card-row mb-color"><strong>Customer Name : </strong> {{ record.uswcusname }}</div>
           <div class="card-row mb-color"><strong>Email : </strong> {{ record.uswemail }}</div>
           <div class="card-row mb-color"><strong>Position : </strong> {{ record.uswpos }}</div>
 
@@ -177,12 +181,8 @@
         </div>
       </div>
     </div>
-    <app-paging 
-      [totalRecords]="totalRecords" 
-      [pageSize]="page_limit" 
-      [pageIndex]="page_start"
-      [pageSizeOptions]="pageSizeOptions" 
-      (pageChanged)="onPageChanged($event)">
+    <app-paging [totalRecords]="totalRecords" [pageSize]="page_limit" [pageIndex]="page_start"
+      [pageSizeOptions]="pageSizeOptions" (pageChanged)="onPageChanged($event)">
     </app-paging>
   </div>
 
@@ -208,7 +208,14 @@
     </app-popup>
   </div>
 
-  <!-- Fail Popup -->
+  <div>
+    <app-popup *ngIf="delete_pop" [title]="'WARNING MESSAGE !'" [messageDelete]="messageDelete"
+      [headerColor]="'#FCD69D'" [confirmButton]="true" [closeButton]="true" [text_button]="'Confirm'"
+      (close)="delete_pop = false" (confirm)="ConfirmDeleteUser()">
+    </app-popup>
+  </div>
+
+
   <div>
     <app-popup *ngIf="warning_search" [title]="'WARNING MESSAGE !'"
       [message]="'กรุณากรอก Customer Code. และ Invoice No.'" [headerColor]="'#FCD69D'" [confirmButton]="true"
@@ -216,6 +223,11 @@
     </app-popup>
   </div>
 
+  <div>
+    <app-creusr-popup *ngIf="creusr_pop" [title]="'Create User'" (close)="closeUserPopup()"
+      (confirm)="confirmUser($event)">
+    </app-creusr-popup>
+  </div>
 
   <app-loading-spinner [isLoading]="isLoading"></app-loading-spinner>
 

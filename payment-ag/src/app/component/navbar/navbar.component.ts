@@ -24,7 +24,6 @@ export class NavbarComponent {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.activeRoute = event.url; // Get the current route
-        console.log('Current Route:', this.activeRoute);
       }
     });
   }
@@ -57,16 +56,30 @@ export class NavbarComponent {
   public logout(): void {
     if (this.isBrowser) {
       localStorage.removeItem('accountRole');
-      this.router.navigate(['payment/loginpage']);
+      this.router.navigate(['loginpage']);
     }
   }
 
   public payment(): void {
-    this.router.navigate(['payment/pymntpage']);
+    this.router.navigate(['pymntpage']);
   }
 
+  public history(): void {
+    this.router.navigate(['history-header']);
+  }
+
+  public isHistoryActive(): boolean {
+    const currentRoute = this.router.url.split('?')[0];
+    return currentRoute === '/history-header' || currentRoute === '/history-detail';
+  }
+
+
   public manageuser(): void {
-    this.router.navigate(['payment/mnusrpage']);
+    this.router.navigate(['mnusrpage']);
+  }
+
+  public login(): void {
+    this.router.navigate(['loginpage']);
   }
 
   public get accountRole(): string | null {

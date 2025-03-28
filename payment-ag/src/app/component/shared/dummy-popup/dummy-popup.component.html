@@ -1,0 +1,84 @@
+<div class="popup-overlay">
+    <div class="popup-content">
+        <div class="popup-header">
+            <div class="text-header">{{ title }}</div>
+        </div>
+        <div class="popup-body">
+            <div [formGroup]="headerForm">
+                <div class="box">
+                    <div class="row">
+                        <div class="text-detail"> Document Type </div>
+                        <input class="input-text" autocomplete="off" type="text" id="doctype" formControlName="docType">
+                    </div>
+                    <div class="row">
+                        <div class="text-detail"> Document No <span style="color: red;">*</span></div>
+                        <input class="input-text" autocomplete="off" type="text" id="docNo" formControlName="docNo"
+                            placeholder="Enter Document NO.">
+                    </div>
+                    <div class="row">
+                        <div class="text-detail"> Usage <span style="color: red;">*</span></div>
+                        <div class="input-text">
+                            <div class="row">
+                                <div class="column">
+                                    <label>
+                                        <input type="radio" formControlName="usage" value="wht" />
+                                        WHT
+                                    </label>
+                                </div>
+                                <div class="column">
+                                    <label>
+                                        <input type="radio" formControlName="usage" value="advance" />
+                                        Advance
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column">
+                                    <label>
+                                        <input type="radio" formControlName="usage" value="fee" />
+                                        Fee
+                                    </label>
+                                </div>
+                                <div class="column">
+                                    <label>
+                                        <input type="radio" formControlName="usage" value="other" />
+                                        Other
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="text-detail"> Document Amt <span style="color: red;">*</span></div>
+                        <input 
+                            class="input-text"
+                            autocomplete="off"
+                            type="text"
+                            id="docAmt"
+                            formControlName="docAmt"
+                            placeholder="Enter Amount"
+                            (blur)="formatFinalAmount()"
+                        />
+                    </div>
+                    <div class="row">
+                        <div class="text-detail"> Comment </div>
+                        <input class="input-text" autocomplete="off" type="text" id="note" formControlName="note"
+                            placeholder="Enter Comment.">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="popup-footer">
+            <button class="button-close" (click)="closePopup()">
+                <span class="material-icons">close</span>
+                Close
+            </button>
+            <button class="button-ok" (click)="confirmAction()"
+            [disabled]="headerForm.invalid">
+            <span class="material-icons">post_add</span>Create
+            </button>
+        </div>
+    </div>
+</div>
+
+<app-loading-spinner [isLoading]="isLoading"></app-loading-spinner>

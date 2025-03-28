@@ -1,0 +1,80 @@
+<div class="popup-overlay">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="text-header">{{ title }}</div>
+    </div>
+    <div class="popup-body">
+      <div class="radio-group">
+        <label>Bank</label>
+        <label>
+          <div class="row-img">
+            <input type="radio" name="bankOption" value="ktc" [(ngModel)]="bankOption" (change)="onBankChange()" />
+            <img class="logo" [src]="'assets/ktc.jpg'" alt="KTC Logo">
+            <!-- <input type="radio" name="bankOption" value="ktb" [(ngModel)]="bankOption" (change)="onBankChange()" />
+            <img class="logo" [src]="'assets/ktb.jpg'" alt="KTB Logo">
+            <input type="radio" name="bankOption" value="kbank" [(ngModel)]="bankOption" (change)="onBankChange()" />
+            <img class="logo" [src]="'assets/kbank.jpg'" alt="K-Bank Logo"> -->
+          </div>
+        </label>
+      </div>
+      <div class="radio-group" *ngIf="bankOption">
+        <label>Card</label>
+        <label>
+          <div class="row-img">
+            <input type="radio" name="cardOption" value="visa" [(ngModel)]="cardOption" (change)="onCardChange()" />
+            <img class="logo" [src]="'assets/visa.jpg'" alt="Visa Logo">
+            <input type="radio" name="cardOption" value="master" [(ngModel)]="cardOption" (change)="onCardChange()" />
+            <img class="logo" [src]="'assets/master.jpg'" alt="Master Logo">
+            <input type="radio" name="cardOption" value="other" [(ngModel)]="cardOption" (change)="onCardChange()" />
+            <img class="logo" [src]="'assets/jcb.jpg'" alt="JCB Logo">
+            <img class="logo" [src]="'assets/upi.jpg'" alt="UPI Logo">
+          </div>
+        </label>
+      </div>
+
+      <div class="box" *ngIf="cardOption">
+        <div class="row">
+          <div class="column">
+            <div class="text-detail"> Balance Amount </div>
+          </div>
+          <div class="column balance-container">
+            <div class="text-detail">{{ balanceAmount | number:'1.2-2'  }}</div>
+            <div class="text-detail">THB</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="column">
+            <div class="text-detail"> Service charge ({{ feeper }}%)</div>
+          </div>
+          <div class="column balance-container">
+            <div class="text-detail">{{ serviceCharge | number:'1.2-2' }}</div>
+            <div class="text-detail">THB</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="column">
+            <div class="text-detail"> Total amount </div>
+          </div>
+          <div class="column balance-container">
+            <div class="text-detail">{{ totalAmount | number:'1.2-2'  }}</div>
+            <div class="text-detail">THB</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popup-footer">
+      <button class="button-close" (click)="closePopup()">
+        <span class="material-icons">close</span>
+        Close
+      </button>
+      <button class="button-ok" (click)="confirmAction()">
+        <span class="material-icons">payment</span>
+        Create
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-loading-spinner [isLoading]="isLoading"></app-loading-spinner>

@@ -1,0 +1,157 @@
+
+.radio-group {
+    margin-top: 20px;
+  }
+  
+  .radio-group label {
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 14px;
+    color: #684C69;
+    display: block;
+    margin: 10px 20px;
+  }
+  
+  .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .popup-content {
+      background: white;
+      border-radius: 8px;
+      width: 450px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .popup-header {
+      padding: 15px;
+      text-align: left;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #e2f9ef;
+      border: #503651;
+      color: #503651;
+    }
+    
+    .popup-body {
+      padding: 10px;
+      font-size: 14px;
+      color: #555;
+    }
+    
+    .popup-footer {
+      padding: 10px;
+      display: flex;
+      justify-content: flex-end;
+      border-top: 1px solid #eaeaea;
+    }
+    
+    .button-ok {
+      background-color: #ccefe8; /* Light aqua background */
+      border: 1px solid #1e8b50; /* Green border */
+      color: #1e8b50; /* Green text color */
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      margin-left: 2px;
+      gap: 5px;
+    }
+    
+    .button-ok .icon {
+      margin-right: 5px;
+      color: #1e8b50;
+    }
+    
+    .button-ok:hover {
+      background-color: #b8ddd6; /* Slightly darker on hover */
+    }
+    
+    .button-close {
+      background-color: #FFDBDB; /* Light aqua background */
+      border: 1px solid #684C69; /* Green border */
+      color: #684C69; /* Green text color */
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      margin-right: 2px;
+    }
+    
+    .button-close .icon {
+      margin-right: 5px;
+      color: #684C69;
+    }
+    
+    .button-close:hover {
+      background-color: #f8d1d1; /* Slightly darker on hover */
+    }
+    
+    .text-header {
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 16px;
+      color: #684C69; /* Slightly darker on hover */
+    }
+    
+    .text-detail {
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 14px;
+      color: #684C69; /* Slightly darker on hover */
+      display: block;
+      margin: 10px 20px;
+    }
+    
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .row-img {
+      display: flex;
+      align-items: left;
+  }
+  
+    .balance-container {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+  
+    .column {
+      border-radius: 5px;
+      width: 50%;
+    }
+  
+    .box {
+      margin: 5px 10px;
+    }
+  
+    .logo {
+      height: 45px;
+    }
+
+    .input-text {
+        width: 60%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 2px solid #f9e3e2;
+        border-radius: 5px;
+        color: #684C69;
+    }
+  
+    

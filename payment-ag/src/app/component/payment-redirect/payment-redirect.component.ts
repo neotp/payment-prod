@@ -11,7 +11,8 @@ import { ActivatedRoute } from '@angular/router';
 export class PaymentRedirectComponent implements OnInit {
 
   paymentData: any;
-  bankUrl: string = 'https://testpaygate.ktc.co.th/ktc/merchandize/payment/payForm.jsp';  // Bank's payment URL
+  bankUrl: string = 'https://testpaygate.ktc.co.th/ktc/eng/merchandize/payment/payForm.jsp';  // Bank's payment URL Test
+  // bankUrl: string = 'https://paygate.ktc.co.th/ktc/eng/merchandize/payment/payForm.jsp';  // Bank's payment URL TestProd
 
   constructor(private route: ActivatedRoute) {}
 
@@ -22,9 +23,7 @@ export class PaymentRedirectComponent implements OnInit {
       console.log('Payment Data:', this.paymentData);  // For debugging
 
       // Automatically submit the form after 1 second
-      setTimeout(() => {
-        this.submitPaymentForm();
-      }, 1000);
+      this.submitPaymentForm();
     });
   }
 
@@ -32,6 +31,7 @@ export class PaymentRedirectComponent implements OnInit {
   submitPaymentForm(): void {
     const paymentForm = document.getElementById('paymentForm') as HTMLFormElement;
     if (paymentForm) {
+      console.log('Payment Form:', paymentForm);  // For debugging
       paymentForm.submit();  // Submit the form to the bank
     }
   }

@@ -27,7 +27,7 @@ describe('AuthGuard', () => {
 
     const route = {
       routeConfig: {
-        path: 'payment/mnusrpage'
+        path: 'mnusrpage'
       }
     } as ActivatedRouteSnapshot; // Mock the ActivatedRouteSnapshot
     const state = {} as RouterStateSnapshot; // Mock the RouterStateSnapshot
@@ -40,7 +40,7 @@ describe('AuthGuard', () => {
 
     const route = {
       routeConfig: {
-        path: 'payment/pymntpage'
+        path: 'pymntpage'
       }
     } as ActivatedRouteSnapshot; // Mock the ActivatedRouteSnapshot
     const state = {} as RouterStateSnapshot; // Mock the RouterStateSnapshot
@@ -56,7 +56,7 @@ describe('AuthGuard', () => {
     const state = {} as RouterStateSnapshot; // Mock the RouterStateSnapshot
 
     expect(guard.canActivate(route, state)).toBeFalse();
-    expect(navigateSpy).toHaveBeenCalledWith(['payment/loginpage']);
+    expect(navigateSpy).toHaveBeenCalledWith(['loginpage']);
   });
 
   it('should navigate to pymntpage if user does not have permission', () => {
@@ -64,13 +64,13 @@ describe('AuthGuard', () => {
 
     const route = {
       routeConfig: {
-        path: 'payment/mnusrpage'
+        path: 'mnusrpage'
       }
     } as ActivatedRouteSnapshot; // Mock the ActivatedRouteSnapshot
     const state = {} as RouterStateSnapshot; // Mock the RouterStateSnapshot
     const navigateSpy = spyOn(router, 'navigate');
 
     expect(guard.canActivate(route, state)).toBeFalse();
-    expect(navigateSpy).toHaveBeenCalledWith(['payment/pymntpage']);
+    expect(navigateSpy).toHaveBeenCalledWith(['pymntpage']);
   });
 });

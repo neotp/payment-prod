@@ -27,7 +27,10 @@ BEGIN
         , pyw.pywduedate
         , pyw.pywdocamt
         , pyw.pywbalamt
+        , pyw.pywpaidamt
+        , pyw.pywrefdoc
         , pyw.pywstat
+        , pyw.pywnote
     FROM pymdp_work pyw
     WHERE pyw.pywcuscode = p_cuscode
     ORDER BY pyw.pywduedate ASC

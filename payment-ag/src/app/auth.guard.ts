@@ -21,20 +21,20 @@ export class AuthGuard implements CanActivate {
     const userRole = localStorage.getItem('accountRole'); // Get user role
 
     if (!userRole) {
-      this.router.navigate(['payment/loginpage']); // Redirect if not logged in
+      this.router.navigate(['loginpage']); // Redirect if not logged in
       return false;
     }
 
     // 🔹 Define role-based allowed routes
-    const allowedAdminRoutes = ['payment/mnusrpage', 'payment/pymntpage'];
-    const allowedUserRoutes = ['payment/pymntpage'];
+    const allowedAdminRoutes = ['mnusrpage', 'pymntpage','history-header', 'history-detail'];
+    const allowedUserRoutes = ['pymntpage','history-header', 'history-detail'];
 
     // Check if the route is allowed based on user role
     const currentRoute = route.routeConfig?.path?.toLowerCase();
     const isRouteAllowed = this.isRouteAllowed(userRole, currentRoute, allowedAdminRoutes, allowedUserRoutes);
 
     if (!isRouteAllowed) {
-      this.router.navigate(['payment/pymntpage']); // Redirect users to payment page
+      this.router.navigate(['pymntpage']); // Redirect users to payment page
       return false;
     }
 

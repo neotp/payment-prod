@@ -1,6 +1,11 @@
 export interface SearchInv {
-    customer_code: string,
+    cuscode: string,
     invno: string,
+  }
+
+export interface CnList {
+    cnNo: string,
+    refCnNo: string,
   }
 
 export interface FindCusCode {
@@ -19,7 +24,10 @@ export interface InvoiceData {
     dueDate: string
     docAmt: string
     balAmt: string
+    paidamt: string
+    refdoc: string
     stat:string
+    note: string
 }
 
 export interface paymentForm {

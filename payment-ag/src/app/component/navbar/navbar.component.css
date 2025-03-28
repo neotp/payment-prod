@@ -31,6 +31,8 @@ li a:hover:not(.active) {
   color: white;
 }
 
+
+
 .divider-line {
   width: 100%;
   height: 2px;
@@ -116,6 +118,12 @@ li a:hover:not(.active) {
   margin-left: 7px;
 }
 
+.mobile-layout .nav-links li a{  
+  padding: 8px 10px;
+  text-decoration: none;
+  font-size: 14px
+}
+
 .mobile-layout .divider-line {
   width: 100%;
   height: 1px;
@@ -130,7 +138,10 @@ li a:hover:not(.active) {
 .mobile-layout .box2 li {
   text-align: center;
 }
-
+.desktop-layout .row {
+  display: flex;
+  align-items: center;
+}
 /* Media Query for Mobile Responsiveness */
 @media (max-width: 768px) {
   .mobile-layout ul {

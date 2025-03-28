@@ -1,0 +1,151 @@
+<div *ngIf="!isMobile" class="desktop-layout">
+
+    <div class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">
+                <div class="text-header">{{ title }}</div>
+            </div>
+            <div class="popup-body">
+                <div [formGroup]="headerForm">
+                    <div class="box">
+                        <div class="row">
+                            <div class="text-detail"> Username <span style="color: red;">*</span></div>
+                            <input class="input-text" autocomplete="off" type="text" id="username"
+                                formControlName="username" placeholder="Enter Username.">
+                        </div>
+                        <div class="row">
+                            <div class="text-detail"> Password <span style="color: red;">*</span></div>
+                            <input class="input-text" autocomplete="off" type="password" id="password"
+                                formControlName="password" placeholder="Enter Password.">
+                        </div>
+                        <div class="row">
+                            <div class="text-detail"> First Name <span style="color: red;">*</span></div>
+                            <input class="input-text" autocomplete="off" type="text" id="fstname"
+                                formControlName="fstname" placeholder="Enter First Name.">
+                        </div>
+                        <div class="row">
+                            <div class="text-detail"> Last Name <span style="color: red;">*</span></div>
+                            <input class="input-text" autocomplete="off" type="text" id="lstname"
+                                formControlName="lstname" placeholder="Enter Last Name.">
+                        </div>
+                        <div class="row">
+                            <div class="text-detail"> Email <span style="color: red;">*</span></div>
+                            <input class="input-text" autocomplete="off" type="email" id="email" formControlName="email"
+                                placeholder="example@gmail.com">
+                        </div>
+                        <div class="row">
+                            <div class="text-detail"> Position <span style="color: red;">*</span></div>
+                            <input class="input-text" autocomplete="off" type="text" id="pos" formControlName="pos"
+                                placeholder="Enter Position.">
+                        </div>
+                        <div class="row">
+                            <div class="text-detail"> Role <span style="color: red;">*</span></div>
+                            <div class="input-text">
+                                <div class="row">
+                                    <div class="column">
+                                        <label>
+                                            <input type="radio" formControlName="role" value="admin" />
+                                            Admin
+                                        </label>
+                                    </div>
+                                    <div class="column">
+                                        <label>
+                                            <input type="radio" formControlName="role" value="user" />
+                                            User
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="button-close" (click)="closePopup()">
+                    <span class="material-icons">close</span>
+                    Close
+                </button>
+                <button class="button-ok" (click)="confirmAction()" [disabled]="headerForm.invalid">
+                    <span class="material-icons">person_add</span>Create
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isMobile" class="mobile-layout">
+
+    <div class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">
+                <div class="text-header">{{ title }}</div>
+            </div>
+            <div class="popup-body">
+                <div [formGroup]="headerForm">
+                    <div class="box">
+                        <div class="row">
+                            <div class="text-detail"> Username <span style="color: red;">*</span></div>
+                            <input class="input-text" autocomplete="off" type="text" id="username"
+                                formControlName="username" placeholder="Enter Username.">
+                        </div>
+                        <div class="row">
+                            <div class="text-detail"> Password <span style="color: red;">*</span></div>
+                            <input class="input-text" autocomplete="off" type="password" id="password"
+                                formControlName="password" placeholder="Enter Password.">
+                        </div>
+                        <div class="row">
+                            <div class="text-detail"> First Name <span style="color: red;">*</span></div>
+                            <input class="input-text" autocomplete="off" type="text" id="fstname"
+                                formControlName="fstname" placeholder="Enter First Name.">
+                        </div>
+                        <div class="row">
+                            <div class="text-detail"> Last Name <span style="color: red;">*</span></div>
+                            <input class="input-text" autocomplete="off" type="text" id="lstname"
+                                formControlName="lstname" placeholder="Enter Last Name.">
+                        </div>
+                        <div class="row">
+                            <div class="text-detail"> Email <span style="color: red;">*</span></div>
+                            <input class="input-text" autocomplete="off" type="email" id="email" formControlName="email"
+                                placeholder="example@gmail.com">
+                        </div>
+                        <div class="row">
+                            <div class="text-detail"> Position <span style="color: red;">*</span></div>
+                            <input class="input-text" autocomplete="off" type="text" id="pos" formControlName="pos"
+                                placeholder="Enter Position.">
+                        </div>
+                        <div class="row">
+                            <div class="text-detail"> Role <span style="color: red;">*</span></div>
+                            <div class="input-text">
+                                <div class="row">
+                                    <div class="column">
+                                        <label>
+                                            <input type="radio" formControlName="role" value="admin" />
+                                            Admin
+                                        </label>
+                                    </div>
+                                    <div class="column">
+                                        <label>
+                                            <input type="radio" formControlName="role" value="user" />
+                                            User
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="button-close" (click)="closePopup()">
+                    <span class="material-icons" style="font-size: 16px">close</span>
+                </button>
+                <button class="button-ok" (click)="confirmAction()" [disabled]="headerForm.invalid">
+                    <span class="material-icons" style="font-size: 16px">person_add</span>Create
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<app-loading-spinner [isLoading]="isLoading"></app-loading-spinner>

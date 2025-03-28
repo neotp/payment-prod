@@ -7,33 +7,41 @@
         <div class="divider-line"></div>
         <div class="box1">
             <li *ngIf="!isLoggedIn()">
-                <a routerLink="payment/loginpage"
+                
+                <a routerLink="loginpage"
                     routerLinkActive="active"  
                     [routerLinkActiveOptions]="{exact: true}"
-                    [class.active]="activeRoute === '/payment/loginpage'">
+                    [class.active]="activeRoute === '/loginpage'">
                     Login</a>
             </li>
             
             <li *ngIf="isLoggedIn() && accountRole === 'admin'">
-                <a routerLink="payment/mnusrpage" (click)="manageuser()"  
+                <a routerLink="mnusrpage" (click)="manageuser()"  
                 routerLinkActive="active"  
                 [routerLinkActiveOptions]="{exact: true}" 
-                [class.active]="activeRoute === '/payment/mnusrpage'">
+                [class.active]="activeRoute === '/mnusrpage'">
                 Manage User</a>
             </li>
 
             <li *ngIf="isLoggedIn() && (accountRole === 'user' || accountRole === 'admin')">
-                <a routerLink="payment/pymntpage" (click)="payment()"
+                <a routerLink="pymntpage" (click)="payment()"
                 routerLinkActive="active"  
                 [routerLinkActiveOptions]="{exact: true}" 
-                [class.active]="activeRoute === '/payment/pymntpage'">
+                [class.active]="activeRoute === '/pymntpage'">
                 Payment</a>
             </li>
 
+            <li *ngIf="isLoggedIn() && (accountRole === 'user' || accountRole === 'admin')">
+                <a routerLink="history-header" (click)="history()"
+                routerLinkActive="active"  
+                [routerLinkActiveOptions]="{exact: false}"
+                [class.active]="isHistoryActive()">
+                History</a>
+            </li>
         </div>
         <div class="box2">
             <li *ngIf="isLoggedIn()">
-                <a class="logactive" routerLink="payment/loginpage" (click)="logout()">Logout</a>
+                <a class="logactive" routerLink="loginpage" (click)="logout()">Logout</a>
             </li>
         </div>
     </ul>
@@ -50,28 +58,36 @@
 
             <div class="nav-links">
                 <li *ngIf="!isLoggedIn()">
-                    <a routerLink="payment/loginpage" 
+                    <a routerLink="loginpage" 
                     routerLinkActive="active"  
                     [routerLinkActiveOptions]="{exact: true}"
-                    [class.active]="activeRoute === '/payment/loginpage'">
+                    [class.active]="activeRoute === '/loginpage'">
                     Login</a>
                 </li>
                 <li *ngIf="isLoggedIn() && accountRole === 'admin'">
-                    <a routerLink="payment/mnusrpage" (click)="manageuser()"  
+                    <a routerLink="mnusrpage" (click)="manageuser()"  
                     routerLinkActive="active"  
                     [routerLinkActiveOptions]="{exact: true}" 
-                    [class.active]="activeRoute === '/payment/mnusrpage'">
+                    [class.active]="activeRoute === '/mnusrpage'">
                     Manage User</a>
                 </li>
                 <li *ngIf="isLoggedIn() && (accountRole === 'user' || accountRole === 'admin')">
-                    <a routerLink="payment/pymntpage" (click)="payment()"  
+                    <a routerLink="pymntpage" (click)="payment()"  
                     routerLinkActive="active"  
                     [routerLinkActiveOptions]="{exact: true}" 
-                    [class.active]="activeRoute === '/payment/pymntpage'">
+                    [class.active]="activeRoute === '/pymntpage'">
                     Payment</a>
                 </li>
+                
+                <li *ngIf="isLoggedIn() && (accountRole === 'user' || accountRole === 'admin')">
+                    <a routerLink="history-header" (click)="history()"
+                    routerLinkActive="active"  
+                    [routerLinkActiveOptions]="{exact: true}" 
+                    [class.active]="isHistoryActive()">
+                    History</a>
+                </li>
                 <li *ngIf="isLoggedIn()" style="right: 1px;">
-                    <a class="logactive" routerLink="/payment/loginpage" (click)="logout()">Logout</a>
+                    <a class="logactive" routerLink="/loginpage" (click)="logout()">Logout</a>
                 </li>
             </div>
         </div>

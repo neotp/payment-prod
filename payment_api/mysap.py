@@ -1,8 +1,9 @@
+import asyncio
 from decimal import Decimal
-from fastapi import FastAPI, Request, HTTPException, Depends, logger
-from fastapi.responses import JSONResponse
+import re
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Depends, logger
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-# from pyrfc import Connection, ABAPApplicationError, ABAPRuntimeError, LogonError, CommunicationError
 from pydantic import BaseModel, Field
 from typing import Dict, List
 import mysql.connector
@@ -11,18 +12,38 @@ import random
 import string
 import logging
 import hashlib
-from datetime import date, datetime
+from datetime import date, datetime, time
 import requests
+from zeep import Client
+from zeep.transports import Transport
+from requests.auth import HTTPBasicAuth
+from apscheduler.schedulers.background import BackgroundScheduler
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from typing import Optional
 
 app = FastAPI()
+
 logger = logging.getLogger(__name__)
+
 logger.setLevel(logging.INFO)
+
 if not logger.handlers:
     handler = logging.StreamHandler()
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
-# SAP and MySQL Configurations
+    
+scheduler = BackgroundScheduler()
+    
+    
+# Conf for SOAP, SAP
+WSDL_URL = "http://172.21.130.233/Application/PaymentMGT.nsf/PaymentWS?WSDL"
+USERNAME = "Pimcore Commerce"
+PASSWORD = "password@1"
+METHOD = "FNCREATEPAYMENTS" 
+
 # SAP_CONFIG = {
 #     "ashost": "172.21.130.208"
 #     , "sysnr": "00"
@@ -30,6 +51,7 @@ if not logger.handlers:
 #     , "user": "notes"
 #     , "passwd": "february_02"
 # }
+
 origins = [
     "http://localhost:4200",
     "http://webapp.sisthai:4200",
@@ -37,7 +59,7 @@ origins = [
     "http://webapp.sisthai:7070",
     "http://172.31.144.1:7070",
     "http://172.31.20.11:7070",
-    # "https://webapp.sisthai.com"  # Add your production domain here
+    "https://webapp.sisthai.com" 
 ]
 
 app.add_middleware(
@@ -48,6 +70,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Conf for MySQL
 MYSQL_CONFIG = {
     "host": "172.31.50.11"
     , "user": "root"
@@ -55,6 +78,7 @@ MYSQL_CONFIG = {
     , "database": "payment_db"
 }
 
+# ---------------------- Model ----------------------
 class LoginData(BaseModel):
     username: str
     password: str
@@ -68,12 +92,25 @@ class RegisterData(BaseModel):
     password: str
     email: str
     position: str
+    
+class CreatUser(BaseModel):
+    username: str
+    password: str
+    fstname: str
+    lstname: str
+    email: str
+    pos: str
+    role: str
 
     
 class UpdateDateUser(BaseModel):
     usrname: str
     usrrole: str
     usrstat: str
+    
+class DeleteUser(BaseModel):
+    usrid: int
+    usrname: str
     
  
 class FindCuscode(BaseModel):
@@ -82,15 +119,32 @@ class FindCuscode(BaseModel):
 class GetInv(BaseModel):
     usrcuscode: str
     
+class FindSumamt(BaseModel):
+    cuscode: str
+    
+class FindFeeRate(BaseModel):
+    bank: str
+    card: str
+    
 class Payment(BaseModel):
     username: str
     cuscode: str
+    sumamt: str
+    fee: str
+    totalAmt: str
+    bank: str
+    card: str
     
     
 class UpdateFlag(BaseModel):
     selected: bool
     cuscode: str
     docno: str
+    
+class UpdatePaidAmt(BaseModel):
+    cuscode: str
+    docno: str
+    paidamt: str
     
 class UpdateAllFlag(BaseModel):
     cuscode: str
@@ -105,29 +159,87 @@ class LoadDate(BaseModel):
     page_start: int
     page_limit: int
     
-class TestSubmit(BaseModel):
-    merchantId: str = Field(..., description="Merchant ID")
-    amount: float = Field(..., description="Payment amount")
-    orderRef: str = Field(..., description="Order reference")
-    currCode: str = Field(..., description="Currency code")
-    successUrl: str = Field(..., description="URL for success")
-    failUrl: str = Field(..., description="URL for failure")
-    cancelUrl: str = Field(..., description="URL for cancellation")
-    payType: str = Field(..., description="Payment type")
-    lang: str = Field(default="E", description="Language")
-    TxType: str = Field(..., description="Transaction type")
-    Term: str = Field(..., description="Term information")
-    promotionType: str = Field(..., description="Promotion type")
-    supplierId: str = Field(..., description="Supplier ID")
-    productId: str = Field(..., description="Product ID")
-    serialNo: str = Field(..., description="Serial number")
-    model: str = Field(..., description="Model information")
-    itemTotal: str = Field(..., description="Total items")
-    redeemPoint: str = Field(..., description="Redeem points")
-    paymentSkip: str = Field(..., description="Payment skip flag")
-    memberPay_service: str = Field(..., description="Member pay service")
-    memberPay_memberId: str = Field(..., description="Member pay member ID")
-    secureHash: str = Field(..., description="Secure hash for validation")
+    
+class NotesData(BaseModel):
+    company_code: str
+    customer_code: str
+    payment_type: str
+    billing_no: str
+    payment_doc: str
+    assignment: str
+    billing_date: str
+    billing_due_date: str
+    amount: float
+    amount_total: float
+    bank_status: str
+    bank_approve_ref: str
+    payment_method: str
+    payment_no: str
+    source: str
+    approve_date: str
+    approve_time: str
+    reason_code: str
+    
+class ResponseStatus(BaseModel):
+    code: int
+    message: str
+    
+class NotesResponse(BaseModel):
+    status: ResponseStatus
+    
+class CallBackKTC(BaseModel):
+    paymentNo: str
+    
+class CreateSo(BaseModel):
+    cuscode: str
+    docType: str
+    docNo: str
+    docAmt: str
+    usage: str
+    note: str
+    
+class SendBank(BaseModel):
+    merchantId: str
+    amount: float
+    orderRef: str
+    currCode: str
+    successUrl: str
+    failUrl: str
+    cancelUrl: str
+    payType: str
+    lang: str
+    TxType: str
+    Term: str
+    promotionType: str
+    supplierId: str
+    productId: str
+    serialNo: str
+    model: str
+    itemTotal: str
+    redeemPoint: str
+    paymentSkip: str
+    memberPay_service: str
+    memberPay_memberId: str
+    secureHash: str
+    
+class SearchPaymenthdr(BaseModel):
+     cuscode : str
+     payNo : str
+     bank : str
+     card : str
+     creusr : str
+     credateFrom: str
+     credateTo: str
+     status : str
+     page_start: int
+     page_limit: int
+     
+class SearchPaymentdtl(BaseModel):
+     hdrid : int
+     page_start: int
+     page_limit: int
+    
+# ---------------------- Model ----------------------
     
 # Dependency: SAP Connection
 # def get_sap_connection():
@@ -147,6 +259,17 @@ def get_mysql_connection():
     except mysql.connector.Error as err:
         raise HTTPException(status_code=500, detail=f"MySQL connection error: {err}")
 
+
+# Dependency: SOAP Connection 
+def call_soap_api(wsdl: str, method: str, data: dict):
+    try:
+        session = requests.Session()
+        session.auth = HTTPBasicAuth(USERNAME, PASSWORD)
+        client = Client(wsdl, transport=Transport(session=session))
+        response = client.service.__getattr__(method)(**data)
+        return response
+    except Exception as e:
+        raise Exception(f"Error making SOAP request: {e}")
 
 @app.get("/testquery")
 def testquery(conn=Depends(get_mysql_connection)):
@@ -174,8 +297,9 @@ def login(data: LoginData, conn=Depends(get_mysql_connection)):
             , None
             ])
         role = out_param[2]
-
+        
         if role:
+            logger.info("login : success, role: %s", role)
             return JSONResponse(content={"status": "success", "role": role})
         else:
             raise HTTPException(status_code=401, detail="Invalid credentials or user not active")
@@ -187,7 +311,7 @@ def login(data: LoginData, conn=Depends(get_mysql_connection)):
         conn.close()
 
 @app.post("/register")
-def login(data: RegisterData, conn=Depends(get_mysql_connection)):
+def register(data: RegisterData, background_tasks: BackgroundTasks, conn=Depends(get_mysql_connection)):
     try:
         cursor = conn.cursor()
         out_param = cursor.callproc("pkgregis_regisuser", [
@@ -206,16 +330,83 @@ def login(data: RegisterData, conn=Depends(get_mysql_connection)):
         
         logger.info("Registration attempt for user data '%s completed with result after: %s", data, count)
         if count == 1:
+            background_tasks.add_task(
+                send_registration_email
+                , data.username
+                , data.fstname
+                , data.lstname
+                , data.customercode
+                , data.customername
+                )
             return JSONResponse(content={"status": "success", "regis": "success"})
         elif count == 0:
-            return JSONResponse(content={"status": "success", "regis": "dup"})
+            return JSONResponse(content={"status": "dup", "regis": "dup"})
         else :
-            return JSONResponse(content={"status": "success", "regis": "fail"})
+            return JSONResponse(content={"status": "fail", "regis": "fail"})
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
     finally:
         cursor.close()
         conn.close()
+        
+def send_registration_email(username: str, fname: str, lname: str, cuscode: str, cusname: str):
+    sender_email = "Chaitanachote@sisthai.com"
+    sender_password = "New@191243"
+    subject = "Registering in payment app!"
+    email= "Chaitanachote@sisthai.com"
+    cc_list = ["pornchai@sisthai.com"]
+    current_datetime = datetime.now().strftime("%H:%M:%S %d/%m/%Y")
+    
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = email
+    message["Cc"] = ", ".join(cc_list)
+    message["Subject"] = subject
+    body = f"""
+        <html>
+            <body>
+                <p><strong>User Registration</strong></p>
+                <table border="1" cellspacing="0" cellpadding="5">
+                    <tr>
+                        <th style="background-color:#f2f2f2; text-align:left;">Username</th>
+                        <th style="background-color:#f2f2f2; text-align:left;">Name</th>
+                        <th style="background-color:#f2f2f2; text-align:left;">Customer Code</th>
+                        <th style="background-color:#f2f2f2; text-align:left;">Customer Name</th>
+                        <th style="background-color:#f2f2f2; text-align:left;">Date Time</th>
+                    </tr>
+                    <tr>
+                        <td>{username}</td>
+                        <td>{fname} {lname}</td>
+                        <td>{cuscode}</td>
+                        <td>{cusname}</td>
+                        <td>{current_datetime}</td>
+                    </tr>
+                </table>
+                <br>
+                <br>
+                <br>
+                <p>Chaitanachote Wongtanaruj</p>
+                <p>Information System Officer</p>
+                <br>
+                <p>SiS Distribution (Thailand) Public Co., Ltd.</p>
+                <p>Mobile : 091-812-9900</p>
+                <p>Email : chaitanachote@sisthai.com</p>
+               
+            </body>
+        </html>
+    """
+    message.attach(MIMEText(body, "html"))
+    try: 
+        logger.info("Connecting to SMTP server...")
+        server = smtplib.SMTP("172.21.130.12", 25)
+        server.login(sender_email, sender_password)
+        logger.info("Login successful!")
+        server.sendmail(sender_email, email, message.as_string())
+        
+        server.quit()
+        logger.info("Email sent successfully!")
+    except Exception as e:
+        logger.info(f"Failed to send email: {e}")
 
 # -------------------------- login function end --------------------------
         
@@ -228,10 +419,8 @@ def findDataPending(data: DataPending,conn=Depends(get_mysql_connection)):
     offset = (data.page_start - 1) * data.page_limit
     
     try:
-        cursor1 = conn.cursor()
         cursor2 = conn.cursor()
         
-        cursor1.callproc("pkgmnusr_insert_usrpss_work")
         cursor2.callproc("pkgmnusr_load_data",[
             offset
             , data.page_limit
@@ -244,15 +433,10 @@ def findDataPending(data: DataPending,conn=Depends(get_mysql_connection)):
             break  
         cursor2.nextset()
 
-        logger.info("datadip: %s", results)
-
         for result in cursor2.stored_results():
             results = result.fetchall()
             column_names = [desc[0] for desc in result.description]  
             formatted_results = [dict(zip(column_names, row)) for row in results]
-        
-        logger.info("total: %s", total_count)
-        logger.info("data: %s", formatted_results)
         
         if result:
             return JSONResponse(content={"status": "success", "total": total_count, "data": formatted_results})
@@ -262,12 +446,7 @@ def findDataPending(data: DataPending,conn=Depends(get_mysql_connection)):
         logger.error(f"Error: {e}")
         raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
     finally:
-        if cursor1:
-            try:
-                cursor1.close()
-            except Exception as e:
-                logger.error(f"Error closing cursor1: {e}")
-        
+       
         if cursor2:
             try:
                 cursor2.close()
@@ -282,7 +461,25 @@ def updateDataNow(conn=Depends(get_mysql_connection)):
     try:
         cursor = conn.cursor()
         
-        cursor.callproc("pkgmnusr_reload_usrpss_work")
+        cursor.callproc("pkgmnusr_insert_usrpss_work")
+        conn.commit()
+        return JSONResponse(content={"status": "success", "message": "User updated successfully"})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+        
+@app.post("/deleteUser")
+def deleteUser(data: DeleteUser,conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
+        
+        cursor.callproc("pkgmnusr_delete_user", [
+            data.usrid
+            , data.usrname
+        ])
         conn.commit()
         return JSONResponse(content={"status": "success", "message": "User updated successfully"})
     
@@ -313,13 +510,14 @@ def updateDataToWork(data: UpdateDateUser, conn=Depends(get_mysql_connection)):
         
                 
 @app.post("/saveData")
-def updateDataToWork(conn=Depends(get_mysql_connection)):
+def saveData(conn=Depends(get_mysql_connection)):
     try:
         cursor = conn.cursor()
         
         out_param = cursor.callproc("pkgmnusr_save_usrpss", [
             None
          ])
+        
         conn.commit()
         
         out_param = cursor.fetchall()
@@ -335,6 +533,99 @@ def updateDataToWork(conn=Depends(get_mysql_connection)):
     finally:
         cursor.close()
         conn.close()
+        
+@app.post("/createUser")
+def createUser(data: CreatUser, background_tasks: BackgroundTasks, conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
+        out_param = cursor.callproc("pkgmnusr_create_usr", [
+            data.username
+            , data.password
+            , data.fstname
+            , data.lstname
+            , data.email
+            , data.pos
+            , data.role
+            , None
+            ])
+
+        count = out_param[7]
+        
+        logger.info("Registration attempt for user data '%s completed with result after: %s", data, count)
+        if count == 1:
+            # background_tasks.add_task(
+            #     send_registration_email
+            #     , data.username
+            #     , data.fstname
+            #     , data.lstname
+            #     , data.customercode
+            #     , data.customername
+            #     )
+            return JSONResponse(content={"status": "success", "regis": "success"})
+        elif count == 0:
+            return JSONResponse(content={"status": "dup", "regis": "dup"})
+        else :
+            return JSONResponse(content={"status": "fail", "regis": "fail"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# def send_registration_email(username: str):
+#     sender_email = "Chaitanachote@sisthai.com"
+#     sender_password = "New@191243"
+#     subject = "Registering in payment app!"
+#     email= "Chaitanachote@sisthai.com"
+#     cc_list = ["pornchai@sisthai.com"]
+#     current_datetime = datetime.now().strftime("%H:%M:%S %d/%m/%Y")
+    
+#     message = MIMEMultipart()
+#     message["From"] = sender_email
+#     message["To"] = email
+#     message["Cc"] = ", ".join(cc_list)
+#     message["Subject"] = subject
+#     body = f"""
+#         <html>
+#             <body>
+#                 <p><strong>User Registration</strong></p>
+#                 <table border="1" cellspacing="0" cellpadding="5">
+#                     <tr>
+#                         <th style="background-color:#f2f2f2; text-align:left;">Username</th>
+#                         <th style="background-color:#f2f2f2; text-align:left;">Date Time</th>
+#                     </tr>
+#                     <tr>
+#                         <td>{username}</td>
+#                         <td>{current_datetime}</td>
+#                     </tr>
+#                 </table>
+#                 <br>
+#                 <br>
+#                 <br>
+#                 <p>Chaitanachote Wongtanaruj</p>
+#                 <p>Information System Officer</p>
+#                 <br>
+#                 <br>
+#                 <p>SiS Distribution (Thailand) Public Co., Ltd.</p>
+#                 <p>Mobile : 091-812-9900</p>
+#                 <p>Email : chaitanachote@sisthai.com</p>
+               
+#             </body>
+#         </html>
+#     """
+#     message.attach(MIMEText(body, "html"))
+#     try: 
+#         logger.info("Connecting to SMTP server...")
+#         server = smtplib.SMTP("172.21.130.12", 25)
+#         server.login(sender_email, sender_password)
+#         logger.info("Login successful!")
+#         server.sendmail(sender_email, email, message.as_string())
+        
+#         server.quit()
+#         logger.info("Email sent successfully!")
+#     except Exception as e:
+#         logger.info(f"Failed to send email: {e}")
 # -------------------------- mnusr function end --------------------------
 
 
@@ -428,23 +719,24 @@ async def insertOutstandingData(conn, outstanding_data: List[Dict]):
                 continue
             
             status = None
+            logger.info(f"Invalid date format for record {record}")
             
             cursor.callproc(
                 "pkgpymnt_insert_pymdp_work",
                 [   
-                    record["PAYER"],
-                    record["DOC_TYPE_DISPLAY"],
-                    record["BILL_DOC"],
-                    doc_date,
-                    due_date,
-                    record["DOC_AMOUNT"],
-                    record["BALANCE_AMOUNT"],
-                    status  # Output parameter for status
+                    record["PAYER"]
+                    , record["DOC_TYPE_DISPLAY"]
+                    , record["BILL_DOC"]
+                    , doc_date
+                    , due_date
+                    , record["DOC_AMOUNT"]
+                    , record["BALANCE_AMOUNT"]
+                    , record["ASSIGNMENT"]
+                    , status 
                 ]
             )
             
-            # Fetch the status from the stored procedure
-            cursor.fetchone()  # This is necessary to get the output of the procedure
+            cursor.fetchone()
             
             if status == 'success':
                 logger.info(f"Record for {record['BILL_DOC']} inserted successfully.")
@@ -452,7 +744,7 @@ async def insertOutstandingData(conn, outstanding_data: List[Dict]):
                 logger.warning(f"Record for {record['BILL_DOC']} already exists.")
                 
         conn.commit()
-        return "success"  # Return success if everything goes fine
+        return "success"
     except Exception as e:
         logger.error(f"Error inserting outstanding data: {e}")
         raise HTTPException(status_code=500, detail=f"Error inserting outstanding data: {e}")
@@ -502,9 +794,6 @@ async def loadData(data: LoadDate, conn=Depends(get_mysql_connection)):
 
             formatted_results.append(formatted_row)
 
-        logger.info("Total count: %s", total_count)
-        logger.info("Data: %s", formatted_results)
-
         return JSONResponse(content={"status": "success", "total": total_count, "data": formatted_results})
 
     except Exception as e:
@@ -518,7 +807,6 @@ async def loadData(data: LoadDate, conn=Depends(get_mysql_connection)):
 async def getDataInvoice(data: GetInv, conn=Depends(get_mysql_connection)):
     try:
         outstanding_data = await getDataFromSap(data.usrcuscode)
-        logger.info("data from outstanding : %s", outstanding_data)
         
         status = await insertOutstandingData(conn, outstanding_data)
 
@@ -561,6 +849,32 @@ async def updateflag(data: UpdateFlag, conn=Depends(get_mysql_connection)):
         if conn:
             conn.close()
             
+@app.post("/updatePaidAmt")
+async def updatePaidAmt(data: UpdatePaidAmt, conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
+        
+        cursor.callproc("pkgpymnt_update_paid", [
+            data.cuscode
+            , data.docno
+            , data.paidamt
+            ])
+        conn.commit()
+        
+        return JSONResponse(content={"status": "success"})
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
+    finally:
+        if cursor:
+            try:
+                cursor.close()
+            except Exception as e:
+                logger.error(f"Error closing cursor: {e}")
+        if conn:
+            conn.close()
+            
                         
 @app.post("/updateAllflag")
 async def updateAllflag(data: UpdateAllFlag, conn=Depends(get_mysql_connection)):
@@ -586,12 +900,127 @@ async def updateAllflag(data: UpdateAllFlag, conn=Depends(get_mysql_connection))
                 logger.error(f"Error closing cursor: {e}")
         if conn:                                                            
             conn.close()
+            
+            
+@app.post("/findSumamt")
+async def findSumamt(data: FindSumamt, conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
+        
+        out_param = cursor.callproc("pkgpymnt_find_sum_amt", [
+            data.cuscode
+            , None
+            , None
+        ])
+        
+        conn.commit() 
+        sumamt = out_param[1]
+        isSelect = out_param[2]
+        
+        sumamt = str(sumamt) if isinstance(sumamt, Decimal) else str(sumamt)
+        isSelect = str(isSelect) if isinstance(isSelect, Decimal) else str(isSelect)
+
+        return JSONResponse(content={"status": "Success", "sumamt": sumamt, "isSelect": isSelect})
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
+    finally:
+        if cursor:
+            try:
+                cursor.close()
+            except Exception as e:
+                logger.error(f"Error closing cursor: {e}")
+        if conn:
+            try:
+                conn.close()
+            except Exception as e:
+                logger.error(f"Error closing connection: {e}")
+            
+@app.post("/findfeeRate")
+async def findfeeRate(data: FindFeeRate, conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
+        
+        out_param = cursor.callproc("pkgpymnt_find_fee_rate", [
+            data.bank
+            , data.card
+            , None
+            ])
+        conn.commit()
+        feeRate = out_param[2]
+
+        return JSONResponse(content={"status": "Success", "feeRate": feeRate})
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
+    finally:
+        if cursor:
+            try:
+                cursor.close()
+            except Exception as e:
+                logger.error(f"Error closing cursor: {e}")
+        if conn:                                                            
+            conn.close()
+            
+@app.post("/missingCn")
+async def missingCn(data: FindSumamt, conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
+        cursor.callproc("pkgpymnt_find_missing_cn", [
+            data.cuscode
+        ])
+        conn.commit()
+
+        formatted_results = []  
+
+        for result in cursor.stored_results():
+            rows = result.fetchall() 
+            column_names = [desc[0] for desc in result.description]  
+            formatted_results = [dict(zip(column_names, row)) for row in rows] 
+
+        cursor.close()
+        conn.close()
+        return JSONResponse(content={"status": "Success", "data": formatted_results})
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     
+@app.post("/createSo")
+def createSo(data: CreateSo, conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
+        out_param = cursor.callproc("pkgpymnt_insert_so", [
+            data.cuscode
+            , data.docType
+            , data.docNo
+            , data.docAmt
+            , data.usage
+            , data.note
+            , None
+            ])
+
+        count = out_param[6]
+        
+        if count == 1:
+            return JSONResponse(content={"status": "success", "dummy": "success"})
+        elif count == 0:
+            return JSONResponse(content={"status": "dup", "dummy": "dup"})
+        else :
+            return JSONResponse(content={"status": "fail", "dummy": "fail"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+           
     
 @app.post("/getPayment")
-async def getPayment(data: Payment, conn=Depends(get_mysql_connection)):
+async def getPayment(data: Payment, background_tasks: BackgroundTasks, conn=Depends(get_mysql_connection)):
     try:
         paymentNo = generatePayment()
+        logger.info("paymentNo : %s", paymentNo)
         cursor = conn.cursor()
         cursor1 = conn.cursor()
         cursor2 = conn.cursor()
@@ -599,9 +1028,14 @@ async def getPayment(data: Payment, conn=Depends(get_mysql_connection)):
             data.username
             , data.cuscode
             , paymentNo
+            , data.sumamt
+            , data.fee
+            , data.totalAmt
+            , data.bank
+            , data.card
             , None
         ])
-        stat = out_param[3]
+        stat = out_param[8]
         
         if stat == 'success':
             cursor1.callproc("pkgpymnt_update_pymdp_work", [
@@ -609,28 +1043,69 @@ async def getPayment(data: Payment, conn=Depends(get_mysql_connection)):
             ])
             cursor2.callproc("pkgpymnt_find_data_payment", [
                 paymentNo
+                , data.card
             ])
-             
-        conn.commit()
-        results = []
-        for result in cursor2.stored_results():
-            results = result.fetchall() 
-            column_names = [desc[0] for desc in result.description] 
-            break  
+            results = []
+            for result in cursor2.stored_results():
+                results = result.fetchall() 
+                column_names = [desc[0] for desc in result.description] 
+                break  
 
-        formatted_results = [
-            {column: convert_decimal(value) for column, value in zip(column_names, row)}
-            for row in results
-        ]
-        
-        logger.info("data from table pymdp_work : %s", formatted_results)
+            formatted_results = [
+                {column: convert_decimal(value) for column, value in zip(column_names, row)}
+                for row in results
+            ]
+            
+            payment_data = formatted_results[0]
+            send_bank_data = SendBank(
+                merchantId=payment_data['merchId'],
+                amount=payment_data['totalamt'],
+                orderRef=payment_data['paymentNo'],
+                currCode="764",
+                successUrl="",
+                failUrl="",
+                cancelUrl="",
+                payType="N",
+                lang="E",
+                TxType="Retail",
+                Term="",
+                promotionType="",
+                supplierId="",
+                productId="",
+                serialNo="",
+                model="",
+                itemTotal="",
+                redeemPoint="",
+                paymentSkip="",
+                memberPay_service="",
+                memberPay_memberId="",
+                secureHash=payment_data['secureHash512']
+            )
+            
+            logger.info(f"send_bank_data type: {type(send_bank_data)}")
 
-        return JSONResponse(content={"status": stat, "data": formatted_results})
+            html = payment_sendbank(send_bank_data)
+            num_characters = len(html)
+            
+            link = generateLink()
+            cursor1.callproc("pkgpymnt_update_html", [
+               paymentNo
+               , link
+               , html
+            ])
+            conn.commit()
+            background_tasks.add_task(check_payment_status, paymentNo, conn)
 
+            
+            logger.info("characters html : %s",num_characters)
+            logger.info("html code : %s",html)
+            return JSONResponse(content={"status": stat, "link": link , "paymentNo": paymentNo})
+        else:
+            logger.info("status insert header : %s", stat)
+            return JSONResponse(content={"status": stat})
     except Exception as e:
         logger.error(f"Error: {e}")
         raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
-
     finally:
         if cursor:
             try:
@@ -644,10 +1119,361 @@ async def getPayment(data: Payment, conn=Depends(get_mysql_connection)):
         
 def generatePayment():
     set_date = datetime.now().strftime("%Y%m%d%H%M%S")
-    run_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
+    run_number = hashlib.sha1(str(random.randint(0, 1000000)).encode('utf-8')).hexdigest()[:7]
     return f"PIM{set_date}{run_number}"
 
+def generateLink():
+    set_date = datetime.now().strftime("%Y%m%d%H%M%S")
+    run_number = hashlib.sha1(str(random.randint(0, 1000000)).encode('utf-8')).hexdigest()[:7]
+    to_hash = run_number + str(set_date) 
+    return f"Pay{to_hash}"
+
+
+def payment_sendbank(data: SendBank):
+    try:
+        bank_url = 'https://testpaygate.ktc.co.th/ktc/eng/merchandize/payment/payForm.jsp'
+        
+        data_dict = data.dict() if isinstance(data, SendBank) else dict(data)
+            
+        response = requests.post(bank_url, data=data_dict)
+        
+        if response.status_code == 200:
+            redirect_url = response.text
+        else:
+            redirect_url = "Error: Failed to get redirect URL"
+
+        return redirect_url  
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"send bank fail: {e}")
+
+
+async def check_payment_status(paymentNo:str, conn):
+    try:
+        await asyncio.sleep(30)  
+        cursor = conn.cursor()
+        cursor.callproc("pkgpymnt_expire_payment", [
+            paymentNo
+            ])
+        conn.commit()
+        return JSONResponse(content={"check_payment_status": 'will check payment'})
+    except Exception as e:
+        logger.error(f"Error in background task: {e}")
+
+
 # -------------------------- pymnt function end --------------------------
+
+
+# -------------------------- hispage function begin --------------------------
+
+@app.post("/searchPaymentData")
+async def searchPaymentData(data: SearchPaymenthdr, conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
+        offset = (data.page_start - 1) * data.page_limit
+        
+        cursor.callproc("pkghis001a_find_header_data", [
+            data.cuscode
+            , data.payNo
+            , data.bank
+            , data.card
+            , data.creusr
+            , data.credateFrom
+            , data.credateTo
+            , data.status
+            , offset
+            , data.page_limit
+        ])
+        conn.commit()
+
+        results = []
+        total_count = None
+        for result in cursor.stored_results():
+            if total_count is None:
+                total_count = result.fetchone()[0]
+            else:
+                results = result.fetchall()
+
+        if not results:
+            return JSONResponse(content={"status": "success", "total": total_count, "data": []})
+
+        column_names = [desc[0] for desc in result.description]
+        formatted_results = []
+
+        for row in results:
+            formatted_row = {}
+            for i, column in enumerate(row):
+                column_name = column_names[i]
+                if isinstance(column, Decimal):
+                    column = str(column)
+
+                if column_name in [ 'credate']:
+                    formatted_row[column_name] = format_date_ddmmyyyy(column)
+                else:
+                    formatted_row[column_name] = column
+
+            formatted_results.append(formatted_row)
+        return JSONResponse(content={"status": "Success", "total": total_count, "data": formatted_results})
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/findPaymentDetail")
+async def findPaymentDetail(data: SearchPaymentdtl, conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
+        offset = (data.page_start - 1) * data.page_limit
+        
+        cursor.callproc("pkghis001b_find_detail_data", [
+            data.hdrid
+            , offset
+            , data.page_limit
+        ])
+        conn.commit()
+
+        results = []
+        total_count = None
+        for result in cursor.stored_results():
+            if total_count is None:
+                total_count = result.fetchone()[0]
+            else:
+                results = result.fetchall()
+
+        if not results:
+            return JSONResponse(content={"status": "success", "total": total_count, "data": []})
+
+        column_names = [desc[0] for desc in result.description]
+        formatted_results = []
+
+        for row in results:
+            formatted_row = {}
+            for i, column in enumerate(row):
+                column_name = column_names[i]
+                if isinstance(column, Decimal):
+                    column = str(column)
+
+                if column_name in [ 'dueDate', 'docDate']:
+                    formatted_row[column_name] = format_date_ddmmyyyy(column)
+                else:
+                    formatted_row[column_name] = column
+
+            formatted_results.append(formatted_row)
+        return JSONResponse(content={"status": "Success", "total": total_count, "data": formatted_results})
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# -------------------------- hispage function end --------------------------
+
+# -------------------------- KTC begin --------------------------
+
+@app.get("/ktc/callBank/{payNo}/{link}")
+def ktcCallBank(payNo: str,  link: str, conn=Depends(get_mysql_connection)):
+    try:
+        cursor = conn.cursor()
+        out_param = cursor.callproc("pkgpymnt_get_html", [
+          payNo
+          , link
+          , None
+          ])
+
+        html = out_param[2]  
+        
+        if html is None:
+            raise HTTPException(status_code=404, detail="No HTML content returned")
+
+        updated_html_content = html.replace(
+            'action="payForm2.jsp"', 
+            'action="https://testpaygate.ktc.co.th/ktc/eng/merchandize/payment/payForm2.jsp"'
+        )
+        updated_html_content = updated_html_content.replace(
+            'form.action =  "payTPN.jsp"', 
+            'action="https://testpaygate.ktc.co.th/ktc/eng/merchandize/payment/payTPN.jsp"'
+        )
+        
+        updated_html_content = updated_html_content.replace(
+            'form.action =  "payForm2.jsp"', 
+            'action="https://testpaygate.ktc.co.th/ktc/eng/merchandize/payment/payForm2.jsp"'
+        )
+        
+        logger.info("HTML Code : %s", updated_html_content)
+
+        return HTMLResponse(content=updated_html_content)
+
+    except Exception as e:
+        logger.error(f"Error in ktcCallBank: {e}")
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+@app.post("/ktc/successed")
+async def ktc_successed(data: CallBackKTC, conn=Depends(get_mysql_connection)):
+    try:
+        logger.info("payment No : %s", data.paymentNo)
+        cursor = conn.cursor()
+        
+        out_param = cursor.callproc("pkgpymnt_update_pymdtl", [
+            data.paymentNo
+            , None
+        ])
+        status = out_param[1]
+        cursor.nextset() 
+        logger.info("Update pymdtl : %s", status)
+        
+        if status == "success":  
+            return JSONResponse(content={"status": "Success"})
+        else:
+            return JSONResponse(content={"status": "fail"})
+    except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error processing the payment data: {e}")
+
+# -------------------------- KTC end ----------------------------
+
+# -------------------------- Batch Jobs ebegin -----------------------
+def job_send_data_notes():
+    conn = get_mysql_connection()
+    cursor = None  
+    try:
+        cursor = conn.cursor() 
+        cursor.callproc("pkgpymnt_prepare_data_send_notes")
+        
+        for result in cursor.stored_results():
+            results = result.fetchall()
+            column_names = [desc[0] for desc in result.description]
+            break 
+
+        billing = [
+            {column: convert_decimal(value) for column, value in zip(column_names, row)}
+            for row in results
+        ]
+
+        logger.info("billing : %s", billing)
+
+        if not billing:
+            return JSONResponse(content={"detail": "No billing data found for the provided payment number"})
+            
+        prepare_data_list = []
+        for billing_data in billing:
+            prepare_data = {
+                'company_code': billing_data.get('company_code'),
+                'customer_code': billing_data.get('customer_code'),
+                'payment_type': billing_data.get('payment_type'),
+                'billing_no': billing_data.get('billing_no'),
+                'payment_doc': billing_data.get('payment_doc'),
+                'assignment': billing_data.get('assignment'),
+                'billing_date': str(billing_data.get('billing_date')),
+                'billing_due_date': str(billing_data.get('billing_due_date')), 
+                'amount': billing_data.get('amount'),
+                'amount_total': billing_data.get('amount_total'),
+                'bank_status': billing_data.get('bank_status'),
+                'bank_approve_ref': billing_data.get('bank_approve_ref'),
+                'payment_method': billing_data.get('payment_method'),
+                'payment_no': billing_data.get('payment_no'),
+                'source': billing_data.get('source'),
+                'approve_date': str(billing_data.get('approve_date')), 
+                'approve_time': str(billing_data.get('approve_time')), 
+                'reason_code': billing_data.get('reason_code'),
+            }
+            prepare_data_list.append(prepare_data)
+
+        payment_data_list = []
+        for prepare_data in prepare_data_list:
+            payment_data = {
+                'COMPANY_CODE': prepare_data['company_code'],
+                'PAYER_CODE': prepare_data['customer_code'],
+                'CUST_CODE': prepare_data['customer_code'],
+                'PAYMENT_TYPE': prepare_data['payment_type'],
+                'DOC_NO': prepare_data['billing_no'],
+                'PAYMENT_DOC': prepare_data['payment_doc'],
+                'ASSIGNMENT': prepare_data['assignment'],
+                'DOC_DATE': prepare_data['billing_date'],
+                'DUE_DATE': prepare_data['billing_due_date'],
+                'AMOUNT': prepare_data['amount'],
+                'PAID_AMT': prepare_data['amount_total'],
+                'STATUS': prepare_data['bank_status'],
+                'APPROVAL_CODE': prepare_data['bank_approve_ref'],
+                'PAYMENT_METHODE': prepare_data['payment_method'],
+                'ORDER_NO': prepare_data['payment_no'],
+                'SOURCE': prepare_data['source'],
+                'PAYMENT_NO': prepare_data['payment_no'],
+                'APPROVAL_CODE_DATE': prepare_data['approve_date'],
+                'APPROVAL_CODE_TIME': prepare_data['approve_time'],
+                'REASON_CODE': prepare_data['reason_code']
+            }
+            payment_data_list.append(payment_data)
+            
+        
+        all_success = True
+        try:
+            for payment_data in payment_data_list:
+                wsdl = WSDL_URL
+                method = METHOD
+                result = call_soap_api(wsdl, method, payment_data)
+                logger.info("Response from notes : %s", result)
+                if result:  
+                    out_param = cursor.callproc("pkgpymnt_send_notes_success", [
+                        payment_data['PAYMENT_NO'],
+                        None
+                    ])
+                    status = out_param[1]
+                    cursor.nextset() 
+                    
+                    if status != 'success':
+                        all_success = False 
+                else:
+                    return JSONResponse(content={"status": "send notes fail"})
+                
+            if all_success:
+                logger.info("Update notes_success : %s", all_success)
+                return JSONResponse(content={"status": status})
+            else:
+                logger.info("Update notes_success : %s", all_success)
+                return JSONResponse(content={"status": status})
+        except Exception as e:
+            logger.error(f"Error processing payment data: {e}")
+            raise HTTPException(status_code=500, detail=f"Error processing the payment data: {e}")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing the payment data: {e}")
+
+    finally:
+        if cursor:
+            cursor.close() 
+        if conn:
+            conn.close() 
+
+@app.on_event("startup")
+def start_scheduler():
+    scheduler.add_job(job_send_data_notes, 'interval', minutes=60)
+    scheduler.start()
+    logger.info("Scheduler started!")
+
+@app.on_event("shutdown")
+def shutdown_scheduler():
+    scheduler.shutdown()
+    logger.info("Scheduler stopped!")
+                
+@app.post("/start-scheduler")
+def start_manual_scheduler():
+    if not scheduler.running:
+        scheduler.add_job(job_send_data_notes, 'interval', minutes=60)
+        scheduler.start()
+        return {"status": "Scheduler started"}
+    return {"status": "Scheduler is already running"}
+
+@app.post("/stop-scheduler")
+def stop_manual_scheduler():
+    if scheduler.running:
+        scheduler.shutdown()
+        return {"status": "Scheduler stopped"}
+    return {"status": "Scheduler is not running"}
+
+# -------------------------- Batch Jobs end --------------------------
 
 # call back
 @app.get("/kbank/notify/")
@@ -675,10 +1501,3 @@ def hello():
 def example_route():
     return JSONResponse(content={"status": "success", "data": "Example response"})
 
-
-@app.post("/submit-payment")
-async def submit_payment(data: TestSubmit):
-    try:
-        return JSONResponse(content={"message": "Payment data received", "data": data.dict()})
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error processing the payment data: {e}")

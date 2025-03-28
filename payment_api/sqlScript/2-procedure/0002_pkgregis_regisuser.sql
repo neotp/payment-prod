@@ -57,9 +57,8 @@ BEGIN
                 , p_email
                 , p_pos
             );
-            -- Commit transaction
             COMMIT;
-            SET p_count = 1;  -- Indicates success
+            SET p_count = 1;
         END;
     END IF;
 END $$

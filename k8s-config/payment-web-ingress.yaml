@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: payment-web-ingress
+  namespace: dev-is
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /           
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+spec:
+  ingressClassName: nginx
+  # tls:
+  #   - hosts:
+  #       - demo-pang.siscloudservices.com
+  #     secretName: siscloudservices-cert
+  rules:
+    # - host: nginx-pang.com
+    -  http:
+        paths:
+          - path: /web-payment
+            pathType: Prefix
+            backend:
+              service:
+                name: paymentweb-svc
+                port:
+                  number: 8044
+          # - path: /apache1
+          #   pathType: Prefix
+          #   backend:
+          #     service:
+          #       name: apache-svc
+          #       port:
+          #         number: 8080
