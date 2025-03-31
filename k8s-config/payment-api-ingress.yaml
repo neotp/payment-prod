@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: payment-api-ingress
+  name: test-api-ingress
   namespace: dev-is
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /           
@@ -16,11 +16,11 @@ spec:
     # - host: nginx-pang.com
     -  http:
         paths:
-          - path: /api-payment
+          - path: /test-api/
             pathType: Prefix
             backend:
               service:
-                name: paymentapi-svc
+                name: testapi-svc
                 port:
                   number: 8044
           # - path: /apache1

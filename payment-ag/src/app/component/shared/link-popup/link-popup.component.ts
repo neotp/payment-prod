@@ -38,7 +38,9 @@ export class LinkPopupComponent {
   public copyLink(): void {
     navigator.clipboard.writeText(this.linkToCopy).then(
       () => {
-        alert('Link copied: ' + this.linkToCopy);
+        // alert('Link copied: ' + this.linkToCopy);
+        console.log(this.linkToCopy);
+        
       },
       (err) => {
         console.error('Failed to copy: ', err);

@@ -1093,8 +1093,9 @@ async def getPayment(data: Payment, background_tasks: BackgroundTasks, conn=Depe
                , link
                , html
             ])
+            background_tasks.add_task(check_payment_status, paymentNo)
+            
             conn.commit()
-            background_tasks.add_task(check_payment_status, paymentNo, conn)
 
             
             logger.info("characters html : %s",num_characters)
@@ -1147,9 +1148,9 @@ def payment_sendbank(data: SendBank):
         raise HTTPException(status_code=500, detail=f"send bank fail: {e}")
 
 
-async def check_payment_status(paymentNo:str, conn):
+async def check_payment_status(paymentNo:str, conn=Depends(get_mysql_connection)):
     try:
-        await asyncio.sleep(30)  
+        await asyncio.sleep(30*1)  
         cursor = conn.cursor()
         cursor.callproc("pkgpymnt_expire_payment", [
             paymentNo

@@ -206,33 +206,46 @@ export class Hispage001aComponent {
   }
 
   public async searchPayment(): Promise<void> {
-      this.setLoading(true);
-      this.populateForm();
-      this.searchData.page_start = this.page_start
-      this.searchData.page_limit = this.page_limit
-      this.api.searchPaymentData(this.searchData).subscribe((result: any) => {
-        this.allData = result.data.map((invoice: any) => ({
-          hdrId: invoice.hdrId
-          , payNo: invoice.payNo
-          , cuscode: invoice.cuscode
-          , amt: this.formatAmount(invoice.amt)
-          , feeAmt: this.formatAmount(invoice.feeAmt)
-          , totalAmt: this.formatAmount(invoice.totalAmt)
-          , bank: this.cardAndBank(invoice.bank)
-          , card: this.cardAndBank(invoice.card)
-          , credate: this.formatDate(invoice.credate, '/')
-          , creusr: invoice.creusr
-          , link: invoice.link
-          , stat: this.statusPayment(invoice.stat)
-        }));
-        this.dataSource.data = this.allData;
-        this.totalRecords = result.total;
-        this.setLoading(false);
-      }, (error: any) => {
-          console.error('Error updating user:', error);
-          this.setLoading(false);
-      });
-    }
+     this.setLoading(true);
+     this.populateForm();
+     this.searchData.page_start = this.page_start
+     this.searchData.page_limit = this.page_limit
+     this.api.searchPaymentData(this.searchData).subscribe((result: any) => {
+       this.allData = result.data.map((invoice: any) => ({
+         hdrId: invoice.hdrId
+         , payNo: invoice.payNo
+         , cuscode: invoice.cuscode
+         , amt: this.formatAmount(invoice.amt)
+         , feeAmt: this.formatAmount(invoice.feeAmt)
+         , totalAmt: this.formatAmount(invoice.totalAmt)
+         , bank: this.cardAndBank(invoice.bank)
+         , card: this.cardAndBank(invoice.card)
+         , credate: this.formatDate(invoice.credate, '/')
+         , creusr: invoice.creusr
+         , link: 'http://172.31.144.1:7000/ktc/callBank/'+ invoice.payNo +'/'+ invoice.link
+         , stat: this.statusPayment(invoice.stat)
+       }));
+       this.dataSource.data = this.allData;
+       this.totalRecords = result.total;
+       this.setLoading(false);
+     }, (error: any) => {
+         console.error('Error updating user:', error);
+         this.setLoading(false);
+     });
+   }
+
+  public copyLink(record: any): void {
+    navigator.clipboard.writeText(record.link).then(
+      () => {
+        alert('Link Copied Now');
+        console.log(record.link);
+        
+      },
+      (err) => {
+        console.error('Failed to copy: ', err);
+      }
+    ); 
+  }
 
   public onPageChanged(event: { pageStart: number, pageLimit: number }) {
     this.page_start = event.pageStart;
