@@ -143,7 +143,7 @@ export class Hispage001aComponent {
     this.searchData.bank = this.searchData.bank === '' ? 'all' : this.searchData.bank;
     this.searchData.card = this.searchData.card === '' ? 'all' : this.searchData.card;
   
-    this.router.navigate(['/history-detail'], {
+    this.router.navigate(['web-payment/history-detail'], {
       state: {
         headerData: this.headerData
         , searchData: this.searchData
@@ -222,7 +222,7 @@ export class Hispage001aComponent {
          , card: this.cardAndBank(invoice.card)
          , credate: this.formatDate(invoice.credate, '/')
          , creusr: invoice.creusr
-         , link: 'http://172.31.144.1:7000/ktc/callBank/'+ invoice.payNo +'/'+ invoice.link
+         , link: 'https://webapp.sisthai.com/payment/ktc/callBank/'+ invoice.payNo +'/'+ invoice.link
          , stat: this.statusPayment(invoice.stat)
        }));
        this.dataSource.data = this.allData;
@@ -334,10 +334,14 @@ export class Hispage001aComponent {
     let statinv = ''
     if (stat === 'Y') {
       statinv = 'Success';
-    } else if (stat === 'N') {
+    } else if (stat === 'P') {
       statinv = 'Process';
     } else if (stat === 'E') {
       statinv = 'Expire';
+    } else if (stat === 'C') {
+      statinv = 'Cancel';
+    } else if (stat === 'F') {
+      statinv = 'Failed';
     }
     return statinv
   };

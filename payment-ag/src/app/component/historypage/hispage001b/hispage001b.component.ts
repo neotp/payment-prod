@@ -122,7 +122,7 @@ export class Hispage001bComponent {
     const params = {
       statData: JSON.stringify(this.statData)
     };
-    this.router.navigate(['/history-header'], {
+    this.router.navigate(['web-payment/history-header'], {
       state: {
         statData: this.statData
       }

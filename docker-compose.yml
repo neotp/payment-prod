@@ -2,7 +2,7 @@ version: '3'
 
 services:
   # Backend service (API)
-  payment-api:
+  payment-api-v1:
     build:
       context: ./payment_api  # path to your backend code (adjust accordingly)
     ports:
@@ -11,19 +11,19 @@ services:
       - PORT=7000
     networks:
       - app-network
-    image: neotp/payment-api  # Image name for the backend
+    image: neotp/payment-api-v1  # Image name for the backend
 
   # Frontend service (Angular SSR)
-  payment-ag:
+  payment-ag-v1:
     build:
       context: ./payment-ag  # path to your frontend Angular project (adjust accordingly)
     ports:
       - "7070:7070"  # Expose port for frontend (SSR)
     depends_on:
-      - payment-api  # Ensure API is up before frontend starts
+      - payment-api-v1  # Ensure API is up before frontend starts
     networks:
       - app-network
-    image: neotp/payment-web  # Image name for the frontend
+    image: neotp/payment-web-v1  # Image name for the frontend
 
 networks:
   app-network:

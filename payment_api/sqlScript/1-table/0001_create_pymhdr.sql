@@ -9,8 +9,10 @@ CREATE TABLE `pymhdr` (
   `pyhcard` varchar(45) DEFAULT NULL,
   `pyhcreusr` varchar(45) DEFAULT NULL,
   `pyhcredate` datetime DEFAULT CURRENT_TIMESTAMP,
-  `pyhcallback` varchar(45) DEFAULT NULL COMMENT 'Y = success, \\nN = not success and unknow',
+  `pyhlink` varchar(250) DEFAULT NULL,
+  `pyhcallback` varchar(45) DEFAULT NULL COMMENT 'Y = success, \\\\nN = not success and unknow, \\\\nE = expire',
   `pyhltnotes` varchar(45) DEFAULT NULL COMMENT 'Y = Already send Lotus Notes, \nN = Unalready send Lotus Notes',
+  `pyhhtml` text,
   PRIMARY KEY (`pyhhdrid`),
   UNIQUE KEY `pyhpymno_UNIQUE` (`pyhpymno`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=139 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

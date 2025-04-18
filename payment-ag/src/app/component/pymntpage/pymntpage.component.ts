@@ -330,7 +330,7 @@ export class PymntpageComponent {
       console.log(response);
       if(response.status === 'success'){
         this.loadData();
-        this.linkMessage = 'http://172.31.144.1:7000/ktc/callBank/'+ response.paymentNo +'/'+ response.link
+        this.linkMessage = 'https://webapp.sisthai.com/payment/ktc/callBank/'+ response.paymentNo +'/'+ response.link
         this.popup('link');
         this.setLoading(false);
       } else {
@@ -366,9 +366,9 @@ export class PymntpageComponent {
   public toggleSelectAll(table: string): void {
     this.setLoading(true);
     const data = this.allData;
-    const allSelected = data.every((item: any) => item.stat === 'Process' || item.selected);
+    const allSelected = data.every((item: any) => item.stat === 'Process' || item.stat === 'Success' || item.selected);
     data.forEach((item: any) => {
-      if (item.stat !== 'Process') {
+      if (item.stat !== 'Process' && item.stat !== 'Success') {
         item.selected = !allSelected;
       }
     });
@@ -376,6 +376,7 @@ export class PymntpageComponent {
   }
 
   public updateFlagAll(flag: boolean): void {
+    this.setLoading(true);
     let flagAll = flag ? '1' : '0';
     const data = {
       cuscode: this.searchData.cuscode
@@ -383,6 +384,7 @@ export class PymntpageComponent {
     }
     this.api.updateAllflag(data).subscribe((response: any) => {
       console.log(response);
+      this.setLoading(false);
     }, (error: any) => {
       console.log('Error during login:', error);
       this.setLoading(false);
@@ -523,6 +525,8 @@ export class PymntpageComponent {
       statinv = 'Unpaid';
     } else if (stat === 'P') {
       statinv = 'Process';
+    } else if (stat === 'S') {
+      statinv = 'Success';
     }
     return statinv
   };

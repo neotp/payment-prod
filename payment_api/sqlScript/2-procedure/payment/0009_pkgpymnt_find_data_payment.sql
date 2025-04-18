@@ -1,5 +1,3 @@
-USE payment_db;
-
 DELIMITER $$
 
 CREATE PROCEDURE pkgpymnt_find_data_payment(
@@ -7,7 +5,7 @@ CREATE PROCEDURE pkgpymnt_find_data_payment(
     IN p_card           VARCHAR(50)
 )
 BEGIN
-    DECLARE v_prmtblmerId           VARCHAR(45) DEFAULT '0002'; --tblno 0002 KTC Merchant Id
+   DECLARE v_prmtblmerId           VARCHAR(45) DEFAULT '0002'; 
     DECLARE v_merId                 VARCHAR(250);
     DECLARE v_secure_hash           VARCHAR(500);
     DECLARE v_secure_hash_512       VARCHAR(500);

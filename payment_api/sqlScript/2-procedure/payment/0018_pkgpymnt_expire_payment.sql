@@ -1,5 +1,3 @@
-USE payment_db;
-
 DELIMITER $$
 
 CREATE PROCEDURE pkgpymnt_expire_payment(
@@ -20,15 +18,15 @@ BEGIN
     UPDATE pymhdr 
         SET pyhcallback = 'E'
     WHERE pyhpymno = p_payment 
-      AND pyhcallback = 'N'      
-      AND pyhcallback <> 'S'; 
+      AND pyhcallback = 'P';
+    --   AND pyhcallback <> 'S'; 
 
     SELECT 
         pyh.pyhhdrid
     INTO 
         v_hdrid
     FROM pymhdr pyh
-    WHERE pyh.pyhpymno = p_payment_no 
+    WHERE pyh.pyhpymno = p_payment
     LIMIT 1;
 
     UPDATE pymdtl 

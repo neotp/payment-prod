@@ -1,5 +1,3 @@
-USE payment_db;
-
 DELIMITER $$
 
 CREATE PROCEDURE pkgregis_regisuser(

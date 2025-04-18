@@ -1518,3 +1518,8 @@
   color: red;
   font-weight: bold;
 }
+
+.success {
+  color: rgb(13, 100, 2);
+  font-weight: bold;
+}

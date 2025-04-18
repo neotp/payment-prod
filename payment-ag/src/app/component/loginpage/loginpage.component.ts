@@ -12,7 +12,6 @@ import { AuthService } from '../../auth.service';
   imports: [ 
     FormsModule
     , ReactiveFormsModule
-    , RouterLink
     , PopupComponent
     , CommonModule],
   selector: 'app-loginpage',
@@ -110,9 +109,9 @@ export class LoginpageComponent implements OnInit {
             };
   
             if (result.role === 'admin') {
-              this.router.navigate(['mnusrpage'], { queryParams , queryParamsHandling: 'preserve'} );
+              this.router.navigate(['web-payment/mnusrpage'], { queryParams , queryParamsHandling: 'preserve'} );
             } else if (result.role === 'user') {
-              this.router.navigate(['pymntpage'], { queryParams , queryParamsHandling: 'preserve'});
+              this.router.navigate(['web-payment/pymntpage'], { queryParams , queryParamsHandling: 'preserve'});
             }
 
             // After successful login, set the last activity time and reset the timeout timer
@@ -126,9 +125,14 @@ export class LoginpageComponent implements OnInit {
       });
     }
   }
+  
+  public forgotPass(): void {
+    this.router.navigate(['web-payment/forgot-password']);
+  }
+
 
   public register(): void {
-    this.router.navigate(['regispage']);
+    this.router.navigate(['web-payment/regispage']);
   }
 
   public handleConfirm(pop: string) {

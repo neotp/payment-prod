@@ -56,7 +56,7 @@ describe('AuthGuard', () => {
     const state = {} as RouterStateSnapshot; // Mock the RouterStateSnapshot
 
     expect(guard.canActivate(route, state)).toBeFalse();
-    expect(navigateSpy).toHaveBeenCalledWith(['loginpage']);
+    expect(navigateSpy).toHaveBeenCalledWith(['web-payment/loginpage']);
   });
 
   it('should navigate to pymntpage if user does not have permission', () => {
@@ -71,6 +71,6 @@ describe('AuthGuard', () => {
     const navigateSpy = spyOn(router, 'navigate');
 
     expect(guard.canActivate(route, state)).toBeFalse();
-    expect(navigateSpy).toHaveBeenCalledWith(['pymntpage']);
+    expect(navigateSpy).toHaveBeenCalledWith(['web-payment/pymntpage']);
   });
 });

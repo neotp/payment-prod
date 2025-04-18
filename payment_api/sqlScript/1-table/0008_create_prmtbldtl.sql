@@ -1,5 +1,5 @@
 CREATE TABLE `prmtbldtl` (
-  `pmddtlid` int NOT NULL,
+  `pmddtlid` int NOT NULL AUTO_INCREMENT,
   `pmdtblno` varchar(45) DEFAULT NULL,
   `pmdtype` varchar(45) DEFAULT NULL,
   `pmdval1` varchar(250) DEFAULT NULL,
@@ -13,4 +13,4 @@ CREATE TABLE `prmtbldtl` (
   `pmdval9` varchar(250) DEFAULT NULL,
   `pmdval10` varchar(250) DEFAULT NULL,
   PRIMARY KEY (`pmddtlid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

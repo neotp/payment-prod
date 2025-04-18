@@ -1,4 +1,3 @@
-USE payment_db;
 DELIMITER $$
 
 CREATE PROCEDURE pkghis001b_find_detail_data(

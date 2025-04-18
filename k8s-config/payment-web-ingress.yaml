@@ -4,7 +4,6 @@ metadata:
   name: payment-web-ingress
   namespace: dev-is
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /           
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
 spec:
   ingressClassName: nginx
@@ -16,13 +15,13 @@ spec:
     # - host: nginx-pang.com
     -  http:
         paths:
-          - path: /web-payment
+          - path: /
             pathType: Prefix
             backend:
               service:
                 name: paymentweb-svc
                 port:
-                  number: 8044
+                  number: 7070
           # - path: /apache1
           #   pathType: Prefix
           #   backend:

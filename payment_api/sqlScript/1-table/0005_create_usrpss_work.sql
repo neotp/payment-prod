@@ -11,4 +11,4 @@ CREATE TABLE `usrpss_work` (
   `uswrole` varchar(45) DEFAULT NULL,
   `uswstat` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`uswid`)
-) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2088 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

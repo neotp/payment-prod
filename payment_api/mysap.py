@@ -1,7 +1,6 @@
 import asyncio
 from decimal import Decimal
-import re
-from fastapi import FastAPI, BackgroundTasks, HTTPException, Depends, logger
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Depends, Request, logger
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -9,10 +8,9 @@ from typing import Dict, List
 import mysql.connector
 import datetime
 import random
-import string
 import logging
 import hashlib
-from datetime import date, datetime, time
+from datetime import date, datetime
 import requests
 from zeep import Client
 from zeep.transports import Transport
@@ -21,7 +19,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from typing import Optional
+import xml.etree.ElementTree as ET
+import re
+import pytz
+
 
 app = FastAPI()
 
@@ -59,7 +60,8 @@ origins = [
     "http://webapp.sisthai:7070",
     "http://172.31.144.1:7070",
     "http://172.31.20.11:7070",
-    "https://webapp.sisthai.com" 
+    "https://webapp.sisthai.com",
+    "https://172.17.17.127"
 ]
 
 app.add_middleware(
@@ -221,6 +223,19 @@ class SendBank(BaseModel):
     memberPay_service: str
     memberPay_memberId: str
     secureHash: str
+    
+class PaymentRequest(BaseModel):
+    PayRef: str
+    successcode: str
+    Ref: str
+    
+class QueryPaymentStatus(BaseModel):
+    merchantId: str
+    loginId: float
+    password: str
+    actionType: str
+    orderRef: str
+    payRef: str
     
 class SearchPaymenthdr(BaseModel):
      cuscode : str
@@ -572,60 +587,6 @@ def createUser(data: CreatUser, background_tasks: BackgroundTasks, conn=Depends(
         cursor.close()
         conn.close()
 
-
-# def send_registration_email(username: str):
-#     sender_email = "Chaitanachote@sisthai.com"
-#     sender_password = "New@191243"
-#     subject = "Registering in payment app!"
-#     email= "Chaitanachote@sisthai.com"
-#     cc_list = ["pornchai@sisthai.com"]
-#     current_datetime = datetime.now().strftime("%H:%M:%S %d/%m/%Y")
-    
-#     message = MIMEMultipart()
-#     message["From"] = sender_email
-#     message["To"] = email
-#     message["Cc"] = ", ".join(cc_list)
-#     message["Subject"] = subject
-#     body = f"""
-#         <html>
-#             <body>
-#                 <p><strong>User Registration</strong></p>
-#                 <table border="1" cellspacing="0" cellpadding="5">
-#                     <tr>
-#                         <th style="background-color:#f2f2f2; text-align:left;">Username</th>
-#                         <th style="background-color:#f2f2f2; text-align:left;">Date Time</th>
-#                     </tr>
-#                     <tr>
-#                         <td>{username}</td>
-#                         <td>{current_datetime}</td>
-#                     </tr>
-#                 </table>
-#                 <br>
-#                 <br>
-#                 <br>
-#                 <p>Chaitanachote Wongtanaruj</p>
-#                 <p>Information System Officer</p>
-#                 <br>
-#                 <br>
-#                 <p>SiS Distribution (Thailand) Public Co., Ltd.</p>
-#                 <p>Mobile : 091-812-9900</p>
-#                 <p>Email : chaitanachote@sisthai.com</p>
-               
-#             </body>
-#         </html>
-#     """
-#     message.attach(MIMEText(body, "html"))
-#     try: 
-#         logger.info("Connecting to SMTP server...")
-#         server = smtplib.SMTP("172.21.130.12", 25)
-#         server.login(sender_email, sender_password)
-#         logger.info("Login successful!")
-#         server.sendmail(sender_email, email, message.as_string())
-        
-#         server.quit()
-#         logger.info("Email sent successfully!")
-#     except Exception as e:
-#         logger.info(f"Failed to send email: {e}")
 # -------------------------- mnusr function end --------------------------
 
 
@@ -1148,10 +1109,12 @@ def payment_sendbank(data: SendBank):
         raise HTTPException(status_code=500, detail=f"send bank fail: {e}")
 
 
-async def check_payment_status(paymentNo:str, conn=Depends(get_mysql_connection)):
+async def check_payment_status(paymentNo:str):
     try:
-        await asyncio.sleep(30*1)  
+        conn = mysql.connector.connect(**MYSQL_CONFIG)
         cursor = conn.cursor()
+        
+        await asyncio.sleep(35*60)  
         cursor.callproc("pkgpymnt_expire_payment", [
             paymentNo
             ])
@@ -1159,6 +1122,9 @@ async def check_payment_status(paymentNo:str, conn=Depends(get_mysql_connection)
         return JSONResponse(content={"check_payment_status": 'will check payment'})
     except Exception as e:
         logger.error(f"Error in background task: {e}")
+    finally:
+        cursor.close()
+        conn.close()
 
 
 # -------------------------- pymnt function end --------------------------
@@ -1281,7 +1247,35 @@ def ktcCallBank(payNo: str,  link: str, conn=Depends(get_mysql_connection)):
         html = out_param[2]  
         
         if html is None:
-            raise HTTPException(status_code=404, detail="No HTML content returned")
+            html_expired = """
+            <html>
+              <head>
+                <title>Link Expired</title>
+                <style>
+                  body {
+                    margin: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    text-align: center;
+                    font-family: Arial, sans-serif;
+                  }
+                  .container {
+                    max-width: 600px;
+                    padding: 20px;
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <h2>Link Expired</h2>
+                  <p>Your link has expired. Please request a new link or contact support if you believe this is an error.</p>
+                </div>
+              </body>
+            </html>
+            """
+            return HTMLResponse(content=html_expired, status_code=404)
 
         updated_html_content = html.replace(
             'action="payForm2.jsp"', 
@@ -1312,27 +1306,164 @@ def ktcCallBank(payNo: str,  link: str, conn=Depends(get_mysql_connection)):
             conn.close()
 
 
-@app.post("/ktc/successed")
-async def ktc_successed(data: CallBackKTC, conn=Depends(get_mysql_connection)):
+@app.post("/ktc/datafeed")
+async def ktc_datafeed(data: Request, background_tasks: BackgroundTasks, conn=Depends(get_mysql_connection)):
+    logger.info("dataFrombank : %s", data)
+
+    form_data = await data.form()
+    logger.info("Parsed form data: %s", form_data)
+
+    successcode = form_data.get("successcode")
+    ref = form_data.get("ref")
+    amt = form_data.get("amt")
+    
+    if successcode == '0':
+        stat = "Y"
+    else :
+        stat = "F"
+    
+    logger.info("data.successcode : %s", successcode)
+    logger.info("stat request : %s", stat)
+    logger.info("ref doc : %s", ref)
+    logger.info("ref amt : %s", amt)
     try:
-        logger.info("payment No : %s", data.paymentNo)
         cursor = conn.cursor()
         
         out_param = cursor.callproc("pkgpymnt_update_pymdtl", [
-            data.paymentNo
+            ref
+            , stat
             , None
         ])
-        status = out_param[1]
+        status = out_param[2]
         cursor.nextset() 
         logger.info("Update pymdtl : %s", status)
-        
+        print("OK")
         if status == "success":  
-            return JSONResponse(content={"status": "Success"})
+            background_tasks.add_task(
+                send_registration_email
+                , ref
+                , stat
+                , amt
+                )
+            return JSONResponse(content={"status": "Success" , "datail": ref })
         else:
             return JSONResponse(content={"status": "fail"})
     except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error processing the payment data: {e}")
 
+
+def send_registration_email(ref: str, stat: str, amt: str):
+    conn = get_mysql_connection()
+    cursor = conn.cursor()
+    out_param = cursor.callproc("pkgpymnt_find_email", [
+           ref
+           , None
+           , None
+           , None
+           , None
+           , None
+       ])
+    eamil = out_param[1]
+    cuscode = out_param[2]
+    sumamt = clean_and_format_amount(out_param[3])
+    feeamt = clean_and_format_amount(out_param[4])
+    ttamt = clean_and_format_amount(out_param[5])
+    
+    cursor.callproc("pkgpymnt_find_invoice", [
+           ref
+       ])
+    
+    invoice = []  
+    for result in cursor.stored_results():
+        rows = result.fetchall() 
+        column_names = [desc[0] for desc in result.description]  
+        invoice = [dict(zip(column_names, row)) for row in rows] 
+        
+        
+    table_rows = ""
+    for inv in invoice:
+        invno = inv.get('invno', '')
+        invnoAmt = clean_and_format_amount(str(inv.get('amt', '0')))
+        invnopaid = clean_and_format_amount(str(inv.get('paid', '0')))
+        table_rows += f"""
+            <tr>
+                <td style="text-align:center;">{invno}</td>
+                <td style="text-align:right;">{invnoAmt}</td>
+                <td style="text-align:right;">{invnopaid}</td>
+            </tr>
+        """
+    if stat == 'Y':
+        status = 'Payment completed' 
+    elif stat == 'F':
+        status = 'Payment Failed' 
+    sender_email = "Chaitanachote@sisthai.com"
+    sender_password = "New@191243"
+    subject = "Payment completed!"
+    email= eamil
+    cc_list = ["Chaitanachote@sisthai.com"]
+    thailand_tz = pytz.timezone("Asia/Bangkok")
+    current_datetime = datetime.now(thailand_tz).strftime("%H:%M:%S %d/%m/%Y")
+    
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = email
+    message["Cc"] = ", ".join(cc_list)
+    message["Subject"] = subject
+    body = f"""
+        <html>
+            <body>
+                <div style="white-space: pre; font-family: monospace;">
+                    <p><strong>Customer Code    :</strong> {cuscode}</p>
+                    <p><strong>Payment No       :</strong> {ref}</p>
+                    <p><strong>Amount           :</strong> {sumamt}</p>
+                    <p><strong>Fee Amount       :</strong> {feeamt}</p>
+                    <p><strong>Total Amount     :</strong> {ttamt}</p>
+                    <p><strong>Status           :</strong> {status}</p>
+                    <p><strong>Date Time        :</strong> {current_datetime}</p>
+                </div>
+                <table border="1" cellspacing="0" cellpadding="5">
+                    <tr>
+                        <th style="background-color:#f2f2f2; text-align:left;">Invoice No</th>
+                        <th style="background-color:#f2f2f2; text-align:left;">Amount</th>
+                        <th style="background-color:#f2f2f2; text-align:left;">Paid Amount</th>
+                    </tr>
+                    {table_rows}
+                </table>
+                <br>
+                <br>
+                <br>
+                <p>Chaitanachote Wongtanaruj</p>
+                <p>Information System Officer</p>
+                <br>
+                <p>SiS Distribution (Thailand) Public Co., Ltd.</p>
+                <p>Mobile : 091-812-9900</p>
+                <p>Email : chaitanachote@sisthai.com</p>
+               
+            </body>
+        </html>
+    """
+    message.attach(MIMEText(body, "html"))
+    try: 
+        logger.info("Connecting to SMTP server...")
+        server = smtplib.SMTP("172.21.130.12", 25)
+        server.login(sender_email, sender_password)
+        logger.info("Login successful!")
+        server.sendmail(sender_email, email, message.as_string())
+        
+        server.quit()
+        logger.info("Email sent successfully!")
+    except Exception as e:
+        logger.info(f"Failed to send email: {e}")
+        
+        
+def clean_and_format_amount(amt):
+    match = re.search(r'\d+(?:\.\d{1,2})?', amt)
+    if match:
+        number = float(match.group())
+        return f"{number:,.2f}"
+    else:
+        return "Invalid amount"
+        
 # -------------------------- KTC end ----------------------------
 
 # -------------------------- Batch Jobs ebegin -----------------------
@@ -1447,10 +1578,90 @@ def job_send_data_notes():
             cursor.close() 
         if conn:
             conn.close() 
+            
+# @app.post("/test-checkpayment")      
+async def job_check_payment_form_bank(): 
+    conn = get_mysql_connection()
+    if not conn.is_connected():
+        logger.error("Database connection failed.")
+        raise HTTPException(status_code=500, detail="Database connection failed.")
+        
+    try:
+        cursor = conn.cursor()
+        bank_url = 'https://testpaygate.ktc.co.th/ktc/eng/merchant/api/orderApi.jsp'
+        
+        cursor.callproc("pkgpymnt_find_payment_check_bank")
+        
+        stored_results = list(cursor.stored_results())
+        if not stored_results:
+            logger.warning("No data returned from stored procedure.")
+            return {"status": "no_data"}
+        
+        result = stored_results[0]
+        results = result.fetchall()
+        column_names = [desc[0] for desc in result.description]
+
+        payment_list = [
+            {column: convert_decimal(value) for column, value in zip(column_names, row)}
+            for row in results
+        ]
+        logger.info("payment check : %s", payment_list)
+
+        for payment in payment_list:
+            prepare_data = {
+                'merchantId': payment.get('merchId'),
+                'loginId': payment.get('loginId'),
+                'password': payment.get('password'),
+                'actionType': "Query",
+                'orderRef': payment.get('paymentNo'),
+                'payRef': "",
+            }
+            logger.info("Sending to bank: %s", prepare_data)
+            try:
+                response = requests.post(bank_url, data=prepare_data)
+                logger.info("Response status code: %s", response.status_code)
+                logger.info("Response body: %s", response.text)
+            
+                root = ET.fromstring(response.text)
+                record = root.find('record')
+                if record is not None:
+                    orderStatus = record.findtext('orderStatus')
+                    ref = record.findtext('ref')
+                    stat = "Y"
+                    logger.info("Response orderStatus: %s", orderStatus)
+                    logger.info("Response ref: %s", ref)
+                    logger.info("Response stat: %s", stat)
+                    cursor.callproc("pkgpymnt_update_status_payment", [
+                        ref
+                        , stat
+                        , None
+                    ])
+            except Exception as e:
+                logger.error("Error while sending to bank: %s", str(e))
+
+        return {"status": "success"}
+    except Exception as e:
+        logger.error("Unhandled exception: %s", str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def job_hourly_sequence():
+    asyncio.run(job_check_payment_form_bank())
+    job_send_data_notes()
+
 
 @app.on_event("startup")
 def start_scheduler():
-    scheduler.add_job(job_send_data_notes, 'interval', minutes=60)
+    scheduler.add_job(
+       job_hourly_sequence,
+       trigger='cron',
+       minute=0,
+       id='hourly_sequence'
+    )
     scheduler.start()
     logger.info("Scheduler started!")
 
@@ -1462,7 +1673,12 @@ def shutdown_scheduler():
 @app.post("/start-scheduler")
 def start_manual_scheduler():
     if not scheduler.running:
-        scheduler.add_job(job_send_data_notes, 'interval', minutes=60)
+        scheduler.add_job(
+           job_hourly_sequence,
+           trigger='cron',
+           minute=0,
+           id='hourly_sequence'
+        )
         scheduler.start()
         return {"status": "Scheduler started"}
     return {"status": "Scheduler is already running"}
@@ -1496,9 +1712,12 @@ def ktb_cancel():
 @app.get("/")
 def hello():
         return JSONResponse(content={"status": "success", "data": "Hello!"})
-        
-        
+              
 @app.get("/example/")
+def example_route():
+    return JSONResponse(content={"status": "success", "data": "Example response"})
+
+@app.get("/test-api/example/")
 def example_route():
     return JSONResponse(content={"status": "success", "data": "Example response"})
 

@@ -1,8 +1,4 @@
-USE payment_db;
-
 DELIMITER $$
-
-
 CREATE PROCEDURE pkgmnusr_insert_usrpss_work()
 BEGIN
     DELETE FROM usrpss_work;

@@ -9,28 +9,30 @@ import { LoadingSpinnerComponent } from './component/shared/loading-spinner/load
 import { PaymentRedirectComponent } from './component/payment-redirect/payment-redirect.component';
 import { Hispage001aComponent } from './component/historypage/hispage001a/hispage001a.component';
 import { Hispage001bComponent } from './component/historypage/hispage001b/hispage001b.component';
+import { NotFoundComponent } from './component/shared/not-found/not-found.component';
+import { ForgotPasswordComponent } from './component/forgot-password/forgot-password.component';
 
 export const routes: Routes = [
     {
-        path: '',
-        redirectTo: 'loginpage',
-        pathMatch: 'full'
+        path: 'web-payment',
+        redirectTo:'web-payment/loginpage',
+        pathMatch:'full'
     },
     {
-        path: 'loginpage',
+        path: 'web-payment/loginpage',
         component: LoginpageComponent
     },
     {
-        path: 'regispage',
+        path: 'web-payment/regispage',
         component: RegispageComponent
     },
     {
-        path: 'pymntpage',
+        path: 'web-payment/pymntpage',
         component: PymntpageComponent,
         canActivate: [AuthGuard] 
     },
     {
-        path: 'mnusrpage',
+        path: 'web-payment/mnusrpage',
         component: MnusrpageComponent,
         canActivate: [AuthGuard] 
     },
@@ -47,16 +49,19 @@ export const routes: Routes = [
         component: PaymentRedirectComponent 
     },
     {
-        path: 'history-header',
+        path: 'web-payment/history-header',
         component: Hispage001aComponent 
     },
     {
-        path: 'history-detail',
+        path: 'web-payment/history-detail',
         component: Hispage001bComponent 
     },
     {
-        path: '**', 
-        redirectTo: 'loginpage',
-        pathMatch: 'full'
+        path: 'web-payment/forgot-password',
+        component: ForgotPasswordComponent 
+    },
+    {
+        path: '**',  // Wildcard route for 404 handling
+        component: NotFoundComponent
     }
 ];

@@ -1,4 +1,3 @@
-USE payment_db;
 DELIMITER $$
 
 CREATE PROCEDURE pkghis001a_find_header_data(

@@ -15,6 +15,7 @@ export class NavbarComponent {
   public isMobile: boolean = false; 
   private isBrowser: boolean;
   public activeRoute: string = '';
+  public isLoggedIn: boolean = false;
 
   constructor(
     private router: Router,
@@ -24,6 +25,12 @@ export class NavbarComponent {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.activeRoute = event.url; // Get the current route
+        this.isLoggedIn = this.isLoggedInNow();
+        
+        // Trigger logout when user navigates to login page
+        if (this.activeRoute === '/web-payment/loginpage') {
+          this.logout(); // Log out the user when they navigate to the login page
+        }
       }
     });
   }
@@ -49,40 +56,40 @@ export class NavbarComponent {
     }
   }
 
-  public isLoggedIn(): boolean {
-    return this.isBrowser && !!localStorage.getItem('accountRole');
-  }
 
   public logout(): void {
     if (this.isBrowser) {
       localStorage.removeItem('accountRole');
-      this.router.navigate(['loginpage']);
+      this.router.navigate(['web-payment/loginpage']);
     }
   }
 
   public payment(): void {
-    this.router.navigate(['pymntpage']);
+    this.router.navigate(['web-payment/pymntpage']);
   }
 
   public history(): void {
-    this.router.navigate(['history-header']);
+    this.router.navigate(['web-payment/history-header']);
   }
 
   public isHistoryActive(): boolean {
     const currentRoute = this.router.url.split('?')[0];
-    return currentRoute === '/history-header' || currentRoute === '/history-detail';
+    return currentRoute === '/web-payment/history-header' || currentRoute === '/web-payment/history-detail';
   }
 
 
   public manageuser(): void {
-    this.router.navigate(['mnusrpage']);
+    this.router.navigate(['web-payment/mnusrpage']);
   }
 
   public login(): void {
-    this.router.navigate(['loginpage']);
+    this.router.navigate(['web-payment/loginpage']);
   }
 
   public get accountRole(): string | null {
     return this.isBrowser ? localStorage.getItem('accountRole') : null;
+  } 
+   public isLoggedInNow(): boolean {
+    return this.isBrowser && !!localStorage.getItem('accountRole');
   }
 }

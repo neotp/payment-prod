@@ -1,5 +1,3 @@
-USE payment_db; 
-
 DELIMITER $$
 
 CREATE PROCEDURE pkgpymnt_insert_pymdp_work(

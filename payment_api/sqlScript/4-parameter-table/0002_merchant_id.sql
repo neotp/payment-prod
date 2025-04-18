@@ -24,8 +24,8 @@ INSERT INTO prmtbldtl(
     	,'visa'
         , '991308799'
         , '5S9VHEHk5XJ6lEbPvCUsJErI6aMMc7ut'
-        , NULL
-        , NULL
+        , 'ktcapi'
+        , 'ww2BCpgtPF'
         , NULL
         , NULL
         , NULL
@@ -53,8 +53,8 @@ INSERT INTO prmtbldtl(
     	,'master'
         , '991308800'
         , 'CYv2ZlX8cotGNe4qlGn8wlIEADuP4tCe'
-        , NULL
-        , NULL
+        , 'ktcapi'
+        , 'Lp8YFCFGfN'
         , NULL
         , NULL
         , NULL
@@ -81,8 +81,8 @@ INSERT INTO prmtbldtl(
     	,'jbc-upi'
         , '991308801'
         , 'XgrvhL3iq7oO71t4etcOCK3AlhRyl8db'
-        , NULL
-        , NULL
+        , 'ktcapi'
+        , 'mrgFHnJg6y'
         , NULL
         , NULL
         , NULL

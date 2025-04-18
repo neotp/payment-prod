@@ -14,4 +14,4 @@ CREATE TABLE `pymdp_work` (
   `pywstat` varchar(45) DEFAULT NULL COMMENT 'N = Not yet paid\\nP = Process\\nS = Successed',
   `pywnote` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`pywid`)
-) ENGINE=InnoDB AUTO_INCREMENT=20164 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20339 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

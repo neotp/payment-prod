@@ -40,7 +40,7 @@ export class CreusrPopupComponent {
       , lstname: [{ value: null, disabled: false }, Validators.required]
       , email: [{ value: null, disabled: false }, Validators.required]
       , pos: [{ value: null, disabled: false }, Validators.required]
-      , role: [{ value: null, disabled: false }, Validators.required]
+      , role: [{ value: 'user', disabled: false }, Validators.required]
     });}
 
 

@@ -6,33 +6,33 @@
         </div>
         <div class="divider-line"></div>
         <div class="box1">
-            <li *ngIf="!isLoggedIn()">
+            <li *ngIf="!isLoggedInNow()">
                 
-                <a routerLink="loginpage"
+                <a routerLink="web-payment/loginpage"
                     routerLinkActive="active"  
                     [routerLinkActiveOptions]="{exact: true}"
-                    [class.active]="activeRoute === '/loginpage'">
+                    [class.active]="activeRoute === '/web-payment/loginpage'">
                     Login</a>
             </li>
             
-            <li *ngIf="isLoggedIn() && accountRole === 'admin'">
-                <a routerLink="mnusrpage" (click)="manageuser()"  
+            <li *ngIf="isLoggedInNow() && accountRole === 'admin'">
+                <a routerLink="web-payment/mnusrpage" (click)="manageuser()"  
                 routerLinkActive="active"  
                 [routerLinkActiveOptions]="{exact: true}" 
-                [class.active]="activeRoute === '/mnusrpage'">
+                [class.active]="activeRoute === '/web-payment/mnusrpage'">
                 Manage User</a>
             </li>
 
-            <li *ngIf="isLoggedIn() && (accountRole === 'user' || accountRole === 'admin')">
-                <a routerLink="pymntpage" (click)="payment()"
+            <li *ngIf="isLoggedInNow() && (accountRole === 'user' || accountRole === 'admin')">
+                <a routerLink="web-payment/pymntpage" (click)="payment()"
                 routerLinkActive="active"  
                 [routerLinkActiveOptions]="{exact: true}" 
-                [class.active]="activeRoute === '/pymntpage'">
+                [class.active]="activeRoute === '/web-payment/pymntpage'">
                 Payment</a>
             </li>
 
-            <li *ngIf="isLoggedIn() && (accountRole === 'user' || accountRole === 'admin')">
-                <a routerLink="history-header" (click)="history()"
+            <li *ngIf="isLoggedInNow() && (accountRole === 'user' || accountRole === 'admin')">
+                <a routerLink="web-payment/history-header" (click)="history()"
                 routerLinkActive="active"  
                 [routerLinkActiveOptions]="{exact: false}"
                 [class.active]="isHistoryActive()">
@@ -40,8 +40,8 @@
             </li>
         </div>
         <div class="box2">
-            <li *ngIf="isLoggedIn()">
-                <a class="logactive" routerLink="loginpage" (click)="logout()">Logout</a>
+            <li *ngIf="isLoggedInNow()">
+                <a class="logactive" routerLink="web-payment/loginpage" (click)="logout()">Logout</a>
             </li>
         </div>
     </ul>
@@ -57,37 +57,37 @@
             </div>
 
             <div class="nav-links">
-                <li *ngIf="!isLoggedIn()">
-                    <a routerLink="loginpage" 
+                <li *ngIf="!isLoggedInNow()">
+                    <a routerLink="web-payment/loginpage" 
                     routerLinkActive="active"  
                     [routerLinkActiveOptions]="{exact: true}"
-                    [class.active]="activeRoute === '/loginpage'">
+                    [class.active]="activeRoute === '/web-payment/loginpage'">
                     Login</a>
                 </li>
-                <li *ngIf="isLoggedIn() && accountRole === 'admin'">
-                    <a routerLink="mnusrpage" (click)="manageuser()"  
+                <li *ngIf="isLoggedInNow() && accountRole === 'admin'">
+                    <a routerLink="web-payment/mnusrpage" (click)="manageuser()"  
                     routerLinkActive="active"  
                     [routerLinkActiveOptions]="{exact: true}" 
-                    [class.active]="activeRoute === '/mnusrpage'">
+                    [class.active]="activeRoute === '/web-payment/mnusrpage'">
                     Manage User</a>
                 </li>
-                <li *ngIf="isLoggedIn() && (accountRole === 'user' || accountRole === 'admin')">
-                    <a routerLink="pymntpage" (click)="payment()"  
+                <li *ngIf="isLoggedInNow() && (accountRole === 'user' || accountRole === 'admin')">
+                    <a routerLink="web-payment/pymntpage" (click)="payment()"  
                     routerLinkActive="active"  
                     [routerLinkActiveOptions]="{exact: true}" 
-                    [class.active]="activeRoute === '/pymntpage'">
+                    [class.active]="activeRoute === '/web-payment/pymntpage'">
                     Payment</a>
                 </li>
                 
-                <li *ngIf="isLoggedIn() && (accountRole === 'user' || accountRole === 'admin')">
-                    <a routerLink="history-header" (click)="history()"
+                <li *ngIf="isLoggedInNow() && (accountRole === 'user' || accountRole === 'admin')">
+                    <a routerLink="web-payment/history-header" (click)="history()"
                     routerLinkActive="active"  
                     [routerLinkActiveOptions]="{exact: true}" 
                     [class.active]="isHistoryActive()">
                     History</a>
                 </li>
-                <li *ngIf="isLoggedIn()" style="right: 1px;">
-                    <a class="logactive" routerLink="/loginpage" (click)="logout()">Logout</a>
+                <li *ngIf="isLoggedInNow()" style="right: 1px;">
+                    <a class="logactive" routerLink="web-payment/loginpage" (click)="logout()">Logout</a>
                 </li>
             </div>
         </div>

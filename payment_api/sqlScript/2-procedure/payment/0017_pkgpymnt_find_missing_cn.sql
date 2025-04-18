@@ -1,4 +1,3 @@
-USE payment_db;
 DELIMITER $$
 
 CREATE PROCEDURE pkgpymnt_find_missing_cn(

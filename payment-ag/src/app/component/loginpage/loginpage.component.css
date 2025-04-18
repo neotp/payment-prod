@@ -71,8 +71,7 @@
 
 .desktop-layout .column {
     flex: 1;
-    margin: 0 px;
-    padding: 5px;
+    padding-top: 15px;
     border-radius: 5px;
 }
 

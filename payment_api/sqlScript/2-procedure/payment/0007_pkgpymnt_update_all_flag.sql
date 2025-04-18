@@ -1,5 +1,3 @@
-USE payment_db;
-
 DELIMITER $$
 
 CREATE PROCEDURE pkgpymnt_update_all_flag(
@@ -11,7 +9,8 @@ BEGIN
     UPDATE pymdp_work 
         SET pywflag = p_flag
     WHERE pywcuscode = p_cuscode
-    AND pywstat <> 'P';
+    AND pywstat <> 'P'
+    AND pywstat <> 'S';
 
 END $$
 

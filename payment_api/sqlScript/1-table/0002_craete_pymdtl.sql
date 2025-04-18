@@ -14,4 +14,4 @@ CREATE TABLE `pymdtl` (
   `pydstat` varchar(10) DEFAULT NULL,
   `pydnote` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`pyddtlid`)
-) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=208 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

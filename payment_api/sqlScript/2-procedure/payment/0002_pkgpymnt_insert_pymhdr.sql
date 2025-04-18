@@ -1,5 +1,3 @@
-USE payment_db;
-
 DELIMITER $$
 
 CREATE PROCEDURE pkgpymnt_insert_pymhdr(
@@ -46,7 +44,7 @@ BEGIN
         , p_card
         , p_username
         , NOW()
-        , 'N'
+        , 'P'
         , 'N'
     );
 

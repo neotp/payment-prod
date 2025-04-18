@@ -1,5 +1,3 @@
-USE payment_db;
-
 DELIMITER $$
 
 CREATE PROCEDURE pkgpymnt_get_html(
@@ -15,7 +13,10 @@ BEGIN
     p_html
   FROM pymhdr pyh
   WHERE pyh.pyhpymno = p_payment_no
-    AND pyh.pyhlink = p_link;
+    AND pyh.pyhlink = p_link
+    AND pyh.pyhcallback = 'P'
+    AND pyh.pyhcallback <> 'E'
+    AND pyh.pyhcallback <> 'Y';
 
 END $$
 

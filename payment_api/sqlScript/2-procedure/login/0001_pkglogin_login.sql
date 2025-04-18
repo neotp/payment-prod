@@ -1,5 +1,3 @@
-USE payment_db;
-
 DELIMITER $$
 CREATE PROCEDURE pkglogin_login(
     IN p_usrname VARCHAR(255),

@@ -22,9 +22,9 @@ INSERT INTO prmtbldtl(
     ) VALUES (
         '0001'
     	,'ktc'
-        , 1.15
-        , 1
-        , 2
+        , 1.25
+        , 1.25
+        , 1.25
         , NULL
         , NULL
         , NULL
@@ -51,9 +51,9 @@ INSERT INTO prmtbldtl(
     ) VALUES (
         '0001'
     	,'ktb'
-        , 1.15
-        , 1
-        , 2
+        , 1.25
+        , 1.25
+        , 1.25
         , NULL
         , NULL
         , NULL
@@ -79,9 +79,9 @@ INSERT INTO prmtbldtl(
     ) VALUES (
         '0001'
     	,'kbank'
-        , 1.15
-        , 1
-        , 2
+        , 1.25
+        , 1.25
+        , 1.25
         , NULL
         , NULL
         , NULL

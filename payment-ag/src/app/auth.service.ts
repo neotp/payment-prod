@@ -39,7 +39,7 @@ export class AuthService {
   public logout(): void {
     localStorage.removeItem('accountRole');
     localStorage.removeItem('username');
-    this.router.navigate(['/loginpage']);
+    this.router.navigate(['web-payment/loginpage']);
   }
 
   // Keep resetting the session timeout on user activity
