@@ -14,8 +14,9 @@ import { CreatUser } from '../interface/manageuser-interface';
 export class ApiService {
   // private apiUrl = 'http://172.31.20.11:7070/';
   
-  // private apiUrl = 'http://172.31.144.1:7000/';
-  private apiUrl = 'https://172.17.17.127/payment/';
+  private apiUrl = 'http://172.31.144.1:7000/';
+  // private apiUrl = 'https://172.17.17.127/payment/';
+  // private apiUrl = 'https://webapp.sisthai.com/payment/';
   
 
   constructor(private http: HttpClient) { }
@@ -193,8 +194,7 @@ export class ApiService {
     );
   }
 
-  // ---------------------------- Ending historypage001a ----------------------------
-
+  // ---------------------------- Ending historypage001a ---------------------------- 
 
   public testConnect(data: SearchInv): Observable<any> {
     return this.http.post(

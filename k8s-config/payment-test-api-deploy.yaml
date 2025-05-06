@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: payment-api-test
+  name: payment-api-test-deploy
+  namespace: dev-is
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-api-test
+  # strategy:
+  #   type: RollingUpdate   
+  #   rollingUpdate:
+  #     maxSurge: 1 # Only 1 pod can be unavailable during an update
+  #     maxUnavailable: 1 # Allows 1 additional pod above the desired count during updates
+  template:
+    metadata:
+      labels:
+        app: payment-api-test
+    spec:
+      imagePullSecrets:
+        - name: docker-hub-secret
+      containers:
+        - image: neotp/payment-api-v2:latest
+          name: payment-api-test
+          imagePullPolicy: Always
+          resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: payment-api-test
+  name: paymentapitest-svc
+  namespace: dev-is
+spec:
+  ports:
+    - port: 7777      # ClusterIP port
+      # protocol: TCP
+      targetPort: 7000  # container port
+  selector:
+    app: payment-api-test
+  type: ClusterIP
+---
+

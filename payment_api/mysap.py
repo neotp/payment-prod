@@ -3,6 +3,7 @@ from decimal import Decimal
 from fastapi import FastAPI, BackgroundTasks, HTTPException, Depends, Request, logger
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pyrfc import Connection, ABAPApplicationError, ABAPRuntimeError, LogonError, CommunicationError
 from pydantic import BaseModel, Field
 from typing import Dict, List
 import mysql.connector
@@ -22,7 +23,7 @@ from email.mime.multipart import MIMEMultipart
 import xml.etree.ElementTree as ET
 import re
 import pytz
-
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 app = FastAPI()
 
@@ -36,7 +37,8 @@ if not logger.handlers:
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     
-scheduler = BackgroundScheduler()
+scheduler = AsyncIOScheduler()
+
     
     
 # Conf for SOAP, SAP
@@ -45,13 +47,13 @@ USERNAME = "Pimcore Commerce"
 PASSWORD = "password@1"
 METHOD = "FNCREATEPAYMENTS" 
 
-# SAP_CONFIG = {
-#     "ashost": "172.21.130.208"
-#     , "sysnr": "00"
-#     , "client": "110"
-#     , "user": "notes"
-#     , "passwd": "february_02"
-# }
+SAP_CONFIG = {
+    "ashost": "172.21.130.208"
+    , "sysnr": "00"
+    , "client": "110"
+    , "user": "notes"
+    , "passwd": "february_02"
+}
 
 origins = [
     "http://localhost:4200",
@@ -246,6 +248,7 @@ class SearchPaymenthdr(BaseModel):
      credateFrom: str
      credateTo: str
      status : str
+     invNo : str
      page_start: int
      page_limit: int
      
@@ -257,15 +260,15 @@ class SearchPaymentdtl(BaseModel):
 # ---------------------- Model ----------------------
     
 # Dependency: SAP Connection
-# def get_sap_connection():
-#     try:
-#         return Connection(**SAP_CONFIG)
-#     except CommunicationError:
-#         raise HTTPException(status_code=500, detail="Could not connect to SAP server.")
-#     except LogonError:
-#         raise HTTPException(status_code=401, detail="Could not log in to SAP.")
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"Unexpected SAP error: {e}")
+def get_sap_connection():
+    try:
+        return Connection(**SAP_CONFIG)
+    except CommunicationError:
+        raise HTTPException(status_code=500, detail="Could not connect to SAP server.")
+    except LogonError:
+        raise HTTPException(status_code=401, detail="Could not log in to SAP.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected SAP error: {e}")
 
 # Dependency: MySQL Connection 
 def get_mysql_connection():
@@ -317,7 +320,7 @@ def login(data: LoginData, conn=Depends(get_mysql_connection)):
             logger.info("login : success, role: %s", role)
             return JSONResponse(content={"status": "success", "role": role})
         else:
-            raise HTTPException(status_code=401, detail="Invalid credentials or user not active")
+            return JSONResponse(content={"status": "fail", "role": "notfound"})
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected Error: {e}")
@@ -647,26 +650,45 @@ def format_date_ddmmyyyy(date_obj):
         return str(date_obj)
     return str(date_obj)
     
-async def getDataFromSap(usrcuscode: str) -> List[Dict]:
-    api_url = 'https://sisapp.sisthai.com/payment/lists'
-    headers = get_request_headers()  
     
+# async def getDataFromSap(usrcuscode: str) -> List[Dict]:
+#     api_url = 'https://sisapp.sisthai.com/payment/lists'
+#     headers = get_request_headers()  
+    
+#     try:
+#         response = requests.get(f"{api_url}?code={usrcuscode}", headers=headers, cookies=None)
+#         logger.info(f"data from sap {response}")
+#         if response.status_code == 200:
+#             response_data = response.json()
+#             if response_data.get('message') == 'Success':
+#                 return response_data.get("data", {}).get("T_OUTSTANDING", [])
+#             else:
+#                 raise ValueError("Success message not found")
+#         else:
+#             raise HTTPException(status_code=response.status_code, detail="Failed to fetch data from SAP")
+#     except Exception as e:
+#         logger.error(f"Error in getDataFromSap: {e}")
+#         raise HTTPException(status_code=500, detail=f"Error in getDataFromSap: {e}")
+    
+async def getDataFromSap(usrcuscode: str, conn) -> List[Dict]:
     try:
-        response = requests.get(f"{api_url}?code={usrcuscode}", headers=headers, cookies=None)
-        logger.info(f"data from sap {response}")
-        if response.status_code == 200:
-            response_data = response.json()
-            if response_data.get('message') == 'Success':
-                return response_data.get("data", {}).get("T_OUTSTANDING", [])
-            else:
-                raise ValueError("Success message not found")
-        else:
-            raise HTTPException(status_code=response.status_code, detail="Failed to fetch data from SAP")
+        parameters = {
+            "I_COMPANY": "1000",
+            "I_PAYER": usrcuscode
+        }
+        result = conn.call("Z_SD0003_GET_OUTSTANDING", **parameters)
+        logger.info(f"data from SAP: {result}")
+
+        # If your RFC returns a structure like {'T_OUTSTANDING': [...]}
+        return result.get("T_OUTSTANDING", [])
+
+    except (ABAPApplicationError, ABAPRuntimeError) as e:
+        logger.error(f"SAP error: {e}")
+        raise HTTPException(status_code=500, detail=f"SAP error occurred: {e}")
     except Exception as e:
-        logger.error(f"Error in getDataFromSap: {e}")
-        raise HTTPException(status_code=500, detail=f"Error in getDataFromSap: {e}")
-    
-    
+        logger.error(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error in getDataFromSap: {e}")
+
 async def insertOutstandingData(conn, outstanding_data: List[Dict]):
     cursor = conn.cursor()
     
@@ -765,9 +787,9 @@ async def loadData(data: LoadDate, conn=Depends(get_mysql_connection)):
         cursor.close() 
  
 @app.post("/getDataInvoice")
-async def getDataInvoice(data: GetInv, conn=Depends(get_mysql_connection)):
+async def getDataInvoice(data: GetInv, conn=Depends(get_mysql_connection), conn_sap=Depends(get_sap_connection)):
     try:
-        outstanding_data = await getDataFromSap(data.usrcuscode)
+        outstanding_data = await getDataFromSap(data.usrcuscode, conn_sap)
         
         status = await insertOutstandingData(conn, outstanding_data)
 
@@ -782,6 +804,8 @@ async def getDataInvoice(data: GetInv, conn=Depends(get_mysql_connection)):
     finally:
         if conn:
             conn.close()
+            
+
             
 @app.post("/updateflag")
 async def updateflag(data: UpdateFlag, conn=Depends(get_mysql_connection)):
@@ -1115,6 +1139,55 @@ async def check_payment_status(paymentNo:str):
         cursor = conn.cursor()
         
         await asyncio.sleep(35*60)  
+        bank_url = 'https://testpaygate.ktc.co.th/ktc/eng/merchant/api/orderApi.jsp'
+        
+        cursor.callproc("pkgpymnt_data_payment_to_check_bank", [
+                paymentNo
+            ])
+        
+        stored_results = list(cursor.stored_results())
+        if not stored_results:
+            logger.warning("No data returned from stored procedure.")
+            return {"status": "no_data"}
+        
+        result = stored_results[0]
+        results = result.fetchall()
+        column_names = [desc[0] for desc in result.description]
+
+        payment_list = [
+            {column: convert_decimal(value) for column, value in zip(column_names, row)}
+            for row in results
+        ]
+        logger.info("payment check : %s", payment_list)
+
+        for payment in payment_list:
+            prepare_data = {
+                'merchantId': payment.get('merchId'),
+                'loginId': payment.get('loginId'),
+                'password': payment.get('password'),
+                'actionType': "Query",
+                'orderRef': payment.get('paymentNo'),
+                'payRef': "",
+            }
+            try:
+                response = requests.post(bank_url, data=prepare_data)
+                root = ET.fromstring(response.text)
+                record = root.find('record')
+                if record is not None:
+                    orderStatus = record.findtext('orderStatus')
+                    ref = record.findtext('ref')
+                    stat = "Y"
+                    logger.info("Response orderStatus: %s", orderStatus)
+                    logger.info("Response ref: %s", ref)
+                    logger.info("Response stat: %s", stat)
+                    cursor.callproc("pkgpymnt_update_status_payment", [
+                        ref
+                        , stat
+                        , None
+                    ])
+            except Exception as e:
+                logger.error("Error while sending to bank: %s", str(e))
+        
         cursor.callproc("pkgpymnt_expire_payment", [
             paymentNo
             ])
@@ -1147,6 +1220,7 @@ async def searchPaymentData(data: SearchPaymenthdr, conn=Depends(get_mysql_conne
             , data.credateFrom
             , data.credateTo
             , data.status
+            , data.invNo
             , offset
             , data.page_limit
         ])
@@ -1340,19 +1414,25 @@ async def ktc_datafeed(data: Request, background_tasks: BackgroundTasks, conn=De
         print("OK")
         if status == "success":  
             background_tasks.add_task(
-                send_registration_email
+                send_payment_email
                 , ref
                 , stat
                 , amt
                 )
             return JSONResponse(content={"status": "Success" , "datail": ref })
         else:
+            background_tasks.add_task(
+                send_payment_email
+                , ref
+                , stat
+                , amt
+                )
             return JSONResponse(content={"status": "fail"})
     except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error processing the payment data: {e}")
 
 
-def send_registration_email(ref: str, stat: str, amt: str):
+def send_payment_email(ref: str, stat: str, amt: str):
     conn = get_mysql_connection()
     cursor = conn.cursor()
     out_param = cursor.callproc("pkgpymnt_find_email", [
@@ -1394,11 +1474,13 @@ def send_registration_email(ref: str, stat: str, amt: str):
         """
     if stat == 'Y':
         status = 'Payment completed' 
+        statush = 'Success'
     elif stat == 'F':
         status = 'Payment Failed' 
+        statush = 'Failed'
     sender_email = "Chaitanachote@sisthai.com"
     sender_password = "New@191243"
-    subject = "Payment completed!"
+    subject = f"[Payment Link] {statush} - Customer Code: {cuscode} , Payment No: {ref} , Amount: {ttamt}"
     email= eamil
     cc_list = ["Chaitanachote@sisthai.com"]
     thailand_tz = pytz.timezone("Asia/Bangkok")
@@ -1649,8 +1731,8 @@ async def job_check_payment_form_bank():
         if conn:
             conn.close()
 
-def job_hourly_sequence():
-    asyncio.run(job_check_payment_form_bank())
+async def job_hourly_sequence():
+    await job_check_payment_form_bank()
     job_send_data_notes()
 
 
@@ -1660,7 +1742,9 @@ def start_scheduler():
        job_hourly_sequence,
        trigger='cron',
        minute=0,
-       id='hourly_sequence'
+       id='job_hourly_sequence',
+       max_instances=2,
+       coalesce=True
     )
     scheduler.start()
     logger.info("Scheduler started!")
@@ -1677,7 +1761,9 @@ def start_manual_scheduler():
            job_hourly_sequence,
            trigger='cron',
            minute=0,
-           id='hourly_sequence'
+           id='job_hourly_sequence',
+           max_instances=2,
+           coalesce=True
         )
         scheduler.start()
         return {"status": "Scheduler started"}
@@ -1689,8 +1775,26 @@ def stop_manual_scheduler():
         scheduler.shutdown()
         return {"status": "Scheduler stopped"}
     return {"status": "Scheduler is not running"}
-
+b''
 # -------------------------- Batch Jobs end --------------------------
+# -------------------------- Test load data begin --------------------------
+@app.post("/load_data_from_sap/")
+async def load_data_from_sap(request: Request, conn=Depends(get_sap_connection)):
+    try:
+        body = await request.json()
+        customer_code = body.get("customer_code")
+        if not customer_code:
+            raise HTTPException(status_code=400, detail="customer_code is required")
+
+        parameters = {"I_COMPANY": "1000", "I_PAYER": customer_code}
+        result = conn.call("Z_SD0003_GET_OUTSTANDING", **parameters)
+        return {"status": "success", "data": result}
+    except (ABAPApplicationError, ABAPRuntimeError) as e:
+        raise HTTPException(status_code=500, detail=f"SAP error occurred: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+
+# -------------------------- Test load data end ----------------------------
 
 # call back
 @app.get("/kbank/notify/")
