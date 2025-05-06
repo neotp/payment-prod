@@ -9,6 +9,7 @@ CREATE PROCEDURE pkghis001a_find_header_data(
     , IN p_credateFrom   VARCHAR(45)
     , IN p_credateTo     VARCHAR(45)
     , IN p_stat          VARCHAR(45)
+    , IN p_invno         VARCHAR(45)
     , IN p_offset         INT
     , IN p_limit          INT
 )
@@ -17,10 +18,11 @@ BEGIN
     DECLARE total_count INT;
 
     SELECT 
-        COUNT(*) 
+        COUNT(DISTINCT pyh.pyhhdrid)
     INTO 
         total_count
     FROM pymhdr pyh
+    JOIN pymdtl pyd ON pyd.pydhdrid = pyh.pyhhdrid 
     WHERE pyh.pyhcuscode = COALESCE(NULLIF(p_cus_code, ''), pyh.pyhcuscode)
       AND pyh.pyhpymno = COALESCE(NULLIF(p_pay_no, ''), pyh.pyhpymno)
       AND pyh.pyhbank = COALESCE(NULLIF(p_bank, ''), pyh.pyhbank)
@@ -28,13 +30,14 @@ BEGIN
       AND pyh.pyhcreusr = COALESCE(NULLIF(p_creusr, ''), pyh.pyhcreusr)
       AND Date(pyh.pyhcredate) >= COALESCE(NULLIF(p_credateFrom, ''), Date(pyh.pyhcredate))
       AND Date(pyh.pyhcredate) <= COALESCE(NULLIF(p_credateTo, ''), Date(pyh.pyhcredate))
-      AND pyh.pyhcallback = COALESCE(NULLIF(p_stat, ''), pyh.pyhcallback);
+      AND pyh.pyhcallback = COALESCE(NULLIF(p_stat, ''), pyh.pyhcallback)
+      AND pyd.pydinvno = COALESCE(NULLIF(p_invno, ''), pyd.pydinvno);
 
       
     SELECT total_count AS total_count;
       
 
-    SELECT 
+    SELECT DISTINCT
         pyh.pyhhdrid            AS hdrId
         , pyh.pyhcuscode        AS cuscode
         , pyh.pyhpymno          AS payNo
@@ -48,6 +51,7 @@ BEGIN
         , pyh.pyhlink           AS link
         , pyh.pyhcallback       AS stat
     FROM pymhdr pyh
+    JOIN pymdtl pyd ON pyd.pydhdrid = pyh.pyhhdrid 
     WHERE pyh.pyhcuscode = COALESCE(NULLIF(p_cus_code, ''), pyh.pyhcuscode)
       AND pyh.pyhpymno = COALESCE(NULLIF(p_pay_no, ''), pyh.pyhpymno)
       AND pyh.pyhbank = COALESCE(NULLIF(p_bank, ''), pyh.pyhbank)
@@ -56,6 +60,7 @@ BEGIN
       AND Date(pyh.pyhcredate) >= COALESCE(NULLIF(p_credateFrom, ''), Date(pyh.pyhcredate))
       AND Date(pyh.pyhcredate) <= COALESCE(NULLIF(p_credateTo, ''), Date(pyh.pyhcredate))
       AND pyh.pyhcallback = COALESCE(NULLIF(p_stat, ''), pyh.pyhcallback)
+      AND pyd.pydinvno = COALESCE(NULLIF(p_invno, ''), pyd.pydinvno)
     ORDER BY pyh.pyhhdrid ASC
     LIMIT p_limit OFFSET p_offset;
 

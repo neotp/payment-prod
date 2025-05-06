@@ -7,6 +7,7 @@ export interface SearchPayment {
     , credateFrom: string
     , credateTo: string
     , status : string
+    , invNo : string
     , page_start : number
     , page_limit : number
   }

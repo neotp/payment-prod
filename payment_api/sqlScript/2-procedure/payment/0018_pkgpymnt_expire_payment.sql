@@ -31,7 +31,8 @@ BEGIN
 
     UPDATE pymdtl 
         SET pydstat = 'E'
-    WHERE pydhdrid = v_hdrid; 
+    WHERE pydhdrid = v_hdrid
+      AND pydstat = 'P'; 
 
     OPEN inv_cursor;
 
@@ -44,7 +45,8 @@ BEGIN
         UPDATE pymdp_work 
             SET pywstat = 'N'
         WHERE pywcuscode = v_cus_code  
-          AND pywdocno = v_invno;        
+          AND pywdocno = v_invno
+          AND pywstat <> 'S';        
     END LOOP;
 
     CLOSE inv_cursor;

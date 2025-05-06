@@ -12,6 +12,7 @@ export class LinkPopupComponent {
   @Input() title: string = '';
   @Input() text_button: string = 'Ok';
   @Input() linkToCopy: string = ''; 
+  @Input() paymentNo: string = ''; 
   @Input() headerColor: string = '#FFFFFF'; // Default color
   @Input() confirmButton: boolean = false; // Show button by default
   @Input() closeButton: boolean = false; // Show button by default

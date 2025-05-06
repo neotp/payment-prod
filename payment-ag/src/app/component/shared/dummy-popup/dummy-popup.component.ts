@@ -33,7 +33,7 @@ export class DummyPopupComponent {
     ){ 
       this.headerForm = this.formBuilder.group({
       docType: [{ value: 'SO', disabled: true }, Validators.required]
-      , docNo: [{ value: null, disabled: false }, Validators.required]
+      , docNo: [{ value: null, disabled: false }, [Validators.required, Validators.maxLength(10)]]
       , docAmt: [{ value: null, disabled: false }, Validators.required]
       , usage: [{ value: null, disabled: false }, Validators.required]
       , note: [{ value: null, disabled: false }]
@@ -71,6 +71,24 @@ export class DummyPopupComponent {
           if (inputField) inputField.value = formattedValue;
         });
       }
+    }
+  }
+
+  public allowOnlyNumbers(event: KeyboardEvent): void {
+    const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight'];
+    const inputChar = event.key;
+  
+    const isNumber = /^[0-9.]$/.test(inputChar);
+    const inputElement = event.target as HTMLInputElement;
+  
+    // Prevent more than one decimal point
+    if (inputChar === '.' && inputElement.value.includes('.')) {
+      event.preventDefault();
+      return;
+    }
+  
+    if (!isNumber && !allowedKeys.includes(inputChar)) {
+      event.preventDefault();
     }
   }
 

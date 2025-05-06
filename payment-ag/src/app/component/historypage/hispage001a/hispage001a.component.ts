@@ -15,6 +15,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { SearchPayment } from '../../../interface/history-interface';
 import { ActivatedRoute, Router} from '@angular/router';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-hispage001a',
@@ -31,7 +32,8 @@ import { ActivatedRoute, Router} from '@angular/router';
     MatDatepickerModule,
     MatPaginatorModule,
     MatSortModule,
-    PagingComponent
+    PagingComponent,
+    MatTooltipModule 
 ],
   templateUrl: './hispage001a.component.html',
   styleUrl: './hispage001a.component.css',
@@ -66,7 +68,7 @@ export class Hispage001aComponent {
   public statData: any = {} ;
   public pageSizeOptions: number[] = [ 10, 20, 50, 100];
 
-  public displayedColumns: string[] = ['payNo', 'cuscode', 'amt', 'feeAmt', 'totolAmt', 'bank', 'card', 'credate', 'creusr', 'link', 'stat'];
+  public displayedColumns: string[] = ['payNo', 'stat', 'cuscode', 'amt', 'feeAmt', 'totolAmt', 'bank', 'card', 'credate', 'creusr', 'link'];
   public dataSource = new MatTableDataSource<any>([]);
   private isBrowser: boolean; 
 
@@ -90,6 +92,7 @@ export class Hispage001aComponent {
         , credateFrom: [{ value: new Date().toISOString().split('T')[0], disabled: false }]
         , credateTo: [{ value: new Date().toISOString().split('T')[0], disabled: false }]
         , status: [{ value: 'all', disabled: false }]
+        , invNo: [{ value: null, disabled: false }]
       });
       const navigation = this.router.getCurrentNavigation();
       if (navigation?.extras?.state) {
@@ -182,6 +185,7 @@ export class Hispage001aComponent {
     this.headerForm.controls['credateFrom'].setValue(data.credateFrom);
     this.headerForm.controls['credateTo'].setValue(data.credateTo);
     this.headerForm.controls['status'].setValue(data.status);
+    this.headerForm.controls['invNo'].setValue(data.invNo);
   }
   public resetForm(): void {
     this.headerForm.controls['cuscode'].reset;
@@ -192,6 +196,7 @@ export class Hispage001aComponent {
     this.headerForm.controls['credateFrom'].reset;
     this.headerForm.controls['credateTo'].reset;
     this.headerForm.controls['status'].reset;
+    this.headerForm.controls['invNo'].reset;
   }
 
   private populateForm(): void {
@@ -203,6 +208,7 @@ export class Hispage001aComponent {
     this.searchData.credateFrom = this.headerForm.controls['credateFrom'].value || '';
     this.searchData.credateTo = this.headerForm.controls['credateTo'].value || '';
     this.searchData.status = (this.headerForm.controls['status'].value === 'all'? '' : this.headerForm.controls['status'].value) || '';
+    this.searchData.invNo = (this.headerForm.controls['invNo'].value === 'all'? '' : this.headerForm.controls['invNo'].value) || '';
   }
 
   public async searchPayment(): Promise<void> {
@@ -345,6 +351,41 @@ export class Hispage001aComponent {
     }
     return statinv
   };
+
+  getStatusIcon(stat: string): string {
+    switch (stat) {
+      case 'Failed':
+        return 'error';
+      case 'Cancel':
+        return 'error';
+      case 'Success':
+        return 'task_alt';
+      case 'Process':
+        return 'warning';
+      case 'Expire':
+        return 'error';
+      default:
+        return 'help';
+    }
+  }
+  
+  getStatusClass(stat: string): string {
+    switch (stat) {
+      case 'Failed':
+        return 'error-color';
+      case 'Cancel':
+        return 'error-color';
+      case 'Success':
+        return 'info-color';
+      case 'Process':
+        return 'warning-color';
+      case 'Expire':
+        return 'error-color';
+      default:
+        return 'default-color';
+    }
+  }
+  
   
   public cardAndBank(val: string): string {
     let value = ''

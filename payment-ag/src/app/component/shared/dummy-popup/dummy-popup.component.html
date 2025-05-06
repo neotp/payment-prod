@@ -13,7 +13,8 @@
                     <div class="row">
                         <div class="text-detail"> Document No <span style="color: red;">*</span></div>
                         <input class="input-text" autocomplete="off" type="text" id="docNo" formControlName="docNo"
-                            placeholder="Enter Document NO.">
+                            placeholder="Enter Document NO." 
+                            maxlength="10">
                     </div>
                     <div class="row">
                         <div class="text-detail"> Usage <span style="color: red;">*</span></div>
@@ -58,6 +59,7 @@
                             formControlName="docAmt"
                             placeholder="Enter Amount"
                             (blur)="formatFinalAmount()"
+                            (keypress)="allowOnlyNumbers($event)"
                         />
                     </div>
                     <div class="row">

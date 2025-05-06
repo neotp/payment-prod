@@ -19,7 +19,7 @@ BEGIN
         FROM usrpss
         WHERE usrusrname = p_usrname
           AND usrpass = p_pass
-          AND usrstat <> 'pending';
+          AND usrstat <> 'P';
     ELSE
         SET p_usrrole = 'notfound';
     END IF;

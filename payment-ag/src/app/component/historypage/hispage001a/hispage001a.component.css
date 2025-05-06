@@ -113,6 +113,40 @@
     background-color: #fd9a9a !important;
     color: #00317A !important;
   }
+
+  .status-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+  }
+
+  .status-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px; /* space between icon and text */
+  }
+
+  .error-color {
+    color: red;
+  }
+  
+  .info-color {
+    color: #3fb91a;
+  }
+  
+  .warning-color {
+    color: #ff9800;
+  }
+  
+  .default-color {
+    color: #757575;
+  }
+  
+  
   
   
   

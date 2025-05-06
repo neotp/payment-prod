@@ -54,6 +54,7 @@ export class PymntpageComponent {
   public link_pop: boolean = false;
   public bal_pop: boolean = false;
   public fail_pop: boolean = false;
+  public not_found_pop: boolean = false;
   public warning_search: boolean = false;
   public bank_pop: boolean = false;
   public dummy_pop: boolean = false;
@@ -69,6 +70,7 @@ export class PymntpageComponent {
   public customercode: any;
   public customername: any;
   public linkMessage: any;
+  public paymentNo: any;
   public loadingApp: EventEmitter<boolean> = new EventEmitter(false);
   public isMobile: boolean = false; 
   private isBrowser: boolean; 
@@ -177,23 +179,27 @@ export class PymntpageComponent {
     }
      this.api.loadData(data).subscribe((res: any) => {
       console.log(res);
-      this.allData = res.data.map((invoice: any) => ({
-        selected: this.convertFlag(invoice.pywflag)
-        , docType: invoice.pywdoctype
-        , docNo: invoice.pywdocno
-        , docDate: this.formatDate(invoice.pywdocdate, '/')
-        , dueDate: this.formatDate(invoice.pywduedate, '/')
-        , docAmt: this.formatAmount(invoice.pywdocamt)
-        , balAmt: this.formatAmount(invoice.pywbalamt)
-        , paidamt: this.formatNumberWithCommas(parseFloat(invoice.pywpaidamt).toFixed(2))
-        , refdoc: invoice.pywrefdoc
-        , stat: this.statusInv(invoice.pywstat)
-        , note: invoice.pywnote
-      }));
-      this.dataDisplay = this.allData;
-      this.dataSource.data = this.dataDisplay; 
-      this.totalRecords = res.total;
-      this.setLoading(false);
+      if (res.total > 0 ) {
+        this.allData = res.data.map((invoice: any) => ({
+          selected: this.convertFlag(invoice.pywflag)
+          , docType: invoice.pywdoctype
+          , docNo: invoice.pywdocno
+          , docDate: this.formatDate(invoice.pywdocdate, '/')
+          , dueDate: this.formatDate(invoice.pywduedate, '/')
+          , docAmt: this.formatAmount(invoice.pywdocamt)
+          , balAmt: this.formatAmount(invoice.pywbalamt)
+          , paidamt: this.formatNumberWithCommas(parseFloat(invoice.pywpaidamt).toFixed(2))
+          , refdoc: invoice.pywrefdoc
+          , stat: this.statusInv(invoice.pywstat)
+          , note: invoice.pywnote
+        }));
+        this.dataDisplay = this.allData;
+        this.dataSource.data = this.dataDisplay; 
+        this.totalRecords = res.total;
+        this.setLoading(false);
+      } else {
+        this.popup('not_found')
+      }
     }, (error: any) => {
       console.log('Error during login:', error);
       this.setLoading(false);
@@ -217,6 +223,7 @@ export class PymntpageComponent {
       this.popup('input')
       this.setLoading(false);
     } else {
+      await this.findCusCode();
       this.dataDisplay = this.allData.filter((item: InvoiceData) =>
         item.docNo === this.searchData.invno
       );
@@ -330,7 +337,8 @@ export class PymntpageComponent {
       console.log(response);
       if(response.status === 'success'){
         this.loadData();
-        this.linkMessage = 'https://webapp.sisthai.com/payment/ktc/callBank/'+ response.paymentNo +'/'+ response.link
+        this.paymentNo = response.paymentNo;
+        this.linkMessage = 'https://webapp.sisthai.com/payment/ktc/callBank/'+ response.paymentNo +'/'+ response.link;
         this.popup('link');
         this.setLoading(false);
       } else {
@@ -452,6 +460,24 @@ export class PymntpageComponent {
       });
     }
     
+  }
+
+  public allowOnlyNumbers(event: KeyboardEvent): void {
+    const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight'];
+    const inputChar = event.key;
+  
+    const isNumber = /^[0-9.]$/.test(inputChar);
+    const inputElement = event.target as HTMLInputElement;
+  
+    // Prevent more than one decimal point
+    if (inputChar === '.' && inputElement.value.includes('.')) {
+      event.preventDefault();
+      return;
+    }
+  
+    if (!isNumber && !allowedKeys.includes(inputChar)) {
+      event.preventDefault();
+    }
   }
 
   private formatNumberWithCommas(amount: string): string {

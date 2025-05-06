@@ -38,9 +38,18 @@
             <div class="box">
                 <div class="row">
                     <div class="column">
-                        <label for="payNo" class="username">Payment No.</label>
-                        <input autocomplete="off" type="text" id="payNo" formControlName="payNo"
-                            placeholder="Enter Payment No." required>
+                        <div class="row-incol">
+                            <div class="column-in">
+                                <label for="payNo" class="username">Payment No.</label>
+                                <input class="input-A" autocomplete="off" type="text" id="payNo" formControlName="payNo"
+                                    placeholder="Enter Payment No." required>
+                            </div>
+                            <div class="column-in-right">
+                                <label for="invNo" class="username ">Invoice No.</label>
+                                <input class="input-A" autocomplete="off" type="text" id="invNo"
+                                    formControlName="invNo" placeholder="Enter Invoice No" required />
+                            </div>
+                        </div>
                     </div>
                     <div class="column">
                         <div class="row-incol">
@@ -84,7 +93,7 @@
                                     formControlName="cuscode" placeholder="Enter Create User" required />
                             </div>
                             <div class="column-in-right">
-                                <label for="creusr" class="username ">Craete User.</label>
+                                <label for="creusr" class="username ">Create User.</label>
                                 <input class="input-A" autocomplete="off" type="text" id="creusr"
                                     formControlName="creusr" placeholder="Enter Create User" required />
                             </div>
@@ -117,6 +126,19 @@
                         <a class="text-link" (click)="navigateToPage(record)">
                             {{ record.payNo }}
                         </a>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="stat">
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Status </th>
+                    <td mat-cell *matCellDef="let record" class="text-center">
+                        <div class="status-container">
+                            <span [ngClass]="getStatusClass(record.stat)" 
+                                class="status-icon"
+                                [matTooltip]="record.stat">
+                                <mat-icon>{{ getStatusIcon(record.stat) }}</mat-icon>
+                            </span>
+                        </div>
                     </td>
                 </ng-container>
 
@@ -164,7 +186,7 @@
 
                 <!-- Position Column -->
                 <ng-container matColumnDef="credate">
-                    <th mat-header-cell *matHeaderCellDef class="text-center"> Craete Date </th>
+                    <th mat-header-cell *matHeaderCellDef class="text-center"> Create Date </th>
                     <td mat-cell *matCellDef="let record" class="text-center"> {{ record.credate }} </td>
                 </ng-container>
 
@@ -177,15 +199,11 @@
                 <!-- Role Column -->
                 <ng-container matColumnDef="link">
                     <th mat-header-cell *matHeaderCellDef class="text-center"> Link to Pay </th>
-                    <td mat-cell *matCellDef="let record" class="text-center"> 
+                    <td mat-cell *matCellDef="let record" class="text-center">
                         <a class="text-link" (click)="copyLink(record)">
-                            {{ record.link }} 
-                        </a></td>
-                </ng-container>
-
-                <ng-container matColumnDef="stat">
-                    <th mat-header-cell *matHeaderCellDef class="text-center"> Status </th>
-                    <td mat-cell *matCellDef="let record" class="text-center"> {{ record.stat }} </td>
+                            {{ record.link }}
+                        </a>
+                    </td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -233,7 +251,7 @@
                 </div>
                 <div class="row-cl">
                     <div class="column-in">
-                        <label for="creusr" class="username" style="font-size: 14px;">Craete User.</label>
+                        <label for="creusr" class="username" style="font-size: 14px;">Create User.</label>
                         <input class="input-A" autocomplete="off" type="text" id="creusr" formControlName="creusr"
                             placeholder="Enter Create User" required />
                     </div>
@@ -289,26 +307,25 @@
 
         </div>
 
-
-
-
-
         <div class="card-container">
             <div class="divider-line"></div>
             <div class="card" *ngFor="let record of allData">
                 <div class="card-content">
 
-                    <div class="card-row mb-color"><strong>Payment No. : </strong> 
+                    <div class="card-row mb-color"><strong>Payment No. : </strong>
                         <a class="text-link" (click)="navigateToPage(record)">
-                        {{ record.payNo }}
-                    </a></div>
+                            {{ record.payNo }}
+                        </a>
+                    </div>
                     <div class="card-row mb-color"><strong>Customer Code. : </strong> {{ record.cuscode }}</div>
                     <div class="card-row mb-color"><strong>Amount : </strong> {{ record.amt | number:'1.2-2' }}</div>
-                    <div class="card-row mb-color"><strong>Fee Amount : </strong> {{ record.feeAmt | number:'1.2-2' }}</div>
-                    <div class="card-row mb-color"><strong>Total Amount : </strong> {{ record.totalAmt | number:'1.2-2' }}</div>
+                    <div class="card-row mb-color"><strong>Fee Amount : </strong> {{ record.feeAmt | number:'1.2-2' }}
+                    </div>
+                    <div class="card-row mb-color"><strong>Total Amount : </strong> {{ record.totalAmt | number:'1.2-2'
+                        }}</div>
                     <div class="card-row mb-color"><strong>Bank : </strong> {{ record.bank }}</div>
                     <div class="card-row mb-color"><strong>Card : </strong> {{ record.card }}</div>
-                    <div class="card-row mb-color"><strong>Craete Date : </strong> {{ record.credate }}</div>
+                    <div class="card-row mb-color"><strong>Create Date : </strong> {{ record.credate }}</div>
                     <div class="card-row mb-color"><strong>Create User : </strong> {{ record.creusr }}</div>
                     <div class="card-row mb-color"><strong>Link to Pay : </strong> {{ record.link }}</div>
                     <div class="card-row mb-color"><strong>Status : </strong> {{ record.stat }}</div>
