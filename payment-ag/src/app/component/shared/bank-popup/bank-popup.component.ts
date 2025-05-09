@@ -55,6 +55,11 @@ export class BankPopupComponent {
     });
   }
 
+  public changeService() {
+    this.serviceCharge = parseFloat(Number(this.balanceAmount * ( this.feeper * (1/100))).toFixed(2)); 
+     this.totalAmount = parseFloat(Number(this.balanceAmount + this.serviceCharge).toFixed(2));
+  }
+
   public closePopup() {
     this.close.emit();
   }

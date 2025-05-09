@@ -45,7 +45,9 @@
 
         <div class="row">
           <div class="column">
-            <div class="text-detail"> Service charge ({{ feeper }}%)</div>
+            <div class="text-detail"> Service charge (
+              <input style="width: 30px;" type="text" name="cardOption" value="visa" [(ngModel)]="feeper"  (change)="changeService()"/>
+              %)</div>
           </div>
           <div class="column balance-container">
             <div class="text-detail">{{ serviceCharge | number:'1.2-2' }}</div>

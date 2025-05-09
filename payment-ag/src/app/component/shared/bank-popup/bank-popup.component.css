@@ -109,7 +109,7 @@
     font-size: 14px;
     color: #684C69; /* Slightly darker on hover */
     display: block;
-    margin: 10px 20px;
+    margin: 10px 5px;
   }
   
   .row {
@@ -129,7 +129,7 @@
   }
 
   .column {
-    margin: 0 10px;
+    margin: 0 5px;
     border-radius: 5px;
     width: 65%;
   }

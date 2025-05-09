@@ -174,6 +174,7 @@ export class PymntpageComponent {
     this.setLoading(true);
     const data = {
       usrcuscode: this.searchData.cuscode
+      , docNo: this.searchData.invno || ''
       , page_start: this.page_start 
       , page_limit: this.page_limit
     }
@@ -199,6 +200,7 @@ export class PymntpageComponent {
         this.setLoading(false);
       } else {
         this.popup('not_found')
+        this.setLoading(false);
       }
     }, (error: any) => {
       console.log('Error during login:', error);
@@ -222,8 +224,14 @@ export class PymntpageComponent {
     } else if (!this.searchData.cuscode && !this.searchData.invno){
       this.popup('input')
       this.setLoading(false);
+    } 
+    else if (!this.searchData.cuscode && this.searchData.invno){
+      this.popup('input')
+      this.setLoading(false);
+    } else if (this.searchData.cuscode && this.searchData.invno && this.dataDisplay.length === 0) {
+      this.findCusCode();
+      this.setLoading(false);
     } else {
-      await this.findCusCode();
       this.dataDisplay = this.allData.filter((item: InvoiceData) =>
         item.docNo === this.searchData.invno
       );
@@ -431,7 +439,7 @@ export class PymntpageComponent {
       docno: record.docNo,
       paidamt : record.paidamt.toString().replace(/,/g, '')
     }
-    if (data.paidamt > record.balAmt) {
+    if (data.paidamt > record.balAmt && record.docType !== 'SO') {
       this.popup('bal');
       record.paidamt = record.balAmt; // Reset to max allowed value
       if (record.paidamt !== null && record.paidamt !== undefined) {

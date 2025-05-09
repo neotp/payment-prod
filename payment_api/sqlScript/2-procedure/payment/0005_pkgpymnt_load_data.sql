@@ -2,6 +2,7 @@ DELIMITER $$
 
 CREATE PROCEDURE pkgpymnt_load_data(
     IN p_cuscode            VARCHAR(50)
+    , IN p_invno            VARCHAR(50)
     , IN p_offset             INT
     , IN p_limit              INT
 )
@@ -11,7 +12,8 @@ BEGIN
     SELECT COUNT(*) 
     INTO total_count
     FROM pymdp_work pyw
-    WHERE pyw.pywcuscode = p_cuscode;
+    WHERE pyw.pywcuscode = p_cuscode
+      AND pyw.pywdocno = COALESCE(NULLIF(p_invno, ''), pyw.pywdocno);
 
     SELECT total_count AS total_count;
 
@@ -31,6 +33,7 @@ BEGIN
         , pyw.pywnote
     FROM pymdp_work pyw
     WHERE pyw.pywcuscode = p_cuscode
+      AND pyw.pywdocno = COALESCE(NULLIF(p_invno, ''), pyw.pywdocno)
     ORDER BY pyw.pywduedate ASC
     LIMIT p_limit OFFSET p_offset;
 

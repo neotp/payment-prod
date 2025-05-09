@@ -80,6 +80,8 @@ MYSQL_CONFIG = {
     , "user": "root"
     , "password": "P@ssw0rdSiS"
     , "database": "payment_db"
+    # , "database": "payment_prod"
+    # , "database": "payment_dev"
 }
 
 # ---------------------- Model ----------------------
@@ -160,6 +162,7 @@ class DataPending(BaseModel):
     
 class LoadDate(BaseModel):
     usrcuscode: str
+    docNo: str
     page_start: int
     page_limit: int
     
@@ -566,9 +569,10 @@ def createUser(data: CreatUser, background_tasks: BackgroundTasks, conn=Depends(
             , data.role
             , None
             ])
-
+        cursor.callproc("pkgmnusr_save_usrpss", [
+            None
+         ])
         count = out_param[7]
-        
         logger.info("Registration attempt for user data '%s completed with result after: %s", data, count)
         if count == 1:
             # background_tasks.add_task(
@@ -744,6 +748,7 @@ async def loadData(data: LoadDate, conn=Depends(get_mysql_connection)):
     try:
         cursor.callproc("pkgpymnt_load_data", [
             data.usrcuscode,
+            data.docNo,
             offset,
             data.page_limit
         ])
@@ -1478,8 +1483,7 @@ def send_payment_email(ref: str, stat: str, amt: str):
     elif stat == 'F':
         status = 'Payment Failed' 
         statush = 'Failed'
-    sender_email = "Chaitanachote@sisthai.com"
-    sender_password = "New@191243"
+    sender_email = "InformationSystem@sisthai.com"
     subject = f"[Payment Link] {statush} - Customer Code: {cuscode} , Payment No: {ref} , Amount: {ttamt}"
     email= eamil
     cc_list = ["Chaitanachote@sisthai.com"]
@@ -1528,7 +1532,6 @@ def send_payment_email(ref: str, stat: str, amt: str):
     try: 
         logger.info("Connecting to SMTP server...")
         server = smtplib.SMTP("172.21.130.12", 25)
-        server.login(sender_email, sender_password)
         logger.info("Login successful!")
         server.sendmail(sender_email, email, message.as_string())
         
@@ -1542,7 +1545,7 @@ def clean_and_format_amount(amt):
     match = re.search(r'\d+(?:\.\d{1,2})?', amt)
     if match:
         number = float(match.group())
-        return f"{number:,.2f}"
+        return f"{number:,.2f}" 
     else:
         return "Invalid amount"
         
@@ -1731,8 +1734,8 @@ async def job_check_payment_form_bank():
         if conn:
             conn.close()
 
-async def job_hourly_sequence():
-    await job_check_payment_form_bank()
+def job_hourly_sequence():
+    job_check_payment_form_bank()
     job_send_data_notes()
 
 
@@ -1793,6 +1796,36 @@ async def load_data_from_sap(request: Request, conn=Depends(get_sap_connection))
         raise HTTPException(status_code=500, detail=f"SAP error occurred: {e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    
+    
+    
+@app.post("/send_load_data_email") 
+def send_load_data_email():
+    sender_email = "InformationSystem@sisthai.com"
+    sender_password = "New@191243"
+    subject = "Test!"
+    email= "Chaitanachote@sisthai.com"
+    cc_list = ["Chaitanachote@sisthai.com"]
+    
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = email
+    message["Cc"] = ", ".join(cc_list)
+    message["Subject"] = subject
+    body = f"""
+    """
+    message.attach(MIMEText(body, "html"))
+    try: 
+        logger.info("Connecting to SMTP server...")
+        server = smtplib.SMTP("172.21.130.12", 25)
+        # server.login(sender_email, sender_password)
+        # logger.info("Login successful!")
+        server.sendmail(sender_email, email, message.as_string())
+        
+        server.quit()
+        logger.info("Email sent successfully!")
+    except Exception as e:
+        logger.info(f"Failed to send email: {e}")
 
 # -------------------------- Test load data end ----------------------------
 
